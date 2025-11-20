@@ -1,0 +1,45 @@
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+
+// Define public routes that don't require authentication
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/about',
+  '/residential',
+  '/contact',
+  '/projects(.*)',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/api/webhooks(.*)',
+  '/admin/login(.*)'  // Catch-all for admin login routes
+]);
+
+// Define admin routes that require authentication
+const isAdminRoute = createRouteMatcher([
+  '/admin(.*)'
+]);
+
+// Admin login page should be public (catch-all pattern)
+const isPublicAdminRoute = createRouteMatcher([
+  '/admin/login(.*)'  // Catch-all pattern to match all login sub-routes
+]);
+
+export default clerkMiddleware(async (auth, request) => {
+  // Protect admin routes - require authentication (except login page)
+  if (isAdminRoute(request) && !isPublicAdminRoute(request)) {
+    const { userId } = await auth();
+    if (!userId) {
+      const signInUrl = new URL('/admin/login', request.url);
+      return NextResponse.redirect(signInUrl);
+    }
+  }
+});
+
+export const config = {
+  matcher: [
+    // Skip Next.js internals and all static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+};
