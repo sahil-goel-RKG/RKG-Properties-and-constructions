@@ -64,25 +64,29 @@ export default function AddListingPage() {
     location: '',
     locationOther: '',
     area: '',
-    areaOther: '',
-    type: 'residential',
+    type: 'apartment',
     developer: '',
     developerOther: '',
     amenities: [], // Changed to array
     price: '',
-    price_min: '',
-    price_max: '',
-    carpet_area_min: '',
-    carpet_area_max: '',
     project_status: '',
-    rera_number: '',
     possession_date: '',
     is_featured: false,
-    bhk_config: '',
+    tower_bhk_config: [{ // Array of tower configurations
+      tower_number: 1,
+      bhk: '',
+      area_sqft: '',
+      flats_per_floor: '',
+      floors_in_tower: '',
+      lifts: '',
+      penthouse: false,
+      parking_per_floor: ''
+    }],
     total_towers: '',
     total_units: '',
-    parking: '',
     facing: '',
+    club_house: false,
+    club_house_area: '',
     project_highlights: '',
     nearby_landmarks: '',
     connectivity: '',
@@ -230,20 +234,14 @@ export default function AddListingPage() {
         return
       }
 
-      if (formData.area === 'other' && !formData.areaOther.trim()) {
-        setError('Please enter an area range when selecting "Other"')
-        setLoading(false)
-        return
-      }
-
       // Determine final location value
       const finalLocation = formData.location === 'other' ? formData.locationOther.trim() : formData.location
       
       // Determine final developer value
       const finalDeveloper = formData.developer === 'other' ? formData.developerOther.trim() : (formData.developer || null)
 
-      // Determine final area value
-      const finalArea = formData.area === 'other' ? formData.areaOther.trim() : (formData.area || null)
+      // Determine final area value (now a single value, not a range)
+      const finalArea = formData.area && formData.area.trim() !== '' ? formData.area.trim() : null
 
       // Upload cover image
       let coverImageUrl = null
@@ -261,6 +259,29 @@ export default function AddListingPage() {
         additionalImageUrls.push(imageUrl)
       }
 
+      // Prepare tower_bhk_config JSON
+      let towerBhkConfigJson = null
+      if (formData.tower_bhk_config && Array.isArray(formData.tower_bhk_config) && formData.tower_bhk_config.length > 0) {
+        try {
+          towerBhkConfigJson = JSON.stringify(formData.tower_bhk_config)
+        } catch (jsonError) {
+          console.error('Error stringifying tower_bhk_config:', jsonError, formData.tower_bhk_config)
+          // Continue without tower_bhk_config if JSON stringify fails
+        }
+      }
+
+      // Prepare bhk_config array
+      const bhkConfigArray = formData.tower_bhk_config && Array.isArray(formData.tower_bhk_config) && formData.tower_bhk_config.length > 0
+        ? formData.tower_bhk_config.map(t => t && t.bhk ? t.bhk : null).filter(Boolean)
+        : []
+
+      console.log('Submitting project with data:', {
+        name: formData.name,
+        slug: formData.slug,
+        tower_bhk_config: towerBhkConfigJson,
+        bhk_config: bhkConfigArray
+      })
+
       // Insert project into database
       const { data: project, error: projectError } = await supabase
         .from('projects')
@@ -270,34 +291,34 @@ export default function AddListingPage() {
           location: finalLocation,
           area: finalArea,
           price: formData.price ? Number(formData.price) : null,
-          price_min: formData.price_min ? Number(formData.price_min) : null,
-          price_max: formData.price_max ? Number(formData.price_max) : null,
           type: formData.type,
           developer: finalDeveloper,
           short_description: formData.short_description || null,
           full_description: formData.full_description || null,
           image_url: coverImageUrl,
-          amenities: formData.amenities.length > 0 ? formData.amenities : null,
-          carpet_area_min: formData.carpet_area_min ? Number(formData.carpet_area_min) : null,
-          carpet_area_max: formData.carpet_area_max ? Number(formData.carpet_area_max) : null,
+          amenities: formData.amenities && Array.isArray(formData.amenities) && formData.amenities.length > 0 ? formData.amenities : null,
           project_status: formData.project_status && formData.project_status.trim() !== '' ? formData.project_status.trim() : null,
-          rera_number: formData.rera_number || null,
-          possession_date: formData.possession_date || null,
+          possession_date: formData.possession_date && formData.possession_date.trim() !== '' ? formData.possession_date.trim() : null,
           is_featured: formData.is_featured || false,
-          bhk_config: formData.bhk_config ? formData.bhk_config.split(',').map(s => s.trim()).filter(Boolean) : [],
+          bhk_config: bhkConfigArray,
+          tower_bhk_config: towerBhkConfigJson,
           project_highlights: formData.project_highlights ? formData.project_highlights.split(',').map(s => s.trim()).filter(Boolean) : [],
           nearby_landmarks: formData.nearby_landmarks ? formData.nearby_landmarks.split(',').map(s => s.trim()).filter(Boolean) : [],
           connectivity: formData.connectivity || null,
           payment_plan: formData.payment_plan || null,
           total_towers: formData.total_towers ? Number(formData.total_towers) : null,
           total_units: formData.total_units ? Number(formData.total_units) : null,
-          parking: formData.parking ? Number(formData.parking) : null,
-          facing: formData.facing || null
+          facing: formData.type === 'builder-floor' ? (formData.facing || null) : null,
+          club_house: formData.club_house || false,
+          club_house_area: formData.club_house && formData.club_house_area ? formData.club_house_area : null
         })
         .select()
         .single()
 
-      if (projectError) throw projectError
+      if (projectError) {
+        console.error('Database error:', projectError)
+        throw projectError
+      }
 
       // Automatically sync developer if a developer is specified
       if (finalDeveloper && finalDeveloper.trim()) {
@@ -338,8 +359,12 @@ export default function AddListingPage() {
       }, 2000)
     } catch (err) {
       console.error('Error adding listing:', err)
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        cause: err.cause
+      })
       setError(err.message || 'Failed to add listing. Please try again.')
-    } finally {
       setLoading(false)
     }
   }
@@ -425,7 +450,7 @@ export default function AddListingPage() {
                   <span className="mt-2 text-xs text-gray-600 text-center">
                     {step === 1 && 'Basic Info'}
                     {step === 2 && 'Details'}
-                    {step === 3 && 'Images'}
+                    {step === 3 && 'Images & Payment'}
                     {step === 4 && 'Review'}
                   </span>
                 </div>
@@ -529,38 +554,25 @@ export default function AddListingPage() {
 
               <div>
                 <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-2">
-                  Area
+                  Total Parcel area (acres)
                 </label>
-                <select
+                <input
+                  type="text"
                   id="area"
-                  value={formData.area}
-                  onChange={(e) => setFormData({ ...formData, area: e.target.value, areaOther: '' })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900"
-                >
-                  <option value="">Select Area Range (Optional)</option>
-                  <option value="500-1000 sqft">500-1000 sqft</option>
-                  <option value="1000-1500 sqft">1000-1500 sqft</option>
-                  <option value="1500-2000 sqft">1500-2000 sqft</option>
-                  <option value="2000-2500 sqft">2000-2500 sqft</option>
-                  <option value="2500-3000 sqft">2500-3000 sqft</option>
-                  <option value="3000-3500 sqft">3000-3500 sqft</option>
-                  <option value="3500-4000 sqft">3500-4000 sqft</option>
-                  <option value="4000-5000 sqft">4000-5000 sqft</option>
-                  <option value="5000-7000 sqft">5000-7000 sqft</option>
-                  <option value="7000-10000 sqft">7000-10000 sqft</option>
-                  <option value="10000+ sqft">10000+ sqft</option>
-                  <option value="other">Other (Custom Range)</option>
-                </select>
-                {formData.area === 'other' && (
-                  <input
-                    type="text"
-                    value={formData.areaOther}
-                    onChange={(e) => setFormData({ ...formData, areaOther: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] mt-2 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="e.g., 1500-1800 sqft or 2500 sqft"
-                    required
-                  />
-                )}
+                  value={formData.area || ''}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    // Allow empty, or positive numbers (including decimals)
+                    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                      const numValue = parseFloat(value)
+                      if (value === '' || (numValue >= 0 && !isNaN(numValue))) {
+                        setFormData({ ...formData, area: value })
+                      }
+                    }
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="e.g., 2.5"
+                />
               </div>
 
               <div>
@@ -571,10 +583,18 @@ export default function AddListingPage() {
                   id="type"
                   required
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  onChange={(e) => {
+                    const newType = e.target.value
+                    setFormData({ 
+                      ...formData, 
+                      type: newType,
+                      // Clear facing when changing from builder-floor to apartment
+                      facing: newType === 'apartment' ? '' : formData.facing
+                    })
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900"
                 >
-                  <option value="residential">Residential</option>
+                  <option value="apartment">Apartments</option>
                   <option value="builder-floor">Builder Floor</option>
                 </select>
               </div>
@@ -713,95 +733,235 @@ export default function AddListingPage() {
 
 
               <div>
-                <label htmlFor="carpet_area_min" className="block text-sm font-medium text-gray-700 mb-2">
-                  Carpet Area Min (sqft)
-                </label>
-                <input
-                  type="number"
-                  id="carpet_area_min"
-                  value={formData.carpet_area_min || ''}
-                  onChange={(e) => setFormData({ ...formData, carpet_area_min: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="carpet_area_max" className="block text-sm font-medium text-gray-700 mb-2">
-                  Carpet Area Max (sqft)
-                </label>
-                <input
-                  type="number"
-                  id="carpet_area_max"
-                  value={formData.carpet_area_max || ''}
-                  onChange={(e) => setFormData({ ...formData, carpet_area_max: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="price_min" className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Min (₹)
-                </label>
-                <input
-                  type="number"
-                  id="price_min"
-                  value={formData.price_min || ''}
-                  onChange={(e) => setFormData({ ...formData, price_min: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="price_max" className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Max (₹)
-                </label>
-                <input
-                  type="number"
-                  id="price_max"
-                  value={formData.price_max || ''}
-                  onChange={(e) => setFormData({ ...formData, price_max: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="rera_number" className="block text-sm font-medium text-gray-700 mb-2">
-                  RERA Number
-                </label>
-                <input
-                  type="text"
-                  id="rera_number"
-                  value={formData.rera_number || ''}
-                  onChange={(e) => setFormData({ ...formData, rera_number: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
                 <label htmlFor="possession_date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Possession Date
+                  Possession (Year)
                 </label>
                 <input
-                  type="date"
+                  type="number"
                   id="possession_date"
+                  min="2020"
+                  max="2050"
                   value={formData.possession_date || ''}
-                  onChange={(e) => setFormData({ ...formData, possession_date: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900"
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || (Number(value) >= 2020 && Number(value) <= 2050)) {
+                      setFormData({ ...formData, possession_date: value })
+                    }
+                  }}
+                  placeholder="e.g., 2025"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
                 />
               </div>
 
-              <div>
-                <label htmlFor="bhk_config" className="block text-sm font-medium text-gray-700 mb-2">
-                  BHK Config (comma separated)
-                </label>
-                <input
-                  type="text"
-                  id="bhk_config"
-                  value={formData.bhk_config || ''}
-                  onChange={(e) => setFormData({ ...formData, bhk_config: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="2BHK, 3BHK, 4BHK"
-                />
+              {/* BHK Configuration Section */}
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    BHK Configuration
+                  </label>
+                </div>
+                <div className="space-y-6">
+                  {formData.tower_bhk_config.map((tower, index) => (
+                    <div key={index} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Tower {tower.tower_number}</h3>
+                        {index > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newTowers = formData.tower_bhk_config.filter((_, i) => i !== index)
+                              setFormData({ ...formData, tower_bhk_config: newTowers })
+                            }}
+                            className="text-red-600 hover:text-red-800 text-sm font-medium"
+                          >
+                            Remove Tower
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            BHK
+                          </label>
+                          <input
+                            type="text"
+                            value={tower.bhk || ''}
+                            onChange={(e) => {
+                              const inputValue = e.target.value
+                              // Auto-append BHK to numbers (handles comma and space separated)
+                              const processedValue = inputValue
+                                .split(/[, ]+/)
+                                .map(item => {
+                                  const trimmed = item.trim()
+                                  // If it's just a number or number with spaces, add BHK
+                                  if (/^\d+$/.test(trimmed)) {
+                                    return trimmed + 'BHK'
+                                  }
+                                  // If it already has BHK, keep it
+                                  if (trimmed.toLowerCase().includes('bhk')) {
+                                    return trimmed
+                                  }
+                                  // Otherwise return as is
+                                  return trimmed
+                                })
+                                .join(', ')
+                              
+                              const newTowers = [...formData.tower_bhk_config]
+                              newTowers[index].bhk = processedValue
+                              setFormData({ ...formData, tower_bhk_config: newTowers })
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., 2, 3 (auto becomes 2BHK, 3BHK)"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Area (acres)
+                          </label>
+                          <input
+                            type="text"
+                            value={tower.area_sqft || ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              // Allow empty, or positive numbers (including decimals)
+                              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                const numValue = parseFloat(value)
+                                if (value === '' || (numValue >= 0 && !isNaN(numValue))) {
+                                  const newTowers = [...formData.tower_bhk_config]
+                                  newTowers[index].area_sqft = value
+                                  setFormData({ ...formData, tower_bhk_config: newTowers })
+                                }
+                              }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., 0.5-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Flats/Floor
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={tower.flats_per_floor || ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              if (value === '' || Number(value) >= 0) {
+                                const newTowers = [...formData.tower_bhk_config]
+                                newTowers[index].flats_per_floor = value
+                                setFormData({ ...formData, tower_bhk_config: newTowers })
+                              }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., 4"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Floors in Tower
+                          </label>
+                          <input
+                            type="text"
+                            value={tower.floors_in_tower || ''}
+                            onChange={(e) => {
+                              const newTowers = [...formData.tower_bhk_config]
+                              newTowers[index].floors_in_tower = e.target.value
+                              setFormData({ ...formData, tower_bhk_config: newTowers })
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., G+14"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            No. of Lifts
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={tower.lifts || ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              if (value === '' || Number(value) >= 0) {
+                                const newTowers = [...formData.tower_bhk_config]
+                                newTowers[index].lifts = value
+                                setFormData({ ...formData, tower_bhk_config: newTowers })
+                              }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., 2"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={`penthouse-${index}`}
+                            checked={tower.penthouse || false}
+                            onChange={(e) => {
+                              const newTowers = [...formData.tower_bhk_config]
+                              newTowers[index].penthouse = e.target.checked
+                              setFormData({ ...formData, tower_bhk_config: newTowers })
+                            }}
+                            className="w-4 h-4 text-[#c99700] border-gray-300 rounded focus:ring-[#ffd86b] focus:ring-2"
+                          />
+                          <label htmlFor={`penthouse-${index}`} className="ml-2 text-sm font-medium text-gray-700">
+                            Penthouse
+                          </label>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Parking/Floor
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={tower.parking_per_floor || ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              // Prevent negative values
+                              if (value === '' || (Number(value) >= 0)) {
+                                const newTowers = [...formData.tower_bhk_config]
+                                newTowers[index].parking_per_floor = value
+                                setFormData({ ...formData, tower_bhk_config: newTowers })
+                              }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., 4"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextTowerNumber = formData.tower_bhk_config.length + 1
+                      setFormData({
+                        ...formData,
+                        tower_bhk_config: [
+                          ...formData.tower_bhk_config,
+                          {
+                            tower_number: nextTowerNumber,
+                            bhk: '',
+                            area_sqft: '',
+                            flats_per_floor: '',
+                            floors_in_tower: '',
+                            lifts: '',
+                            penthouse: false,
+                            parking_per_floor: ''
+                          }
+                        ]
+                      })
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-700 hover:border-[#c99700] hover:text-[#c99700] transition"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Another Tower
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -811,8 +971,14 @@ export default function AddListingPage() {
                 <input
                   type="number"
                   id="total_towers"
+                  min="0"
                   value={formData.total_towers || ''}
-                  onChange={(e) => setFormData({ ...formData, total_towers: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || Number(value) >= 0) {
+                      setFormData({ ...formData, total_towers: value })
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
                 />
               </div>
@@ -824,45 +990,65 @@ export default function AddListingPage() {
                 <input
                   type="number"
                   id="total_units"
+                  min="0"
                   value={formData.total_units || ''}
-                  onChange={(e) => setFormData({ ...formData, total_units: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '' || Number(value) >= 0) {
+                      setFormData({ ...formData, total_units: value })
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
                 />
               </div>
 
-              <div>
-                <label htmlFor="parking" className="block text-sm font-medium text-gray-700 mb-2">
-                  Parking Spaces
-                </label>
-                <input
-                  type="number"
-                  id="parking"
-                  value={formData.parking || ''}
-                  onChange={(e) => setFormData({ ...formData, parking: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
+              {formData.type === 'builder-floor' && (
+                <div>
+                  <label htmlFor="facing" className="block text-sm font-medium text-gray-700 mb-2">
+                    Facing
+                  </label>
+                  <select
+                    id="facing"
+                    value={formData.facing || ''}
+                    onChange={(e) => setFormData({ ...formData, facing: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900"
+                  >
+                    <option value="">Select Facing</option>
+                    <option value="North">North</option>
+                    <option value="South">South</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                    <option value="North-East">North-East</option>
+                    <option value="North-West">North-West</option>
+                    <option value="South-East">South-East</option>
+                    <option value="South-West">South-West</option>
+                  </select>
+                </div>
+              )}
 
               <div>
-                <label htmlFor="facing" className="block text-sm font-medium text-gray-700 mb-2">
-                  Facing
-                </label>
-                <select
-                  id="facing"
-                  value={formData.facing || ''}
-                  onChange={(e) => setFormData({ ...formData, facing: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900"
-                >
-                  <option value="">Select Facing</option>
-                  <option value="North">North</option>
-                  <option value="South">South</option>
-                  <option value="East">East</option>
-                  <option value="West">West</option>
-                  <option value="North-East">North-East</option>
-                  <option value="North-West">North-West</option>
-                  <option value="South-East">South-East</option>
-                  <option value="South-West">South-West</option>
-                </select>
+                <div className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id="club_house"
+                    checked={formData.club_house}
+                    onChange={(e) => setFormData({ ...formData, club_house: e.target.checked, club_house_area: e.target.checked ? formData.club_house_area : '' })}
+                    className="w-4 h-4 text-[#c99700] border-gray-300 rounded focus:ring-[#ffd86b] focus:ring-2"
+                  />
+                  <label htmlFor="club_house" className="ml-2 text-sm font-medium text-gray-700">
+                    Club House
+                  </label>
+                </div>
+                {formData.club_house && (
+                  <input
+                    type="text"
+                    id="club_house_area"
+                    value={formData.club_house_area || ''}
+                    onChange={(e) => setFormData({ ...formData, club_house_area: e.target.value })}
+                    placeholder="Enter club house area (e.g., 5000 sqft)"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400 mt-2"
+                  />
+                )}
               </div>
 
               <div className="md:col-span-2">
@@ -919,19 +1105,6 @@ export default function AddListingPage() {
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label htmlFor="payment_plan" className="block text-sm font-medium text-gray-700 mb-2">
-                  Payment Plan
-                </label>
-                <textarea
-                  id="payment_plan"
-                  rows={3}
-                  value={formData.payment_plan || ''}
-                  onChange={(e) => setFormData({ ...formData, payment_plan: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Payment plan details..."
-                />
-              </div>
             </div>
           </div>
           )}
@@ -1026,8 +1199,8 @@ export default function AddListingPage() {
                     <span className="ml-2 text-gray-900">{formData.location === 'other' ? formData.locationOther : formData.location || '-'}</span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700">Area:</span>
-                    <span className="ml-2 text-gray-900">{formData.area === 'other' ? formData.areaOther : formData.area || '-'}</span>
+                    <span className="font-medium text-gray-700">Total Parcel area:</span>
+                    <span className="ml-2 text-gray-900">{formData.area ? `${formData.area} acres` : '-'}</span>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Type:</span>
@@ -1065,7 +1238,7 @@ export default function AddListingPage() {
               </div>
 
               {/* Additional Details Review */}
-              {(formData.price || formData.project_status || formData.short_description || formData.full_description || formData.carpet_area_min || formData.price_min || formData.rera_number || formData.bhk_config || formData.total_towers) && (
+              {(formData.price || formData.project_status || formData.short_description || formData.full_description || formData.bhk_config || formData.total_towers) && (
                 <div className="border-b border-gray-200 pb-4">
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">Additional Details</h3>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
@@ -1075,40 +1248,39 @@ export default function AddListingPage() {
                         <span className="ml-2 text-gray-900">₹{Number(formData.price).toLocaleString('en-IN')}</span>
                       </div>
                     )}
-                    {formData.price_min && formData.price_max && (
-                      <div>
-                        <span className="font-medium text-gray-700">Price Range:</span>
-                        <span className="ml-2 text-gray-900">₹{Number(formData.price_min).toLocaleString('en-IN')} - ₹{Number(formData.price_max).toLocaleString('en-IN')}</span>
-                      </div>
-                    )}
                     {formData.project_status && (
                       <div>
                         <span className="font-medium text-gray-700">Status:</span>
                         <span className="ml-2 text-gray-900 capitalize">{formData.project_status.replace('-', ' ')}</span>
                       </div>
                     )}
-                    {formData.carpet_area_min && formData.carpet_area_max && (
-                      <div>
-                        <span className="font-medium text-gray-700">Carpet Area:</span>
-                        <span className="ml-2 text-gray-900">{formData.carpet_area_min} - {formData.carpet_area_max} sqft</span>
-                      </div>
-                    )}
-                    {formData.bhk_config && (
-                      <div>
-                        <span className="font-medium text-gray-700">BHK Config:</span>
-                        <span className="ml-2 text-gray-900">{formData.bhk_config}</span>
-                      </div>
-                    )}
-                    {formData.rera_number && (
-                      <div>
-                        <span className="font-medium text-gray-700">RERA Number:</span>
-                        <span className="ml-2 text-gray-900">{formData.rera_number}</span>
+                    {formData.tower_bhk_config.length > 0 && formData.tower_bhk_config.some(t => t.bhk) && (
+                      <div className="md:col-span-2">
+                        <span className="font-medium text-gray-700">BHK Configuration:</span>
+                        <div className="mt-2 space-y-2">
+                          {formData.tower_bhk_config.map((tower, idx) => (
+                            tower.bhk && (
+                              <div key={idx} className="pl-4 border-l-2 border-gray-300">
+                                <p className="font-semibold text-gray-800">Tower {tower.tower_number}</p>
+                                <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 mt-1">
+                                  {tower.bhk && <span>BHK: {tower.bhk}</span>}
+                                  {tower.area_sqft && <span>Area: {tower.area_sqft} acres</span>}
+                                  {tower.flats_per_floor && <span>Flats/Floor: {tower.flats_per_floor}</span>}
+                                  {tower.floors_in_tower && <span>Floors: {tower.floors_in_tower}</span>}
+                                  {tower.lifts && <span>Lifts: {tower.lifts}</span>}
+                                  {tower.penthouse && <span className="text-[#c99700]">Penthouse: Yes</span>}
+                                  {tower.parking_per_floor && <span>Parking/Floor: {tower.parking_per_floor}</span>}
+                                </div>
+                              </div>
+                            )
+                          ))}
+                        </div>
                       </div>
                     )}
                     {formData.possession_date && (
                       <div>
-                        <span className="font-medium text-gray-700">Possession Date:</span>
-                        <span className="ml-2 text-gray-900">{formData.possession_date ? new Date(formData.possession_date + 'T00:00:00').toLocaleDateString() : '-'}</span>
+                        <span className="font-medium text-gray-700">Possession:</span>
+                        <span className="ml-2 text-gray-900">{formData.possession_date}</span>
                       </div>
                     )}
                     {formData.total_towers && (
@@ -1123,13 +1295,7 @@ export default function AddListingPage() {
                         <span className="ml-2 text-gray-900">{formData.total_units}</span>
                       </div>
                     )}
-                    {formData.parking && (
-                      <div>
-                        <span className="font-medium text-gray-700">Parking:</span>
-                        <span className="ml-2 text-gray-900">{formData.parking} spaces</span>
-                      </div>
-                    )}
-                    {formData.facing && (
+                    {formData.type === 'builder-floor' && formData.facing && (
                       <div>
                         <span className="font-medium text-gray-700">Facing:</span>
                         <span className="ml-2 text-gray-900">{formData.facing}</span>
@@ -1181,6 +1347,21 @@ export default function AddListingPage() {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Payment Plan */}
+            <div className="mb-6">
+              <label htmlFor="payment_plan" className="block text-sm font-medium text-gray-700 mb-2">
+                Payment Plan
+              </label>
+              <textarea
+                id="payment_plan"
+                rows={4}
+                value={formData.payment_plan || ''}
+                onChange={(e) => setFormData({ ...formData, payment_plan: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                placeholder="Payment plan details..."
+              />
             </div>
           </div>
           )}

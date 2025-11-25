@@ -10,7 +10,7 @@ export default function ResidentialFilters({
   types = [],
   showDeveloperFilter = true,
   showTypeFilter = false,
-  basePath = '/residential'
+  basePath = '/apartments'
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()

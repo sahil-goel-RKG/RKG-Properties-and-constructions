@@ -122,6 +122,11 @@ export default function EditPropertyPage() {
           if (!['builder-floor', 'builder floor', 'builder_floor'].includes(project.type)) {
             return false
           }
+        } else if (typeFilter === 'apartment') {
+          // Handle both 'apartment' and legacy 'residential' types
+          if (project.type !== 'apartment' && project.type !== 'residential') {
+            return false
+          }
         } else if (project.type !== typeFilter) {
           return false
         }
@@ -298,7 +303,7 @@ export default function EditPropertyPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c99700] focus:border-transparent text-gray-900 bg-white"
                   >
                     <option value="all">All Types</option>
-                    <option value="residential">Residential</option>
+                    <option value="apartment">Apartments</option>
                     <option value="builder-floor">Builder Floor</option>
                   </select>
                 </div>

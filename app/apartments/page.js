@@ -1,5 +1,6 @@
 import ProjectCard from '@/components/ProjectCard'
 import ResidentialFilters from '@/components/ResidentialFilters'
+import Pagination from '@/components/Pagination'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { cache } from 'react'
 import Link from 'next/link'
@@ -14,7 +15,7 @@ const getUniqueLocations = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('location')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .not('location', 'is', null)
 
     if (error) {
@@ -36,7 +37,7 @@ const getUniqueDevelopers = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('developer')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .not('developer', 'is', null)
 
     if (error) {
@@ -58,7 +59,7 @@ const getUniqueAreas = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('area')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .not('area', 'is', null)
 
     if (error) {
@@ -74,13 +75,15 @@ const getUniqueAreas = cache(async () => {
   }
 })
 
-async function getResidentialProjects(location = null, developer = null, area = null) {
+const ITEMS_PER_PAGE = 12
+
+async function getResidentialProjectsCount(location = null, developer = null, area = null) {
   try {
     const supabase = createServerSupabaseClient()
     let query = supabase
       .from('projects')
-      .select('id, name, slug, location, developer, area, price, image_url, type, short_description, bhk_config, project_status, is_featured')
-      .eq('type', 'residential')
+      .select('id', { count: 'exact', head: true })
+      .eq('type', 'apartment')
 
     if (location) {
       query = query.ilike('location', `%${location}%`)
@@ -94,8 +97,46 @@ async function getResidentialProjects(location = null, developer = null, area = 
       query = query.ilike('area', `%${area}%`)
     }
 
-    query = query.order('is_featured', { ascending: false })
+    const { count, error } = await query
+
+    if (error) {
+      console.error('Error fetching projects count:', error)
+      return 0
+    }
+
+    return count || 0
+  } catch (error) {
+    console.error('Error fetching projects count:', error)
+    return 0
+  }
+}
+
+async function getResidentialProjects(location = null, developer = null, area = null, page = 1, limit = ITEMS_PER_PAGE) {
+  try {
+    const supabase = createServerSupabaseClient()
+    const offset = (page - 1) * limit
+    
+    let query = supabase
+      .from('projects')
+      .select('id, name, slug, location, developer, area, price, image_url, type, short_description, bhk_config, project_status, is_featured')
+      .eq('type', 'apartment')
+
+    if (location) {
+      query = query.ilike('location', `%${location}%`)
+    }
+
+    if (developer) {
+      query = query.ilike('developer', `%${developer}%`)
+    }
+
+    if (area) {
+      query = query.ilike('area', `%${area}%`)
+    }
+
+    query = query
+      .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
 
     const { data, error } = await query
 
@@ -112,8 +153,8 @@ async function getResidentialProjects(location = null, developer = null, area = 
 }
 
 export const metadata = {
-  title: 'Residential Projects | RKG Properties and Constructions',
-  description: 'Browse our premium residential projects in Gurgaon',
+  title: 'Apartments | RKG Properties and Constructions',
+  description: 'Browse our premium apartment projects in Gurgaon',
 }
 
 export default async function ResidentialPage({ searchParams }) {
@@ -122,14 +163,18 @@ export default async function ResidentialPage({ searchParams }) {
   const locationFilter = params?.location || null
   const developerFilter = params?.developer || null
   const areaFilter = params?.area || null
+  const currentPage = Math.max(1, parseInt(params?.page || '1', 10))
 
   // Fetch all data in parallel for faster loading
-  const [projects, locations, developers, areas] = await Promise.all([
-    getResidentialProjects(locationFilter, developerFilter, areaFilter),
+  const [projects, totalCount, locations, developers, areas] = await Promise.all([
+    getResidentialProjects(locationFilter, developerFilter, areaFilter, currentPage, ITEMS_PER_PAGE),
+    getResidentialProjectsCount(locationFilter, developerFilter, areaFilter),
     getUniqueLocations(),
     getUniqueDevelopers(),
     getUniqueAreas()
   ])
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
   // Build filter description text
   const filterText = []
@@ -150,17 +195,34 @@ export default async function ResidentialPage({ searchParams }) {
     if (filterToClear !== 'area' && areaFilter) {
       newParams.set('area', areaFilter)
     }
+    // Reset to page 1 when clearing filters
     const queryString = newParams.toString()
-    return queryString ? `/residential?${queryString}` : '/residential'
+    return queryString ? `/apartments?${queryString}` : '/apartments'
+  }
+
+  // Build base URL for pagination (preserves filters)
+  const getBaseUrl = () => {
+    const newParams = new URLSearchParams()
+    if (locationFilter) {
+      newParams.set('location', locationFilter)
+    }
+    if (developerFilter) {
+      newParams.set('developer', developerFilter)
+    }
+    if (areaFilter) {
+      newParams.set('area', areaFilter)
+    }
+    const queryString = newParams.toString()
+    return queryString ? `/apartments?${queryString}` : '/apartments'
   }
 
   return (
     <div className="min-h-screen bg-gray-50 py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Residential Projects</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Apartments</h1>
           <p className="text-xl text-gray-600">
-            Discover premium residential properties in Gurgaon
+            Discover premium apartment properties in Gurgaon
           </p>
         </div>
 
@@ -216,7 +278,7 @@ export default async function ResidentialPage({ searchParams }) {
           <>
             <div className="mb-6 text-gray-600">
               <p>
-                {projects.length} {projects.length === 1 ? 'property' : 'properties'} found
+                {totalCount} {totalCount === 1 ? 'property' : 'properties'} found
                 {hasFilters && ` (${filterText.join(', ')})`}
               </p>
             </div>
@@ -225,24 +287,31 @@ export default async function ResidentialPage({ searchParams }) {
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl={getBaseUrl()}
+              totalItems={totalCount}
+              itemsPerPage={ITEMS_PER_PAGE}
+            />
           </>
         ) : (
           <div className="text-center py-12 bg-white rounded-lg shadow-md">
             {hasFilters ? (
               <>
                 <p className="text-gray-600 mb-4">
-                  No residential projects found {hasFilters && `with ${filterText.join(' and ')}`}.
+                  No apartment projects found {hasFilters && `with ${filterText.join(' and ')}`}.
                 </p>
                 <Link
-                  href="/residential"
+                  href="/apartments"
                   className="inline-block golden-text hover:text-[#a67800] hover:underline"
                 >
-                  View all residential projects
+                  View all apartment projects
                 </Link>
               </>
             ) : (
               <p className="text-gray-600 mb-4">
-                No residential projects found. Please add projects to your Supabase database.
+                No apartment projects found. Please add projects to your Supabase database.
               </p>
             )}
           </div>

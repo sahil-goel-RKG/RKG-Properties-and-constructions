@@ -7,10 +7,10 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function ProjectsSlider({
   projects,
-  title = 'Residential Projects',
-  description = 'Discover premium residential properties in Gurgaon',
-  ctaLabel = 'View All Residential Projects',
-  ctaHref = '/residential',
+  title = 'Apartments',
+  description = 'Discover premium apartment properties in Gurgaon',
+  ctaLabel = 'View All Apartments',
+  ctaHref = '/apartments',
   allowEmpty = false,
   emptyMessage = 'No projects available at the moment. Check back soon!',
   bgColor = 'bg-white',

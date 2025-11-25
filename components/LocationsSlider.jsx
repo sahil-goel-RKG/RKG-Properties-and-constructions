@@ -98,7 +98,7 @@ export default function LocationsSlider({ locations }) {
             {stableLocations.map((location) => (
               <Link
                 key={location}
-                href={`/residential?location=${encodeURIComponent(location)}`}
+                href={`/apartments?location=${encodeURIComponent(location)}`}
                 className="group px-6 py-3 rounded-full text-center transition-all duration-200 cursor-pointer border-2 border-[rgb(0,37,122)] hover:border-[rgb(0,50,150)] flex-shrink-0 whitespace-nowrap shadow-md hover:shadow-[0_10px_25px_rgba(0,37,122,0.4)] bg-transparent hover:bg-[rgb(0,37,122)]"
               >
                 <p className="font-semibold text-[rgb(0,37,122)] transition-all duration-200 group-hover:text-white">

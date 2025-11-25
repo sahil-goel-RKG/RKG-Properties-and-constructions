@@ -45,7 +45,7 @@ async function getDeveloperByName(developerName) {
 
     // Calculate stats
     const totalProjects = projects.length
-    const residentialProjects = projects.filter(p => p.type === 'residential').length
+    const residentialProjects = projects.filter(p => p.type === 'apartment').length
     const builderFloorProjects = projects.filter(p => p.type === 'builder-floor' || p.type === 'builder floor' || p.type === 'builder_floor').length
 
     return {
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }) {
 
   return {
     title: `${developerName} | RKG Properties and Constructions`,
-    description: `Explore premium properties by ${developerName}. Browse residential and builder floor projects.`,
+    description: `Explore premium properties by ${developerName}. Browse apartments and builder floor projects.`,
   }
 }
 
@@ -170,7 +170,7 @@ export default async function DeveloperDetailPage({ params }) {
                     {developer.stats.residentialProjects}
                   </div>
                   <div className="text-gray-700 font-medium">
-                    Residential Projects
+                    Apartments
                   </div>
                 </div>
                 <div className="bg-gray-50 p-6 rounded-lg text-center">
@@ -254,7 +254,7 @@ export default async function DeveloperDetailPage({ params }) {
                   {developerName} is a renowned real estate developer with a strong presence in the market. 
                   With {developer.stats.totalProjects} projects across {developer.locations.length} locations, 
                   they have established themselves as a trusted name in the industry. Their portfolio includes 
-                  premium residential projects and builder floor developments, each designed with attention to 
+                  premium apartment projects and builder floor developments, each designed with attention to 
                   detail and quality craftsmanship.
                 </p>
               </div>

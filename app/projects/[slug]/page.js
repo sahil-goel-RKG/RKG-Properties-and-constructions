@@ -6,6 +6,7 @@ import Link from 'next/link'
 import ProjectImageGallery from '@/components/ProjectImageGallery'
 import { formatPriceLabel } from '@/lib/formatPrice'
 import { developerNameToSlug } from '@/lib/developerUtils'
+import BHKConfigurationSlider from '@/components/BHKConfigurationSlider'
 
 // Cache the project fetch for faster loads
 const getProject = cache(async (slug) => {
@@ -95,19 +96,28 @@ export default async function ProjectDetailPage({ params }) {
 
   // Format area display
   const formatAreaDisplay = () => {
-    if (project.carpet_area_min && project.carpet_area_max) {
-      if (project.carpet_area_min === project.carpet_area_max) {
-        return `${project.carpet_area_min} sq. ft.`
-      }
-      return `${project.carpet_area_min} - ${project.carpet_area_max} sq. ft.`
+    if (!project.area) {
+      return 'Not specified'
     }
-    if (project.super_area_min && project.super_area_max) {
-      if (project.super_area_min === project.super_area_max) {
-        return `${project.super_area_min} sq. yd.`
-      }
-      return `${project.super_area_min} - ${project.super_area_max} sq. yd.`
+    // If area already contains "acres", return as is
+    if (project.area.toLowerCase().includes('acres')) {
+      return project.area
     }
-    return project.area || 'Not specified'
+    // If area contains "sqft", convert to acres (1 acre = 43560 sqft) - for legacy data
+    if (project.area.toLowerCase().includes('sqft')) {
+      const match = project.area.match(/(\d+)/i)
+      if (match) {
+        const sqft = parseFloat(match[1])
+        const acres = (sqft / 43560).toFixed(2)
+        return `${acres} acres`
+      }
+    }
+    // Default: return area value with "acres" appended if not already present
+    const numericValue = project.area.replace(/[^\d.]/g, '')
+    if (numericValue && !project.area.toLowerCase().includes('acre')) {
+      return `${project.area} acres`
+    }
+    return project.area
   }
 
   // Format project status
@@ -232,25 +242,10 @@ export default async function ProjectDetailPage({ params }) {
                 </div>
               )}
 
-              {/* BHK Configuration */}
-              {project.bhk_config && project.bhk_config.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Available Configurations</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {project.bhk_config.map((bhk, index) => (
-                      <span
-                        key={index}
-                        className="px-4 py-2 bg-[#f70000] text-white rounded-lg font-semibold"
-                      >
-                        {bhk}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Key Details Grid */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {/* Project Information */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Project Information</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
                     <svg className="w-5 h-5 mr-2 golden-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,7 +262,7 @@ export default async function ProjectDetailPage({ params }) {
                     <svg className="w-5 h-5 mr-2 golden-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-                    Area
+                    Total Parcel area
                   </h3>
                   <p className="text-gray-700">{formatAreaDisplay()}</p>
                   {project.carpet_area_min && project.carpet_area_max && (
@@ -301,26 +296,12 @@ export default async function ProjectDetailPage({ params }) {
                   </div>
                 )}
 
-                {project.project_status && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Status</h3>
-                    {statusInfo && (
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${statusInfo.color}`}>
-                        {statusInfo.label}
-                      </span>
-                    )}
-                  </div>
-                )}
 
                 {project.possession_date && (
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="font-semibold text-gray-900 mb-2">Possession</h3>
                     <p className="text-gray-700">
-                      {new Date(project.possession_date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                      {project.possession_date}
                     </p>
                   </div>
                 )}
@@ -346,20 +327,54 @@ export default async function ProjectDetailPage({ params }) {
                   </div>
                 )}
 
-                {project.parking !== null && project.parking !== undefined && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Parking</h3>
-                    <p className="text-gray-700">{project.parking} {project.parking === 1 ? 'space' : 'spaces'}</p>
-                  </div>
-                )}
 
-                {project.facing && (
+                {project.type === 'builder-floor' && project.facing && (
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="font-semibold text-gray-900 mb-2">Facing</h3>
                     <p className="text-gray-700">{project.facing}</p>
                   </div>
                 )}
+
+                {project.club_house && (
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <h3 className="font-semibold text-gray-900 mb-2">Club House</h3>
+                    <p className="text-gray-700">
+                      {project.club_house_area ? project.club_house_area : 'Available'}
+                    </p>
+                  </div>
+                )}
+                </div>
               </div>
+
+              {/* BHK Configuration - Tower Based */}
+              {(() => {
+                let towerConfig = null
+                if (project.tower_bhk_config) {
+                  try {
+                    towerConfig = typeof project.tower_bhk_config === 'string' 
+                      ? JSON.parse(project.tower_bhk_config) 
+                      : project.tower_bhk_config
+                  } catch (e) {
+                    console.error('Error parsing tower_bhk_config:', e)
+                  }
+                }
+                
+                // Fallback to legacy bhk_config if tower_bhk_config not available
+                const hasTowerConfig = towerConfig && Array.isArray(towerConfig) && towerConfig.length > 0 && towerConfig.some(t => t.bhk)
+                const hasLegacyConfig = !hasTowerConfig && project.bhk_config && project.bhk_config.length > 0
+                
+                return (
+                  (hasTowerConfig || hasLegacyConfig) && (
+                    <div className="mb-8">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-6">BHK Configuration</h2>
+                      <BHKConfigurationSlider 
+                        towerConfig={hasTowerConfig ? towerConfig : null}
+                        legacyConfig={hasLegacyConfig ? project.bhk_config : null}
+                      />
+                    </div>
+                  )
+                )
+              })()}
 
               {/* Full Description */}
               {(project.full_description || project.description) && (
@@ -434,16 +449,6 @@ export default async function ProjectDetailPage({ params }) {
                 </div>
               )}
 
-              {/* Payment Plan */}
-              {project.payment_plan && (
-                <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Payment Plan</h2>
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">{project.payment_plan}</p>
-                  </div>
-                </div>
-              )}
-
               {/* Floor Plans & Documents */}
               {(project.floor_plan_url || project.brochure_url || project.video_url) && (
                 <div className="mb-8">
@@ -488,6 +493,16 @@ export default async function ProjectDetailPage({ params }) {
                         Watch Video
                       </a>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Plan */}
+              {project.payment_plan && (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Payment Plan</h2>
+                  <div className="bg-gray-50 p-6 rounded-lg">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">{project.payment_plan}</p>
                   </div>
                 </div>
               )}

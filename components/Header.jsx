@@ -1,16 +1,31 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
-const propertyTypes = [
-  { label: 'Residential Projects', href: '/residential' },
-  { label: 'Builder Floor Projects', href: '/builder-floor' },
+const propertySections = [
+  {
+    title: 'Apartments',
+    items: [
+      { label: 'Apartments', href: '/apartments' },
+      { label: 'Builder floors', href: '/builder-floor' },
+    ],
+  },
 ]
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isPropertyOpen, setIsPropertyOpen] = useState(false)
+  const closeTimeoutRef = useRef(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    }
+  }, [])
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
@@ -34,8 +49,21 @@ export default function Header() {
             </Link>
             <div
               className="relative h-full"
-              onMouseEnter={() => setIsPropertyOpen(true)}
-              onMouseLeave={() => setIsPropertyOpen(false)}
+              onMouseEnter={() => {
+                // Clear any pending close timeout
+                if (closeTimeoutRef.current) {
+                  clearTimeout(closeTimeoutRef.current)
+                  closeTimeoutRef.current = null
+                }
+                setIsPropertyOpen(true)
+              }}
+              onMouseLeave={() => {
+                // Set a 1 second delay before closing
+                closeTimeoutRef.current = setTimeout(() => {
+                  setIsPropertyOpen(false)
+                  closeTimeoutRef.current = null
+                }, 1000)
+              }}
             >
               <button
                 className="h-full px-4 flex items-center gap-2 text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition"
@@ -55,14 +83,21 @@ export default function Header() {
               </button>
               {isPropertyOpen && (
                 <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
-                  {propertyTypes.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#c99700] transition"
-                    >
-                      {item.label}
-                    </Link>
+                  {propertySections.map((section, sectionIndex) => (
+                    <div key={sectionIndex}>
+                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        {section.title}
+                      </div>
+                      {section.items.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="block px-4 py-2 pl-6 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#c99700] transition"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}
@@ -122,15 +157,22 @@ export default function Header() {
                 <span className="text-sm text-gray-500 group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="pl-4 space-y-2">
-                {propertyTypes.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="block py-1 text-gray-700 hover:text-[#c99700]"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
+                {propertySections.map((section, sectionIndex) => (
+                  <div key={sectionIndex}>
+                    <div className="py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      {section.title}
+                    </div>
+                    {section.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="block py-1 pl-2 text-gray-700 hover:text-[#c99700]"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
                 ))}
               </div>
             </details>

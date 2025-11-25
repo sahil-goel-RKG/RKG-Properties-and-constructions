@@ -19,7 +19,7 @@ const getResidentialProjects = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('id, name, slug, location, developer, area, price, image_url, type, short_description, bhk_config, project_status, is_featured')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(12)
@@ -65,7 +65,7 @@ const getHeroImages = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('image_url')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .not('image_url', 'is', null)
       .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false })
@@ -89,7 +89,7 @@ const getUniqueLocations = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('location')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .not('location', 'is', null)
 
     if (error) {
@@ -111,7 +111,7 @@ const getUniqueDevelopers = cache(async () => {
     const { data, error } = await supabase
       .from('projects')
       .select('developer')
-      .eq('type', 'residential')
+      .eq('type', 'apartment')
       .not('developer', 'is', null)
 
     if (error) {
@@ -174,7 +174,7 @@ export default async function Home() {
                 Buying, selling, or investing — We help clients achieve their real estate goals with market insight, negotiation expertise, and concierge-level service.
               </p>
               <div className="flex flex-wrap gap-4 mb-8">
-                <Link href="/residential" className="inline-block bg-white golden-text px-8 py-3 rounded-lg font-semibold hover:bg-[#fff2be] transition">
+                <Link href="/apartments" className="inline-block bg-white golden-text px-8 py-3 rounded-lg font-semibold hover:bg-[#fff2be] transition">
                   Browse Projects
                 </Link>
                 <a href="/pdf/Sahil Goel.pdf" download className="inline-block border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#c99700] transition">
