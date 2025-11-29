@@ -12,12 +12,12 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (isLoaded && !user) {
-      router.push('/admin/login')
-      return
-    }
-
-    if (user) {
+    if (isLoaded) {
+      if (!user) {
+        router.push('/admin/login')
+        return
+      }
+      // User is authenticated, fetch data
       fetchContactSubmissions()
     }
   }, [user, isLoaded, router])
@@ -74,12 +74,6 @@ export default function AdminDashboard() {
             ← Back to Website
           </Link>
           <div className="flex gap-3">
-            <Link
-              href="/admin/sync-developers"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
-            >
-              🔄 Sync Developers
-            </Link>
             <Link
               href="/admin/edit-property"
               className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"

@@ -43,8 +43,14 @@ export default function ContactPage() {
                     >
                       +91-8851753005
                     </a>
+                    <a
+                      href="tel:+919220286089"
+                      className="golden-text hover:underline block"
+                    >
+                      +91-9220286089
+                    </a>
                   </div>
-
+                 
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">✉️ Email</h3>
                     <a
@@ -68,7 +74,7 @@ export default function ContactPage() {
                       🏢 RERA Registration
                     </h3>
                     <p className="text-gray-600 text-sm">
-                      RC/HARERA/GGM/2727/2322/2024/440
+                      RC/HARERA/GGM/3244/2839/2025/121
                     </p>
                   </div>
                 </div>
@@ -80,9 +86,9 @@ export default function ContactPage() {
                   Business Hours
                 </h2>
                 <div className="space-y-2 text-gray-600">
-                  <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                  <p>Saturday: 10:00 AM - 4:00 PM</p>
-                  <p>Sunday: Closed</p>
+                  <p>Mon : 10:00 AM - 7:00 PM</p>
+                  <p>Tue : Closed</p>
+                  <p>Wed - Sun : 10:00 AM - 7:00 PM</p>
                 </div>
               </div>
             </div>

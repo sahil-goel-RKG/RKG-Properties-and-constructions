@@ -82,6 +82,7 @@ export default function AboutPage() {
                     <div>
                       <p className="text-sm text-gray-500 mb-1">📞 Phone</p>
                       <p className="text-gray-900 font-medium">+91-8851753005</p>
+                      <p className="text-gray-900 font-medium">+91-9220286089</p>
                     </div>
                   </div>
                   <a 
@@ -118,16 +119,11 @@ export default function AboutPage() {
                 <p className="text-gray-700 leading-relaxed mb-6">
                   Dedicated real estate professional with deep knowledge of the local market and a commitment to delivering exceptional client experiences. Sahil brings strategic insight, negotiation expertise, and personalized attention to every transaction.
                 </p>
-                <p className="mb-6">
-                  <a 
-                    className="inline-block bg-white border-2 border-[#c99700] golden-text px-6 py-2 rounded-lg font-semibold hover:bg-[#fff2be] transition" 
-                    href="/pdf/Sahil Goel.pdf" 
-                    download
-                  >
-                    Download Resume
-                  </a>
-                </p>
-                
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Skills</h3>
+                <p className="text-gray-600 mb-1"> 10+ years in real estate</p>
+                <p className="text-gray-500 text-sm mb-6">Cold calling Professional</p>
+
+
                 <h4 className="text-xl font-bold text-gray-900 mt-6 mb-3">Credentials & Achievements</h4>
                 <ul className="space-y-2 text-gray-600 leading-relaxed">
                   <li>Licensed Real Estate Consultant</li>

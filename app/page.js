@@ -168,18 +168,16 @@ export default async function Home() {
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
             <div className="text-white">
               <h1 className="text-5xl font-bold mb-6">
-                Your Trusted Real Estate Partner
+              Your Trusted Real Estate Partner in Gurgaon
               </h1>
-              <p className="text-xl mb-8 text-gray-100">
-                Buying, selling, or investing — We help clients achieve their real estate goals with market insight, negotiation expertise, and concierge-level service.
+              <p className="text-xl mb-6 text-gray-100">
+              With over a decade of hands-on experience in Gurgaon’s most premium corridors—Golf Course Road, Golf Course Extension, SPR, Sohna Road, Dwarka Expressway, and New Gurgaon—RKG brings a powerful blend of market knowledge, negotiation expertise, and personalised guidance that helps clients make confident decisions in a complex market.
               </p>
               <div className="flex flex-wrap gap-4 mb-8">
                 <Link href="/apartments" className="inline-block bg-white golden-text px-8 py-3 rounded-lg font-semibold hover:bg-[#fff2be] transition">
                   Browse Projects
                 </Link>
-                <a href="/pdf/Sahil Goel.pdf" download className="inline-block border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#c99700] transition">
-                  Download Resume
-                </a>
+                
               </div>
               <div className="flex flex-wrap gap-8 mt-10">
                 <div>

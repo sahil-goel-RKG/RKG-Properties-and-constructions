@@ -98,6 +98,9 @@ export default function AddListingPage() {
   // Image state
   const [coverImage, setCoverImage] = useState(null)
   const [additionalImages, setAdditionalImages] = useState([])
+  
+  // Brochure state
+  const [brochureFile, setBrochureFile] = useState(null)
   const [imagePreviews, setImagePreviews] = useState({
     cover: null,
     additional: []
@@ -193,6 +196,25 @@ export default function AddListingPage() {
     })
   }
 
+  // Handle brochure file
+  const handleBrochureChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate PDF
+      if (file.type !== 'application/pdf') {
+        setError('Please upload a PDF file for the brochure')
+        return
+      }
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Brochure file size should be less than 10MB')
+        return
+      }
+      setBrochureFile(file)
+      setError('')
+    }
+  }
+
   // Upload image to Supabase Storage via API route
   const uploadImage = async (file, path) => {
     const formData = new FormData()
@@ -259,6 +281,28 @@ export default function AddListingPage() {
         additionalImageUrls.push(imageUrl)
       }
 
+      // Upload brochure PDF
+      let brochureUrl = null
+      if (brochureFile) {
+        try {
+          console.log('Uploading brochure file:', brochureFile.name, brochureFile.size, 'bytes', 'Type:', brochureFile.type)
+          const brochurePath = `properties/${formData.slug}/brochure-${Date.now()}.pdf`
+          brochureUrl = await uploadImage(brochureFile, brochurePath)
+          console.log('Brochure uploaded successfully, URL:', brochureUrl)
+          if (!brochureUrl) {
+            console.error('Brochure upload returned null/undefined URL')
+            throw new Error('Brochure upload failed: No URL returned')
+          }
+        } catch (brochureError) {
+          console.error('Error uploading brochure:', brochureError)
+          setError(`Failed to upload brochure: ${brochureError.message}`)
+          setLoading(false)
+          return
+        }
+      } else {
+        console.log('No brochure file to upload')
+      }
+
       // Prepare tower_bhk_config JSON
       let towerBhkConfigJson = null
       if (formData.tower_bhk_config && Array.isArray(formData.tower_bhk_config) && formData.tower_bhk_config.length > 0) {
@@ -279,7 +323,8 @@ export default function AddListingPage() {
         name: formData.name,
         slug: formData.slug,
         tower_bhk_config: towerBhkConfigJson,
-        bhk_config: bhkConfigArray
+        bhk_config: bhkConfigArray,
+        brochure_url: brochureUrl
       })
 
       // Insert project into database
@@ -310,7 +355,8 @@ export default function AddListingPage() {
           total_units: formData.total_units ? Number(formData.total_units) : null,
           facing: formData.type === 'builder-floor' ? (formData.facing || null) : null,
           club_house: formData.club_house || false,
-          club_house_area: formData.club_house && formData.club_house_area ? formData.club_house_area : null
+          club_house_area: formData.club_house && formData.club_house_area ? formData.club_house_area : null,
+          brochure_url: brochureUrl
         })
         .select()
         .single()
@@ -339,18 +385,29 @@ export default function AddListingPage() {
         }
       }
 
-      // Insert additional images into project_images table
+      // Insert additional images into project_images table via API route
       if (additionalImageUrls.length > 0) {
-        const imagesToInsert = additionalImageUrls.map((url) => ({
-          project_id: project.id,
-          image_url: url
+        const imagesToInsert = additionalImageUrls.map((url, index) => ({
+          image_url: url,
+          display_order: index + 1
         }))
 
-        const { error: imagesError } = await supabase
-          .from('project_images')
-          .insert(imagesToInsert)
+        const imagesResponse = await fetch('/api/projects/images', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            projectId: project.id,
+            images: imagesToInsert
+          })
+        })
 
-        if (imagesError) throw imagesError
+        if (!imagesResponse.ok) {
+          const errorData = await imagesResponse.json()
+          throw new Error(errorData.error || 'Failed to insert project images')
+        }
       }
 
       setSuccess('Property added successfully!')
@@ -816,25 +873,23 @@ export default function AddListingPage() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Area (acres)
+                            Area (sqft)
                           </label>
                           <input
                             type="text"
                             value={tower.area_sqft || ''}
                             onChange={(e) => {
                               const value = e.target.value
-                              // Allow empty, or positive numbers (including decimals)
-                              if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                                const numValue = parseFloat(value)
-                                if (value === '' || (numValue >= 0 && !isNaN(numValue))) {
-                                  const newTowers = [...formData.tower_bhk_config]
-                                  newTowers[index].area_sqft = value
-                                  setFormData({ ...formData, tower_bhk_config: newTowers })
-                                }
+                              // Allow range format: "10-25" or single number "10"
+                              // Also allow empty
+                              if (value === '' || /^\d*\.?\d*\s*-\s*\d*\.?\d*$/.test(value) || /^\d*\.?\d*$/.test(value)) {
+                                const newTowers = [...formData.tower_bhk_config]
+                                newTowers[index].area_sqft = value
+                                setFormData({ ...formData, tower_bhk_config: newTowers })
                               }
                             }}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                            placeholder="e.g., 0.5-1"
+                            placeholder="e.g., 1000-1500 sqft"
                           />
                         </div>
                         <div>
@@ -1173,6 +1228,26 @@ export default function AddListingPage() {
                 </div>
               )}
             </div>
+
+            {/* Property Brochure */}
+            <div className="mt-6">
+              <label htmlFor="brochure" className="block text-sm font-medium text-gray-700 mb-2">
+                Property Brochure (PDF)
+              </label>
+              <input
+                type="file"
+                id="brochure"
+                accept="application/pdf"
+                onChange={handleBrochureChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
+              />
+              {brochureFile && (
+                <p className="mt-2 text-sm text-gray-600">
+                  Selected: {brochureFile.name} ({(brochureFile.size / 1024 / 1024).toFixed(2)} MB)
+                </p>
+              )}
+              <p className="mt-1 text-xs text-gray-500">Upload a PDF brochure for this property (max 10MB)</p>
+            </div>
           </div>
           )}
 
@@ -1264,7 +1339,7 @@ export default function AddListingPage() {
                                 <p className="font-semibold text-gray-800">Tower {tower.tower_number}</p>
                                 <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 mt-1">
                                   {tower.bhk && <span>BHK: {tower.bhk}</span>}
-                                  {tower.area_sqft && <span>Area: {tower.area_sqft} acres</span>}
+                                  {tower.area_sqft && <span>Area: {tower.area_sqft} sqft</span>}
                                   {tower.flats_per_floor && <span>Flats/Floor: {tower.flats_per_floor}</span>}
                                   {tower.floors_in_tower && <span>Floors: {tower.floors_in_tower}</span>}
                                   {tower.lifts && <span>Lifts: {tower.lifts}</span>}

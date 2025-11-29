@@ -12,12 +12,20 @@ export default function AdminLoginPage() {
           routing="path"
           path="/admin/login"
           signUpUrl="/admin/login"
-          redirectUrl="/admin"
+          afterSignInUrl="/admin"
+          afterSignUpUrl="/admin"
           appearance={{
+            variables: {
+              colorPrimary: '#c99700',
+            },
             elements: {
               rootBox: "mx-auto",
-              card: "shadow-lg"
-            }
+              card: "shadow-lg",
+              formButtonPrimary: "bg-[#c99700] hover:bg-[#a67800]",
+            },
+            layout: {
+              socialButtonsPlacement: "top",
+            },
           }}
         />
       </div>

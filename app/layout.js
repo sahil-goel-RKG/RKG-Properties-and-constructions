@@ -21,7 +21,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: '#c99700',
+        },
+        elements: {
+          formButtonPrimary: 'bg-[#c99700] hover:bg-[#a67800]',
+        },
+      }}
+    >
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}

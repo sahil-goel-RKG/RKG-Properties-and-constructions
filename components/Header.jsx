@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 
 const propertySections = [
   {
-    title: 'Apartments',
+    title: 'Residential',
     items: [
       { label: 'Apartments', href: '/apartments' },
       { label: 'Builder floors', href: '/builder-floor' },
@@ -28,19 +29,41 @@ export default function Header() {
   }, [])
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link
-            href="/"
-            className="inline-flex flex-col items-center golden-text"
-            style={{ textShadow: '0 2px 6px rgba(201, 151, 0, 0.4)' }}
-          >
-            <span className="text-4xl font-extrabold tracking-wide leading-none" style={{ letterSpacing: '0.50em', fontFamily: 'Georgia, serif' }}>RKG</span>
-            <span className="mt-1 text-xs uppercase text-center whitespace-nowrap" style={{ letterSpacing: '0.05em', fontFamily: 'serif' }}>
-              Properties &amp; Constructions
-            </span>
-          </Link>
+    <>
+      <style jsx>{`
+        .logo-hover-group:hover .logo-image {
+          filter: drop-shadow(0 2px 12px rgba(201, 151, 0, 0.5));
+        }
+        .logo-hover-group:hover .logo-text {
+          text-shadow: 0 2px 12px rgba(201, 151, 0, 0.5);
+        }
+      `}</style>
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-2">
+          <div className="flex items-center justify-between h-16 py-0 ">
+            <Link
+              href="/"
+              className="flex items-center gap-2 golden-text logo-hover-group transition-all duration-300"
+            >
+              <Image
+                src="/img/Logo4.PNG"
+                alt="RKG Properties & Constructions Logo"
+                width={100}
+                height={100}
+                className="object-contain -mb-2 logo-image transition-all duration-300"
+                priority
+              />
+               <div className="flex flex-col items-start -ml-5">
+                <span 
+                  className="text-5xl font-extrabold tracking-wide leading-none logo-text transition-all duration-300" 
+                  style={{ letterSpacing: '0.05em', fontFamily: 'Georgia, serif', color: '#DEB63B' }}
+                >
+                  RKG
+                </span>
+                 
+              </div>
+              
+            </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center h-full">
@@ -62,7 +85,7 @@ export default function Header() {
                 closeTimeoutRef.current = setTimeout(() => {
                   setIsPropertyOpen(false)
                   closeTimeoutRef.current = null
-                }, 1000)
+                }, 100)
               }}
             >
               <button
@@ -194,6 +217,7 @@ export default function Header() {
         )}
       </div>
     </header>
+    </>
   )
 }
 

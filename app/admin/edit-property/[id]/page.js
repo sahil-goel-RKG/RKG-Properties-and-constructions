@@ -17,6 +17,7 @@ export default function EditPropertyDetailPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [originalSlug, setOriginalSlug] = useState('')
   
   // Locations and developers state
   const [locations, setLocations] = useState([])
@@ -85,7 +86,8 @@ export default function EditPropertyDetailPage() {
       floors_in_tower: '',
       lifts: '',
       penthouse: false,
-      parking_per_floor: ''
+      parking_per_floor: '',
+      no_of_basements: ''
     }],
     amenities: [], // Changed to array
     full_description: '',
@@ -107,6 +109,10 @@ export default function EditPropertyDetailPage() {
   const [additionalImages, setAdditionalImages] = useState([]) // New files to upload
   const [existingImages, setExistingImages] = useState([]) // Existing images from DB
   const [imagesToDelete, setImagesToDelete] = useState([]) // Image IDs to delete
+  
+  // Brochure state
+  const [brochureFile, setBrochureFile] = useState(null)
+  const [existingBrochureUrl, setExistingBrochureUrl] = useState(null)
   const [imagePreviews, setImagePreviews] = useState({
     cover: null,
     additional: []
@@ -197,6 +203,9 @@ export default function EditPropertyDetailPage() {
         return
       }
 
+      // Store original slug
+      setOriginalSlug(project.slug || '')
+      
       // Set form data
       setFormData({
         name: project.name || '',
@@ -208,7 +217,7 @@ export default function EditPropertyDetailPage() {
         developer: project.developer || '',
         developerOther: '',
         short_description: project.short_description || '',
-        price: project.price || '',
+        price: project.price ? (project.price.toString().includes('Cr') ? project.price.toString() : project.price.toString() + ' Cr') : '',
         project_status: project.project_status || '',
         possession_date: project.possession_date 
           ? (project.possession_date.includes('-') 
@@ -222,8 +231,8 @@ export default function EditPropertyDetailPage() {
               ? JSON.parse(project.tower_bhk_config) 
               : project.tower_bhk_config)
           : (project.bhk_config && Array.isArray(project.bhk_config) && project.bhk_config.length > 0
-              ? [{ tower_number: 1, bhk: project.bhk_config.join(', '), area_sqft: '', flats_per_floor: '', floors_in_tower: '', lifts: '', penthouse: false, parking_per_floor: '' }]
-              : [{ tower_number: 1, bhk: '', area_sqft: '', flats_per_floor: '', floors_in_tower: '', lifts: '', penthouse: false, parking_per_floor: '' }]),
+              ? [{ tower_number: 1, bhk: project.bhk_config.join(', '), area_sqft: '', flats_per_floor: '', floors_in_tower: '', lifts: '', penthouse: false, parking_per_floor: '', no_of_basements: '' }]
+              : [{ tower_number: 1, bhk: '', area_sqft: '', flats_per_floor: '', floors_in_tower: '', lifts: '', penthouse: false, parking_per_floor: '', no_of_basements: '' }]),
         amenities: Array.isArray(project.amenities) ? project.amenities : [],
         full_description: project.full_description || '',
         project_highlights: Array.isArray(project.project_highlights) ? project.project_highlights.join(', ') : project.project_highlights || '',
@@ -236,6 +245,7 @@ export default function EditPropertyDetailPage() {
         facing: project.facing || '',
         club_house: project.club_house || false,
         club_house_area: project.club_house_area || '',
+        brochure_url: project.brochure_url || null
       })
 
       // Set cover image
@@ -243,7 +253,8 @@ export default function EditPropertyDetailPage() {
         setCoverImageUrl(project.image_url)
         setImagePreviews(prev => ({ ...prev, cover: project.image_url }))
       }
-
+      setExistingBrochureUrl(project.brochure_url || null)
+      
       // Fetch existing additional images
       const { data: images, error: imagesError } = await supabase
         .from('project_images')
@@ -331,6 +342,34 @@ export default function EditPropertyDetailPage() {
     })
   }
 
+  // Handle brochure file
+  const handleBrochureChange = (e) => {
+    const file = e.target.files[0]
+    console.log('Brochure file selected:', file ? { name: file.name, size: file.size, type: file.type } : 'No file')
+    if (file) {
+      // Validate PDF
+      if (file.type !== 'application/pdf') {
+        console.error('Invalid file type:', file.type)
+        setError('Please upload a PDF file for the brochure')
+        setBrochureFile(null)
+        return
+      }
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        console.error('File too large:', file.size)
+        setError('Brochure file size should be less than 10MB')
+        setBrochureFile(null)
+        return
+      }
+      setBrochureFile(file)
+      setError('')
+      console.log('✅ Brochure file validated and set:', file.name)
+    } else {
+      setBrochureFile(null)
+      console.log('Brochure file cleared')
+    }
+  }
+
   // Remove existing image
   const removeExistingImage = (imageId) => {
     setImagesToDelete([...imagesToDelete, imageId])
@@ -357,9 +396,41 @@ export default function EditPropertyDetailPage() {
     return data.url
   }
 
+  // Prevent form submission on Enter key press (especially on review page)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Prevent Enter key from submitting form on review page (step 4)
+      if (currentStep === 4 && e.key === 'Enter' && e.target.tagName !== 'BUTTON') {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    }
+
+    if (currentStep === 4) {
+      document.addEventListener('keydown', handleKeyDown)
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+  }, [currentStep])
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault()
+    e.stopPropagation()
+    
+    // Prevent auto-submission - only allow explicit button click
+    if (currentStep !== 4) {
+      return
+    }
+    
+    // Check authentication before submitting
+    if (!user) {
+      setError('You must be logged in to update properties. Please sign in and try again.')
+      router.push('/admin/login')
+      return
+    }
+    
     setSaving(true)
     setError('')
     setSuccess('')
@@ -390,6 +461,30 @@ export default function EditPropertyDetailPage() {
         newAdditionalImageUrls.push(imageUrl)
       }
 
+      // Upload brochure PDF if provided
+      let newBrochureUrl = existingBrochureUrl
+      if (brochureFile) {
+        try {
+          console.log('Uploading brochure file:', brochureFile.name, brochureFile.size, 'bytes', 'Type:', brochureFile.type)
+          const brochurePath = `properties/${formData.slug}/brochure-${Date.now()}.pdf`
+          newBrochureUrl = await uploadImage(brochureFile, brochurePath)
+          console.log('Brochure uploaded successfully, URL:', newBrochureUrl)
+          if (!newBrochureUrl) {
+            console.error('Brochure upload returned null/undefined URL')
+            throw new Error('Brochure upload failed: No URL returned')
+          }
+        } catch (brochureError) {
+          console.error('Error uploading brochure:', brochureError)
+          setError(`Failed to upload brochure: ${brochureError.message}`)
+          setSaving(false)
+          return
+        }
+      } else {
+        console.log('No new brochure file selected')
+        console.log('Existing brochure URL:', existingBrochureUrl)
+        console.log('Brochure file state:', brochureFile ? 'File selected' : 'No file selected')
+      }
+
       // Prepare update data
       // Handle project_status - explicitly handle empty string, null, and valid values
       let statusValue = null
@@ -412,7 +507,13 @@ export default function EditPropertyDetailPage() {
         developer: finalDeveloper,
         short_description: formData.short_description && formData.short_description.trim() !== '' ? formData.short_description.trim() : null,
         full_description: formData.full_description && formData.full_description.trim() !== '' ? formData.full_description.trim() : null,
-        price: formData.price && formData.price.toString().trim() !== '' ? Number(formData.price) : null,
+        price: formData.price && formData.price.toString().trim() !== '' 
+          ? (() => {
+              // Remove "Cr" suffix if present before converting to number
+              const priceStr = formData.price.toString().replace(/\s*(Cr|cr|Crore|crore)\s*/gi, '').trim()
+              return priceStr ? Number(priceStr) : null
+            })()
+          : null,
         project_status: statusValue, // Always include, even if null
         possession_date: formData.possession_date && formData.possession_date.toString().trim() !== '' ? formData.possession_date.toString().trim() : null,
         is_featured: formData.is_featured || false,
@@ -444,15 +545,39 @@ export default function EditPropertyDetailPage() {
         updated_at: new Date().toISOString()
       }
       
-      console.log('Full update data:', JSON.stringify(updateData, null, 2))
-      
       // Update cover image URL if changed
       if (newCoverImageUrl) {
         updateData.image_url = newCoverImageUrl
       }
 
+      // Update brochure URL - always include it explicitly
+      // If a file was selected, newBrochureUrl should have a value after upload
+      if (brochureFile) {
+        // A file was selected, so we should have a URL after upload
+        if (newBrochureUrl) {
+          updateData.brochure_url = newBrochureUrl
+          console.log('✅ Brochure file was uploaded, including brochure_url in update:', newBrochureUrl)
+        } else {
+          console.error('❌ ERROR: Brochure file was selected but upload returned no URL!')
+          setError('Failed to upload brochure. Please try again.')
+          setSaving(false)
+          return
+        }
+      } else if (existingBrochureUrl) {
+        // No new file, but keep existing brochure
+        updateData.brochure_url = existingBrochureUrl
+        console.log('ℹ️ No new brochure file, keeping existing:', existingBrochureUrl)
+      } else {
+        // No brochure at all - explicitly set to null to clear if needed
+        // But only if we're intentionally clearing it (not on first load)
+        console.log('ℹ️ No brochure file selected and no existing brochure')
+      }
+      
+      console.log('Full update data:', JSON.stringify(updateData, null, 2))
+
       // Update project via API route (uses admin client to bypass RLS)
       console.log('Updating project ID:', projectId)
+      console.log('User authenticated:', !!user, 'User ID:', user?.id)
       console.log('Update data being sent:', JSON.stringify(updateData, null, 2))
       console.log('Status value in updateData:', updateData.project_status)
       
@@ -461,17 +586,35 @@ export default function EditPropertyDetailPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           id: projectId,
           ...updateData
         })
       })
+      
+      console.log('Update response status:', updateResponse.status, updateResponse.statusText)
 
-      const updateResult = await updateResponse.json()
+      const responseText = await updateResponse.text()
+      let updateResult = null
+      
+      if (responseText) {
+        try {
+          updateResult = JSON.parse(responseText)
+        } catch (jsonError) {
+          console.error('Failed to parse response as JSON:', jsonError)
+          console.error('Response text:', responseText)
+          if (!updateResponse.ok) {
+            throw new Error(`Server error: ${updateResponse.status} ${updateResponse.statusText}. Response: ${responseText.substring(0, 200)}`)
+          }
+        }
+      }
 
       if (!updateResponse.ok) {
-        console.error('Update error:', updateResult)
-        throw new Error(updateResult.error || 'Failed to update project')
+        const errorDetails = updateResult ? updateResult : { rawResponse: responseText }
+        console.error('Update error:', errorDetails)
+        const errorMessage = (updateResult && (updateResult.error || updateResult.message)) || `Failed to update project (${updateResponse.status})`
+        throw new Error(errorMessage)
       }
 
       const updatedProject = updateResult.data
@@ -509,46 +652,61 @@ export default function EditPropertyDetailPage() {
         }
       }
 
-      // Delete removed images
+      // Delete removed images via API route
       if (imagesToDelete.length > 0) {
-        const { error: deleteError } = await supabase
-          .from('project_images')
-          .delete()
-          .in('id', imagesToDelete)
+        const deleteResponse = await fetch('/api/projects/images', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            imageIds: imagesToDelete
+          })
+        })
 
-        if (deleteError) {
+        if (!deleteResponse.ok) {
+          const errorData = await deleteResponse.json()
           // If table doesn't exist, just log warning
-          if (deleteError.code === 'PGRST205' || deleteError.message?.includes('Could not find the table')) {
+          if (errorData.error?.includes('table does not exist')) {
             console.warn('project_images table does not exist. Skipping image deletion.')
           } else {
-            throw deleteError
+            throw new Error(errorData.error || 'Failed to delete project images')
           }
         }
       }
 
-      // Insert new additional images
+      // Insert new additional images via API route
       if (newAdditionalImageUrls.length > 0) {
         const maxOrder = existingImages.length > 0 
           ? Math.max(...existingImages.map(img => img.display_order || 0))
           : 0
 
         const imagesToInsert = newAdditionalImageUrls.map((url, index) => ({
-          project_id: projectId,
           image_url: url,
           display_order: maxOrder + index + 1
         }))
 
-        const { error: imagesError } = await supabase
-          .from('project_images')
-          .insert(imagesToInsert)
+        const imagesResponse = await fetch('/api/projects/images', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            projectId: projectId,
+            images: imagesToInsert
+          })
+        })
 
-        if (imagesError) {
+        if (!imagesResponse.ok) {
+          const errorData = await imagesResponse.json()
           // If table doesn't exist, show warning but don't fail the update
-          if (imagesError.code === 'PGRST205' || imagesError.message?.includes('Could not find the table')) {
+          if (errorData.error?.includes('table does not exist')) {
             console.warn('project_images table does not exist. Additional images were not saved. Please run PROJECT_IMAGES_TABLE.sql')
             setError('Warning: Additional images could not be saved because project_images table does not exist. Please create the table first.')
           } else {
-            throw imagesError
+            throw new Error(errorData.error || 'Failed to insert project images')
           }
         }
       }
@@ -691,7 +849,23 @@ export default function EditPropertyDetailPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8 space-y-6">
+        <form 
+          onSubmit={(e) => {
+            // Only allow submission on step 4 (review page)
+            if (currentStep === 4) {
+              handleSubmit(e)
+            } else {
+              e.preventDefault()
+            }
+          }} 
+          className="bg-white rounded-lg shadow-md p-8 space-y-6"
+          onKeyDown={(e) => {
+            // Prevent Enter key from submitting form except on review page
+            if (e.key === 'Enter' && currentStep !== 4) {
+              e.preventDefault()
+            }
+          }}
+        >
           {/* Step 1: Basic Information */}
           {currentStep === 1 && (
           <div className="space-y-6">
@@ -845,9 +1019,31 @@ export default function EditPropertyDetailPage() {
                   type="text"
                   id="price"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  onChange={(e) => {
+                    const inputValue = e.target.value
+                    // Auto-append Cr to numbers
+                    let processedValue = inputValue
+                    
+                    // Remove existing "Cr" or "cr" for processing
+                    const cleanedValue = inputValue.replace(/\s*(Cr|cr)\s*/gi, '').trim()
+                    
+                    // Check if it's a valid number (including decimals)
+                    if (cleanedValue === '' || /^\d*\.?\d*$/.test(cleanedValue)) {
+                      // If it's a number and not empty, append Cr
+                      if (cleanedValue !== '' && cleanedValue !== '.') {
+                        processedValue = cleanedValue + ' Cr'
+                      } else {
+                        processedValue = cleanedValue
+                      }
+                    } else {
+                      // If it contains non-numeric characters (except Cr), keep as is
+                      processedValue = inputValue
+                    }
+                    
+                    setFormData({ ...formData, price: processedValue })
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="e.g., 5000000"
+                  placeholder="e.g., 5.5 (auto becomes 5.5 Cr)"
                 />
               </div>
 
@@ -1023,25 +1219,23 @@ export default function EditPropertyDetailPage() {
               </div>
               <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Area (acres)
+                            Area (sqft)
                 </label>
                 <input
                             type="text"
                             value={tower.area_sqft || ''}
                             onChange={(e) => {
                               const value = e.target.value
-                              // Allow empty, or positive numbers (including decimals)
-                              if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                                const numValue = parseFloat(value)
-                                if (value === '' || (numValue >= 0 && !isNaN(numValue))) {
-                                  const newTowers = [...formData.tower_bhk_config]
-                                  newTowers[index].area_sqft = value
-                                  setFormData({ ...formData, tower_bhk_config: newTowers })
-                                }
+                              // Allow range format: "10-25" or single number "10"
+                              // Also allow empty
+                              if (value === '' || /^\d*\.?\d*\s*-\s*\d*\.?\d*$/.test(value) || /^\d*\.?\d*$/.test(value)) {
+                                const newTowers = [...formData.tower_bhk_config]
+                                newTowers[index].area_sqft = value
+                                setFormData({ ...formData, tower_bhk_config: newTowers })
                               }
                             }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
-                            placeholder="e.g., 0.5-1"
+                            placeholder="e.g., 1000-1500 sqft"
                 />
               </div>
               <div>
@@ -1137,6 +1331,27 @@ export default function EditPropertyDetailPage() {
                             placeholder="e.g., 4"
                           />
                         </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            No. of Basements
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={tower.no_of_basements || ''}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              // Prevent negative values
+                              if (value === '' || (Number(value) >= 0)) {
+                                const newTowers = [...formData.tower_bhk_config]
+                                newTowers[index].no_of_basements = value
+                                setFormData({ ...formData, tower_bhk_config: newTowers })
+                              }
+                            }}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b] bg-white text-gray-900 placeholder:text-gray-400"
+                            placeholder="e.g., 2"
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1156,7 +1371,8 @@ export default function EditPropertyDetailPage() {
                             floors_in_tower: '',
                             lifts: '',
                             penthouse: false,
-                            parking_per_floor: ''
+                            parking_per_floor: '',
+                            no_of_basements: ''
                           }
                         ]
                       })
@@ -1429,6 +1645,59 @@ export default function EditPropertyDetailPage() {
               )}
             </div>
 
+            {/* Property Brochure */}
+            <div className="mb-6">
+              <label htmlFor="brochure" className="block text-sm font-medium text-gray-700 mb-2">
+                Property Brochure (PDF)
+              </label>
+              {existingBrochureUrl && (
+                <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Current Brochure:</p>
+                  <a 
+                    href={existingBrochureUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#c99700] hover:text-[#a67800] underline text-sm"
+                  >
+                    View Current Brochure
+                  </a>
+                </div>
+              )}
+              <input
+                type="file"
+                id="brochure"
+                accept="application/pdf"
+                onChange={handleBrochureChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
+              />
+              {brochureFile && (
+                <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-medium text-green-800">
+                    ✅ New file selected: {brochureFile.name}
+                  </p>
+                  <p className="text-xs text-green-600 mt-1">
+                    Size: {(brochureFile.size / 1024 / 1024).toFixed(2)} MB | Type: {brochureFile.type}
+                  </p>
+                </div>
+              )}
+              {existingBrochureUrl && !brochureFile && (
+                <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm font-medium text-blue-800">
+                    📄 Current brochure available
+                  </p>
+                  <a 
+                    href={existingBrochureUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:text-blue-800 underline mt-1 inline-block"
+                  >
+                    View current brochure →
+                  </a>
+                </div>
+              )}
+              <p className="mt-1 text-xs text-gray-500">Upload a PDF brochure for this property (max 10MB). This will replace the existing brochure if one exists.</p>
+            </div>
+
             {/* Payment Plan */}
             <div className="mb-6">
               <label htmlFor="payment_plan" className="block text-sm font-medium text-gray-700 mb-2">
@@ -1534,12 +1803,13 @@ export default function EditPropertyDetailPage() {
                                 <p className="font-semibold text-gray-800">Tower {tower.tower_number}</p>
                                 <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 mt-1">
                                   {tower.bhk && <span>BHK: {tower.bhk}</span>}
-                                  {tower.area_sqft && <span>Area: {tower.area_sqft} acres</span>}
+                                  {tower.area_sqft && <span>Area: {tower.area_sqft} sqft</span>}
                                   {tower.flats_per_floor && <span>Flats/Floor: {tower.flats_per_floor}</span>}
                                   {tower.floors_in_tower && <span>Floors: {tower.floors_in_tower}</span>}
                                   {tower.lifts && <span>Lifts: {tower.lifts}</span>}
                                   {tower.penthouse && <span className="text-[#c99700]">Penthouse: Yes</span>}
                                   {tower.parking_per_floor && <span>Parking/Floor: {tower.parking_per_floor}</span>}
+                                  {tower.no_of_basements && <span>Basements: {tower.no_of_basements}</span>}
                       </div>
                       </div>
                             )
@@ -1678,7 +1948,12 @@ export default function EditPropertyDetailPage() {
                 </button>
               ) : (
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleSubmit(e)
+                  }}
                   disabled={saving}
                   className="px-6 py-2 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >

@@ -1,5 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
+import { apiLimiter, getClientIdentifier } from '@/lib/rateLimit'
 
 /**
  * API Route to delete a project
@@ -10,6 +12,34 @@ import { NextResponse } from 'next/server'
  */
 export async function DELETE(request) {
   try {
+    // Check if user is authenticated
+    const { userId } = await auth()
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Please sign in to delete projects.' },
+        { status: 401 }
+      )
+    }
+
+    // Rate limiting
+    const clientId = getClientIdentifier(request)
+    const rateLimitResult = await apiLimiter.limit(`${userId}-${clientId}`)
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+            'X-RateLimit-Limit': '100',
+            'X-RateLimit-Remaining': '0',
+          }
+        }
+      )
+    }
+
     if (!supabaseAdmin) {
       return NextResponse.json(
         { error: 'Admin client not configured. Please set SUPABASE_SERVICE_ROLE_KEY in .env.local' },
@@ -44,6 +74,11 @@ export async function DELETE(request) {
     return NextResponse.json({
       success: true,
       message: 'Project deleted successfully'
+    }, {
+      headers: {
+        'X-RateLimit-Limit': '100',
+        'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+      }
     })
   } catch (error) {
     console.error('Error in projects/delete route:', error)

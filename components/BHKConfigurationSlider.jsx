@@ -104,7 +104,7 @@ export default function BHKConfigurationSlider({ towerConfig, legacyConfig }) {
               {tower.area_sqft && (
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-gray-600">Area:</span>
-                  <span className="text-sm text-gray-900">{tower.area_sqft} acres</span>
+                  <span className="text-sm text-gray-900">{tower.area_sqft} sqft</span>
                 </div>
               )}
               {tower.flats_per_floor && (

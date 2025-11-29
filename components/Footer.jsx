@@ -61,6 +61,11 @@ export default function Footer() {
                 </a>
               </li>
               <li>
+                <a href="tel:+919220286089" className="hover:text-white transition">
+                  📞 +91-9220286089
+                </a>
+              </li>
+              <li>
                 <a href="mailto:sahil@rkgproperties.in" className="hover:text-white transition">
                   ✉️ sahil@rkgproperties.in
                 </a>

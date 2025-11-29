@@ -33,6 +33,13 @@ export default clerkMiddleware(async (auth, request) => {
       return NextResponse.redirect(signInUrl);
     }
   }
+  
+  // For API routes, ensure auth context is available
+  // This helps API routes access the auth session
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    // Don't block, just ensure auth is available
+    // The API route will handle its own authentication
+  }
 });
 
 export const config = {

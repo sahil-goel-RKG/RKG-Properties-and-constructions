@@ -136,11 +136,11 @@ export default async function ProjectDetailPage({ params }) {
   const developerSlug = project.developer ? developerNameToSlug(project.developer) : null
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
-          <nav className="mb-8 text-sm text-gray-600">
+          <nav className="py-8 text-sm text-gray-600">
             <Link href="/" className="hover:text-[#c99700]">
               Home
             </Link>
@@ -155,12 +155,16 @@ export default async function ProjectDetailPage({ params }) {
             <span className="text-gray-900">{project.name}</span>
           </nav>
 
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            {/* Project Image Gallery */}
-            <ProjectImageGallery images={allImages} projectName={project.name} />
+          {/* Section 1: Image Gallery - White Background */}
+          <section className="bg-white py-8">
+            <div className="rounded-lg shadow-lg overflow-hidden">
+              <ProjectImageGallery images={allImages} projectName={project.name} />
+            </div>
+          </section>
 
-            {/* Project Details */}
-            <div className="p-8">
+          {/* Section 2: Title and Header - White Background */}
+          <section className="bg-white py-8">
+            <div className="px-4">
               <div className="mb-6">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">
                   {project.name}
@@ -241,8 +245,12 @@ export default async function ProjectDetailPage({ params }) {
                   </p>
                 </div>
               )}
+            </div>
+          </section>
 
-              {/* Project Information */}
+          {/* Section 3: Project Information - Gray Background */}
+          <section className="bg-gray-100 py-8">
+            <div className="px-4">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Project Information</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -339,15 +347,17 @@ export default async function ProjectDetailPage({ params }) {
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <h3 className="font-semibold text-gray-900 mb-2">Club House</h3>
                     <p className="text-gray-700">
-                      {project.club_house_area ? project.club_house_area : 'Available'}
+                      {project.club_house_area ? `${project.club_house_area} sqft` : 'Available'}
                     </p>
                   </div>
                 )}
                 </div>
               </div>
+            </div>
+          </section>
 
-              {/* BHK Configuration - Tower Based */}
-              {(() => {
+          {/* Section 4: BHK Configuration - White Background */}
+          {(() => {
                 let towerConfig = null
                 if (project.tower_bhk_config) {
                   try {
@@ -365,19 +375,23 @@ export default async function ProjectDetailPage({ params }) {
                 
                 return (
                   (hasTowerConfig || hasLegacyConfig) && (
-                    <div className="mb-8">
-                      <h2 className="text-2xl font-bold text-gray-900 mb-6">BHK Configuration</h2>
-                      <BHKConfigurationSlider 
-                        towerConfig={hasTowerConfig ? towerConfig : null}
-                        legacyConfig={hasLegacyConfig ? project.bhk_config : null}
-                      />
-                    </div>
+                    <section className="bg-white py-8">
+                      <div className="px-4">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">BHK Configuration</h2>
+                        <BHKConfigurationSlider 
+                          towerConfig={hasTowerConfig ? towerConfig : null}
+                          legacyConfig={hasLegacyConfig ? project.bhk_config : null}
+                        />
+                      </div>
+                    </section>
                   )
                 )
               })()}
 
-              {/* Full Description */}
-              {(project.full_description || project.description) && (
+          {/* Section 5: Full Description - Gray Background */}
+          {(project.full_description || project.description) && (
+            <section className="bg-gray-100 py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                     About {project.name}
@@ -386,10 +400,14 @@ export default async function ProjectDetailPage({ params }) {
                     {project.full_description || project.description}
                   </p>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Project Highlights */}
-              {project.project_highlights && project.project_highlights.length > 0 && (
+          {/* Section 6: Project Highlights - White Background */}
+          {project.project_highlights && project.project_highlights.length > 0 && (
+            <section className="bg-white py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">Project Highlights</h2>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -403,10 +421,14 @@ export default async function ProjectDetailPage({ params }) {
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Amenities */}
-              {project.amenities && project.amenities.length > 0 && (
+          {/* Section 7: Amenities - Gray Background */}
+          {project.amenities && project.amenities.length > 0 && (
+            <section className="bg-gray-100 py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">Amenities</h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -420,10 +442,14 @@ export default async function ProjectDetailPage({ params }) {
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Nearby Landmarks */}
-              {project.nearby_landmarks && project.nearby_landmarks.length > 0 && (
+          {/* Section 8: Nearby Landmarks - White Background */}
+          {project.nearby_landmarks && project.nearby_landmarks.length > 0 && (
+            <section className="bg-white py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">Nearby Landmarks</h2>
                   <div className="flex flex-wrap gap-3">
@@ -437,20 +463,28 @@ export default async function ProjectDetailPage({ params }) {
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Connectivity */}
-              {project.connectivity && (
+          {/* Section 9: Connectivity - Gray Background */}
+          {project.connectivity && (
+            <section className="bg-gray-100 py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">Connectivity</h2>
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <p className="text-gray-700 leading-relaxed">{project.connectivity}</p>
                   </div>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Floor Plans & Documents */}
-              {(project.floor_plan_url || project.brochure_url || project.video_url) && (
+          {/* Section 10: Documents & Media - White Background */}
+          {(project.floor_plan_url || project.brochure_url || project.video_url) && (
+            <section className="bg-white py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">Documents & Media</h2>
                   <div className="flex flex-wrap gap-4">
@@ -495,20 +529,28 @@ export default async function ProjectDetailPage({ params }) {
                     )}
                   </div>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* Payment Plan */}
-              {project.payment_plan && (
+          {/* Section 11: Payment Plan - Gray Background */}
+          {project.payment_plan && (
+            <section className="bg-gray-100 py-8">
+              <div className="px-4">
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-4">Payment Plan</h2>
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <p className="text-gray-700 leading-relaxed whitespace-pre-line">{project.payment_plan}</p>
                   </div>
                 </div>
-              )}
+              </div>
+            </section>
+          )}
 
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap gap-4 pt-6 border-t border-gray-200">
+          {/* Section 12: CTA Buttons - White Background */}
+          <section className="bg-white py-8">
+            <div className="px-4">
+              <div className="flex flex-wrap gap-4 pt-6">
                 <Link
                   href="/contact"
                   className="bg-[#22c55e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
@@ -531,7 +573,7 @@ export default async function ProjectDetailPage({ params }) {
                 )}
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>
