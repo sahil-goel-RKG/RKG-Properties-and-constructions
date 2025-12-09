@@ -20,6 +20,7 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://*.clerk.accounts.dev https://www.google.com https://www.gstatic.com https://www.recaptcha.net",
+              "worker-src 'self' blob: https://*.clerk.com https://*.clerk.accounts.dev",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.clerk.com https://*.clerk.accounts.dev",
               "font-src 'self' data: https://fonts.gstatic.com https://*.clerk.com",
               "img-src 'self' data: https: blob:",

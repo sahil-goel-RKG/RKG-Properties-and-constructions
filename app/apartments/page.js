@@ -226,7 +226,6 @@ export default async function ResidentialPage({ searchParams }) {
           </p>
         </div>
 
-        {/* Filter Menu */}
         <ResidentialFilters locations={locations} developers={developers} areas={areas} />
 
         {/* Active Filters Display */}
@@ -282,9 +281,9 @@ export default async function ResidentialPage({ searchParams }) {
                 {hasFilters && ` (${filterText.join(', ')})`}
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard key={project.id} project={project}/>
               ))}
             </div>
             <Pagination

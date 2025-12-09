@@ -38,7 +38,7 @@ export default function Header() {
           text-shadow: 0 2px 12px rgba(201, 151, 0, 0.5);
         }
       `}</style>
-      <header className="bg-white shadow-md sticky top-0 z-50">
+      <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
         <div className="container mx-auto px-2">
           <div className="flex items-center justify-between h-16 py-0 ">
             <Link

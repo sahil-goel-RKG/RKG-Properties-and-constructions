@@ -17,6 +17,7 @@ export default function EditPropertyDetailPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [imageUploadSuccess, setImageUploadSuccess] = useState('')
   const [originalSlug, setOriginalSlug] = useState('')
   
   // Locations and developers state
@@ -106,6 +107,7 @@ export default function EditPropertyDetailPage() {
   // Image state
   const [coverImage, setCoverImage] = useState(null)
   const [coverImageUrl, setCoverImageUrl] = useState(null) // Existing cover image URL
+  const [coverImageRemoved, setCoverImageRemoved] = useState(false) // Track if cover image was removed
   const [additionalImages, setAdditionalImages] = useState([]) // New files to upload
   const [existingImages, setExistingImages] = useState([]) // Existing images from DB
   const [imagesToDelete, setImagesToDelete] = useState([]) // Image IDs to delete
@@ -434,6 +436,7 @@ export default function EditPropertyDetailPage() {
     setSaving(true)
     setError('')
     setSuccess('')
+    // Don't clear imageUploadSuccess - let it persist to show image upload status
 
     try {
       // Determine final location value
@@ -545,9 +548,17 @@ export default function EditPropertyDetailPage() {
         updated_at: new Date().toISOString()
       }
       
-      // Update cover image URL if changed
-      if (newCoverImageUrl) {
+      // Update cover image URL (include null to clear if removed)
+      if (coverImage) {
+        // New image uploaded
         updateData.image_url = newCoverImageUrl
+      } else if (coverImageRemoved) {
+        // Cover image was explicitly removed by user
+        updateData.image_url = null
+        console.log('Cover image will be cleared from database')
+      } else if (coverImageUrl) {
+        // Keep existing cover image
+        updateData.image_url = coverImageUrl
       }
 
       // Update brochure URL - always include it explicitly
@@ -701,6 +712,7 @@ export default function EditPropertyDetailPage() {
 
         if (!imagesResponse.ok) {
           const errorData = await imagesResponse.json()
+          console.error('Failed to insert project images:', errorData)
           // If table doesn't exist, show warning but don't fail the update
           if (errorData.error?.includes('table does not exist')) {
             console.warn('project_images table does not exist. Additional images were not saved. Please run PROJECT_IMAGES_TABLE.sql')
@@ -708,6 +720,12 @@ export default function EditPropertyDetailPage() {
           } else {
             throw new Error(errorData.error || 'Failed to insert project images')
           }
+        } else {
+          const imagesResult = await imagesResponse.json()
+          console.log('✅ Project images inserted successfully:', imagesResult)
+          setImageUploadSuccess(`✅ ${newAdditionalImageUrls.length} image(s) added successfully!`)
+          // Clear the success message after 5 seconds
+          setTimeout(() => setImageUploadSuccess(''), 5000)
         }
       }
 
@@ -840,6 +858,12 @@ export default function EditPropertyDetailPage() {
         {success && (
           <div className="mb-6 p-4 bg-[#fff5d6] border border-[#f2cd6d] rounded-lg text-[#a67800]">
             {success}
+          </div>
+        )}
+
+        {imageUploadSuccess && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+            {imageUploadSuccess}
           </div>
         )}
 
@@ -1544,7 +1568,21 @@ export default function EditPropertyDetailPage() {
               </label>
               {coverImageUrl && !imagePreviews.cover?.startsWith('data:') && (
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">Current Cover Image:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-gray-600">Current Cover Image:</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCoverImageUrl(null)
+                        setCoverImage(null)
+                        setCoverImageRemoved(true)
+                        setImagePreviews(prev => ({ ...prev, cover: null }))
+                      }}
+                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      Remove Cover Image
+                    </button>
+                  </div>
                   <div className="relative w-full max-w-md h-64">
                     <Image
                       src={coverImageUrl}
@@ -1611,6 +1649,11 @@ export default function EditPropertyDetailPage() {
               <label htmlFor="additionalImages" className="block text-sm font-medium text-gray-700 mb-2">
                 Add More Images (Multiple images can be selected)
               </label>
+              {imageUploadSuccess && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                  {imageUploadSuccess}
+                </div>
+              )}
               <input
                 type="file"
                 id="additionalImages"

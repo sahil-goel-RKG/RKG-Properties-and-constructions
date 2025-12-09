@@ -12,6 +12,7 @@ export default function AddListingPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [imageUploadSuccess, setImageUploadSuccess] = useState('')
   
   // Locations and developers state
   const [locations, setLocations] = useState([])
@@ -241,6 +242,7 @@ export default function AddListingPage() {
     setLoading(true)
     setError('')
     setSuccess('')
+    // Don't clear imageUploadSuccess - let it persist to show image upload status
 
     try {
       // Validate "other" fields
@@ -327,10 +329,14 @@ export default function AddListingPage() {
         brochure_url: brochureUrl
       })
 
-      // Insert project into database
-      const { data: project, error: projectError } = await supabase
-        .from('projects')
-        .insert({
+      // Insert project via admin API (bypasses RLS)
+      const createResponse = await fetch('/api/projects/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
           name: formData.name,
           slug: formData.slug,
           location: finalLocation,
@@ -358,13 +364,29 @@ export default function AddListingPage() {
           club_house_area: formData.club_house && formData.club_house_area ? formData.club_house_area : null,
           brochure_url: brochureUrl
         })
-        .select()
-        .single()
+      })
 
-      if (projectError) {
-        console.error('Database error:', projectError)
-        throw projectError
+      // Parse response safely (avoid HTML/redirect parsing errors)
+      const contentType = createResponse.headers.get('content-type') || ''
+      let createResult = null
+      try {
+        if (contentType.includes('application/json')) {
+          createResult = await createResponse.json()
+        } else {
+          const text = await createResponse.text()
+          throw new Error(`Unexpected response (status ${createResponse.status}): ${text?.slice(0, 200) || 'No body'}`)
+        }
+      } catch (parseErr) {
+        console.error('Create project response parse error:', parseErr)
+        throw new Error('Failed to parse server response while creating project. Please retry.')
       }
+
+      if (!createResponse.ok) {
+        console.error('Create project API error:', createResult)
+        throw new Error(createResult?.error || 'Failed to create project')
+      }
+
+      const { project } = createResult || {}
 
       // Automatically sync developer if a developer is specified
       if (finalDeveloper && finalDeveloper.trim()) {
@@ -406,8 +428,15 @@ export default function AddListingPage() {
 
         if (!imagesResponse.ok) {
           const errorData = await imagesResponse.json()
+          console.error('Failed to insert project images:', errorData)
           throw new Error(errorData.error || 'Failed to insert project images')
         }
+
+        const imagesResult = await imagesResponse.json()
+        console.log('✅ Project images inserted successfully:', imagesResult)
+        setImageUploadSuccess(`✅ ${additionalImageUrls.length} image(s) added successfully!`)
+        // Clear the success message after 5 seconds
+        setTimeout(() => setImageUploadSuccess(''), 5000)
       }
 
       setSuccess('Property added successfully!')
@@ -532,6 +561,12 @@ export default function AddListingPage() {
         {success && (
           <div className="mb-6 p-4 bg-[#fff5d6] border border-[#f2cd6d] rounded-lg text-[#a67800]">
             {success}
+          </div>
+        )}
+
+        {imageUploadSuccess && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+            {imageUploadSuccess}
           </div>
         )}
 
@@ -1198,6 +1233,11 @@ export default function AddListingPage() {
               <label htmlFor="additionalImages" className="block text-sm font-medium text-gray-700 mb-2">
                 Additional Images (Multiple images can be selected)
               </label>
+              {imageUploadSuccess && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                  {imageUploadSuccess}
+                </div>
+              )}
               <input
                 type="file"
                 id="additionalImages"

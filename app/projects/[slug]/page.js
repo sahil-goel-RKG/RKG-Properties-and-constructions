@@ -29,7 +29,7 @@ const getProject = cache(async (slug) => {
   }
 })
 
-// Cache project images fetch
+// Cache project images fetch (revalidate disabled for real-time updates)
 const getProjectImages = cache(async (projectId) => {
   if (!projectId) {
     return []
@@ -45,9 +45,16 @@ const getProjectImages = cache(async (projectId) => {
 
     if (error) {
       console.error('Error fetching project images:', error)
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      })
       return []
     }
 
+    console.log(`Fetched ${data?.length || 0} project images for project ${projectId}`)
     return data || []
   } catch (err) {
     console.error('Error fetching project images:', err)
@@ -56,7 +63,8 @@ const getProjectImages = cache(async (projectId) => {
 })
 
 // Add revalidation for ISR (Incremental Static Regeneration)
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = 0 // Revalidate on every request (for development/testing)
+// Change to 3600 for production (revalidate every hour)
 
 export async function generateMetadata({ params }) {
   const { slug } = await params

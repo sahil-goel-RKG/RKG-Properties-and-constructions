@@ -74,3 +74,14 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Prevent rendering artifacts and horizontal strips */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}

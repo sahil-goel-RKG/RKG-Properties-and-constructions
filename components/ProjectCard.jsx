@@ -8,7 +8,8 @@ export default function ProjectCard({ project }) {
   return (
     <Link
       href={`/projects/${project.slug}`}
-      className="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col"
+      className="block bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col"
+      style={{ willChange: 'transform', transform: 'translateZ(0)' }}
     >
       <div className="relative h-48 bg-gray-200 flex-shrink-0">
         {project.image_url ? (
