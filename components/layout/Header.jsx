@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
+import UserButtonWrapper from '@/app/builder-floor/UserButtonWrapper'
 
 const propertySections = [
   {
@@ -65,73 +66,79 @@ export default function Header() {
               
             </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center h-full">
-            <Link href="/" className="h-full px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition">
-              Home
-            </Link>
-            <div
-              className="relative h-full"
-              onMouseEnter={() => {
-                // Clear any pending close timeout
-                if (closeTimeoutRef.current) {
-                  clearTimeout(closeTimeoutRef.current)
-                  closeTimeoutRef.current = null
-                }
-                setIsPropertyOpen(true)
-              }}
-              onMouseLeave={() => {
-                // Set a 1 second delay before closing
-                closeTimeoutRef.current = setTimeout(() => {
-                  setIsPropertyOpen(false)
-                  closeTimeoutRef.current = null
-                }, 100)
-              }}
-            >
-              <button
-                className="h-full px-4 flex items-center gap-2 text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition"
+          {/* Desktop Navigation and User Icon */}
+          <div className="hidden md:flex items-center h-full">
+            <nav className="flex items-center h-full">
+              <Link href="/" className="h-full px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition">
+                Home
+              </Link>
+              <div
+                className="relative h-full"
+                onMouseEnter={() => {
+                  // Clear any pending close timeout
+                  if (closeTimeoutRef.current) {
+                    clearTimeout(closeTimeoutRef.current)
+                    closeTimeoutRef.current = null
+                  }
+                  setIsPropertyOpen(true)
+                }}
+                onMouseLeave={() => {
+                  // Set a 1 second delay before closing
+                  closeTimeoutRef.current = setTimeout(() => {
+                    setIsPropertyOpen(false)
+                    closeTimeoutRef.current = null
+                  }, 100)
+                }}
               >
-                Properties
-                <svg
-                  className={`w-4 h-4 transition-transform ${isPropertyOpen ? 'rotate-180' : ''}`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+                <button
+                  className="h-full px-4 flex items-center gap-2 text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0l-4.24-4.24a.75.75 0 01.02-1.06z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-              {isPropertyOpen && (
-                <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
-                  {propertySections.map((section, sectionIndex) => (
-                    <div key={sectionIndex}>
-                      <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                        {section.title}
+                  Properties
+                  <svg
+                    className={`w-4 h-4 transition-transform ${isPropertyOpen ? 'rotate-180' : ''}`}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0l-4.24-4.24a.75.75 0 01.02-1.06z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {isPropertyOpen && (
+                  <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
+                    {propertySections.map((section, sectionIndex) => (
+                      <div key={sectionIndex}>
+                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                          {section.title}
+                        </div>
+                        {section.items.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className="block px-4 py-2 pl-6 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#c99700] transition"
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
                       </div>
-                      {section.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className="block px-4 py-2 pl-6 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#c99700] transition"
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Link href="/about" className="h-full px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition">
+                About Us
+              </Link>
+              <Link href="/contact" className="h-full px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition">
+                Contact Us
+              </Link>
+            </nav>
+            {/* User Icon - Only shows when signed in */}
+            <div className="flex items-center ml-2">
+              <UserButtonWrapper afterSignOutUrl="/" />
             </div>
-            <Link href="/about" className="h-full px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition">
-              About Us
-            </Link>
-            <Link href="/contact" className="h-full px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition">
-              Contact Us
-            </Link>
-          </nav>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -213,6 +220,10 @@ export default function Header() {
             >
               Contact Us
             </Link>
+            {/* User Icon for Mobile - Only shows when signed in */}
+            <div className="md:hidden py-2">
+              <UserButtonWrapper afterSignOutUrl="/" />
+            </div>
           </nav>
         )}
       </div>

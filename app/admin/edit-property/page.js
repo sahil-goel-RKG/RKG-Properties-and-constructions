@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { formatPriceLabel } from '@/lib/formatPrice'
 
 export default function EditPropertyPage() {
   const { user, isLoaded } = useUser()
@@ -42,23 +43,95 @@ export default function EditPropertyPage() {
     }
   }, [user, isLoaded, router])
 
+  
   const fetchProjects = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+  
+      // Fetch Apartments
+      const { data: apartments, error: aptError } = await supabase
         .from('projects')
         .select('*')
         .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setProjects(data || [])
+  
+      if (aptError) throw aptError
+  
+      // Fetch Builder Floors
+      const { data: builderFloors, error: bfError } = await supabase
+        .from('builder_floors')
+        .select('*')
+        .order('created_at', { ascending: false })
+  
+      if (bfError) throw bfError
+  
+      // Normalize Builder Floor fields to match Apartment format
+      const formattedBF = builderFloors.map(bf => {
+        // Calculate lowest price from building_config or legacy fields
+        let lowestPrice = null
+        
+        // Check if building_config exists
+        let buildingConfig = null
+        if (bf.building_config) {
+          try {
+            buildingConfig = typeof bf.building_config === 'string' 
+              ? JSON.parse(bf.building_config) 
+              : bf.building_config
+            if (!Array.isArray(buildingConfig)) {
+              buildingConfig = null
+            }
+          } catch (e) {
+            console.error('Error parsing building_config:', e)
+            buildingConfig = null
+          }
+        }
+        
+        if (buildingConfig && buildingConfig.length > 0) {
+          // Collect all prices from all buildings and all floor types
+          const allPrices = []
+          buildingConfig.forEach((building) => {
+            if (building.price_ug) allPrices.push(Number(building.price_ug))
+            if (building.price_mid1) allPrices.push(Number(building.price_mid1))
+            if (building.price_mid2) allPrices.push(Number(building.price_mid2))
+            if (building.price_top) allPrices.push(Number(building.price_top))
+          })
+          
+          if (allPrices.length > 0) {
+            lowestPrice = Math.min(...allPrices)
+          }
+        } else {
+          // Fallback to legacy individual fields
+          const legacyPrices = []
+          if (bf.price_ug) legacyPrices.push(Number(bf.price_ug))
+          if (bf.price_mid1) legacyPrices.push(Number(bf.price_mid1))
+          if (bf.price_mid2) legacyPrices.push(Number(bf.price_mid2))
+          if (bf.price_top) legacyPrices.push(Number(bf.price_top))
+          
+          if (legacyPrices.length > 0) {
+            lowestPrice = Math.min(...legacyPrices)
+          }
+        }
+        
+        return {
+          ...bf,
+          project_status: bf.status || null,
+          area: bf.plot_size || null,
+          price: lowestPrice,
+          developer: bf.developer || null,
+          type: "builder-floor"
+        }
+      })
+  
+      setProjects([ ...apartments, ...formattedBF ])
+      
     } catch (err) {
       console.error('Error fetching projects:', err)
-      setError('Failed to fetch projects')
+      setError('Failed to fetch properties')
     } finally {
       setLoading(false)
     }
   }
+  
+
 
   const fetchFilterOptions = async () => {
     try {
@@ -157,29 +230,35 @@ export default function EditPropertyPage() {
   }, [projects, searchQuery, typeFilter, locationFilter, developerFilter, areaFilter, statusFilter])
 
 
-  const handleDelete = async (projectId) => {
+  const handleDelete = async (project) => {
     if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
       return
     }
-
+  
     try {
       setSaving(true)
       setError('')
-      
-      const response = await fetch('/api/projects/delete', {
+  
+      // 👉 choose API based on type
+      const url =
+        project.type === 'builder-floor'
+          ? '/api/builder-floors/delete'
+          : '/api/projects/delete'
+  
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: projectId }),
+        body: JSON.stringify({ id: project.id }),
       })
-
+  
       const data = await response.json()
-
+  
       if (!response.ok) {
         throw new Error(data.error || 'Failed to delete project')
       }
-
+  
       setSuccess('Project deleted successfully!')
       await fetchProjects()
       setTimeout(() => setSuccess(''), 3000)
@@ -191,6 +270,7 @@ export default function EditPropertyPage() {
       setSaving(false)
     }
   }
+  
 
   if (!isLoaded) {
     return (
@@ -476,24 +556,42 @@ export default function EditPropertyPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {project.price ? `₹${Number(project.price).toLocaleString('en-IN')}` : '-'}
+                        {project.price ? (() => {
+                          const priceInfo = formatPriceLabel(project.price)
+                          return priceInfo ? priceInfo.label : `₹${Number(project.price).toLocaleString('en-IN')} Cr`
+                        })() : '-'}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
-                          <Link
-                            href={`/admin/edit-property/${project.id}`}
-                            className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                          >
-                            Edit
-                          </Link>
+                          {(() => {
+                            // Decide where to navigate for editing
+                            const type = project.type
+
+                            // Builder floor → dedicated builder floor edit page
+                            const editHref =
+                              type === 'builder-floor'
+                                ? `/admin/edit-builder-floor/${project.id}`
+                                : `/admin/edit-property/${project.id}` // Apartments (and other project types)
+
+                            return (
+                              <Link
+                                href={editHref}
+                                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                              >
+                                Edit
+                              </Link>
+                            )
+                          })()}
+
                           <button
-                            onClick={() => handleDelete(project.id)}
+                            onClick={() => handleDelete(project)}
                             className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
                           >
                             Delete
                           </button>
                         </div>
                       </td>
+
                     </tr>
                   ))}
                 </tbody>

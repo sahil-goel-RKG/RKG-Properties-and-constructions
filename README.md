@@ -6,6 +6,7 @@ A modern real estate website built with Next.js, TypeScript, Tailwind CSS, and S
 
 - 🏠 Residential and Commercial Project Listings
 - 📝 Contact Form with Supabase Database Integration
+- 📧 Email Notifications via Resend (when users submit contact form)
 - 🖼️ Image Storage via Supabase Storage
 - 📱 Fully Responsive Design
 - 🚀 Server-Side Rendering with Next.js 16
@@ -137,6 +138,25 @@ VALUES (
 
 - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon/public key
+- `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key (for server-side operations)
+- `RESEND_API_KEY` - Your Resend API key for sending email notifications (optional but recommended)
+- `CONTACT_EMAIL` - Email address to receive contact form submissions (defaults to sahil@rkgproperties.in)
+- `RESEND_FROM_EMAIL` - Email address to send from (defaults to onboarding@resend.dev, must be verified in Resend)
+
+### Setting Up Resend Email Notifications
+
+1. Create an account at [resend.com](https://resend.com)
+2. Get your API key from the Resend dashboard
+3. Verify your domain or use the default `onboarding@resend.dev` email
+4. Add the following to your `.env.local` file:
+
+```env
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CONTACT_EMAIL=sahil@rkgproperties.in
+RESEND_FROM_EMAIL=onboarding@resend.dev
+```
+
+**Note:** If `RESEND_API_KEY` is not set, the contact form will still work and save submissions to Supabase, but email notifications will be skipped.
 
 ## Technologies Used
 
@@ -146,7 +166,67 @@ VALUES (
 - **Supabase** - Backend and database
 - **React 19** - UI library
 
+## Project Structure
+
+See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for detailed information about the project organization.
+
+## Production Deployment
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in all required values:
+
+```bash
+cp .env.example .env.local
+```
+
+Required environment variables:
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon/public key
+- `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key (for server-side operations)
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- `CLERK_SECRET_KEY` - Clerk secret key
+- `RESEND_API_KEY` - Resend API key for email notifications
+- `CONTACT_EMAIL` - Email address to receive contact form submissions
+- `RESEND_FROM_EMAIL` - Verified email address for sending emails
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+### Deployment Platforms
+
+#### Vercel (Recommended)
+1. Connect your GitHub repository to Vercel
+2. Add all environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+#### Other Platforms
+- Ensure Node.js 18+ is available
+- Set all environment variables
+- Run `npm run build` and `npm start`
+
+## Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint errors automatically
+
+## Security Features
+
+- ✅ Row Level Security (RLS) on Supabase
+- ✅ Rate limiting on API routes
+- ✅ Input validation and sanitization
+- ✅ Content Security Policy headers
+- ✅ Automatic sign-out after inactivity
+- ✅ Authentication required for admin routes
+- ✅ Secure image uploads
+
 ## License
 
-Private project - All rights reserved.
-"# RKG_Properties_and_Constructions" 
+Private project - All rights reserved. 

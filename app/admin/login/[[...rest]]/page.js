@@ -1,6 +1,11 @@
 import { SignIn } from '@clerk/nextjs'
 
-export default function AdminLoginPage() {
+export default async function AdminLoginPage({ searchParams }) {
+  // Get returnUrl from query params, default to /admin if not provided
+  // In Next.js 15+, searchParams is a Promise
+  const params = await searchParams
+  const returnUrl = params?.returnUrl || '/admin'
+  
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-16">
       <div className="w-full max-w-md">
@@ -12,8 +17,9 @@ export default function AdminLoginPage() {
           routing="path"
           path="/admin/login"
           signUpUrl="/admin/login"
-          afterSignInUrl="/admin"
-          afterSignUpUrl="/admin"
+          afterSignInUrl={returnUrl}
+          afterSignUpUrl={returnUrl}
+          redirectUrl={returnUrl}
           appearance={{
             variables: {
               colorPrimary: '#c99700',

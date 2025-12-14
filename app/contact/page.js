@@ -1,4 +1,4 @@
-import ContactForm from '@/components/ContactForm'
+import ContactForm from '@/components/features/ContactForm'
 
 export const metadata = {
   title: 'Contact Us | RKG Properties and Constructions',

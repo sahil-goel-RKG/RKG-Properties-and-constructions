@@ -1,6 +1,6 @@
-import ProjectCard from '@/components/ProjectCard'
-import ResidentialFilters from '@/components/ResidentialFilters'
-import Pagination from '@/components/Pagination'
+import ProjectCard from '@/components/ui/ProjectCard'
+import ResidentialFilters from '@/components/features/ResidentialFilters'
+import Pagination from '@/components/ui/Pagination'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { cache } from 'react'
 import Link from 'next/link'
@@ -282,9 +282,13 @@ export default async function ResidentialPage({ searchParams }) {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} project={project}/>
-              ))}
+            {projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                variant="apartment"   // 👈 important
+              />
+            ))}
             </div>
             <Pagination
               currentPage={currentPage}

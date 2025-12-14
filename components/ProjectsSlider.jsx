@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useCallback } from 'react'
-import ProjectCard from './ProjectCard'
+import ProjectCard from '@/components/ui/ProjectCard'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -14,6 +14,7 @@ export default function ProjectsSlider({
   allowEmpty = false,
   emptyMessage = 'No projects available at the moment. Check back soon!',
   bgColor = 'bg-white',
+  variant = 'apartment', // 'apartment' or 'builder-floor'
 }) {
   const scrollContainerRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -113,7 +114,7 @@ export default function ProjectsSlider({
           >
             {projects.map((project) => (
               <div key={project.id} className="flex-shrink-0 w-80 self-stretch">
-                <ProjectCard project={project} />
+                <ProjectCard project={project} variant={variant} />
               </div>
             ))}
           </div>

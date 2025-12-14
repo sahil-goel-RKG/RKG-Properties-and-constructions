@@ -1,17 +1,34 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
+import { useUser } from '@clerk/nextjs'
 import { formatPriceLabel } from '@/lib/formatPrice'
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, variant }) {
+  const { isSignedIn, isLoaded } = useUser()
+  
+  // variant comes from the caller: "apartment" or "builder-floor"
+  // For safety, also fall back to project.type if present
+  const isBuilderFloor =
+    variant === 'builder-floor' || project.type === 'builder-floor'
+
+  const href = isBuilderFloor
+    ? `/builder-floor/${project.slug}`   // 👉 for builder floors
+    : `/projects/${project.slug}`        // 👉 for apartments
+
   const priceInfo = formatPriceLabel(project.price)
+
+  // For builder floors, blur if user is not signed in
+  const shouldBlur = isBuilderFloor && isLoaded && !isSignedIn
 
   return (
     <Link
-      href={`/projects/${project.slug}`}
+      href={href}
       className="block bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col"
       style={{ willChange: 'transform', transform: 'translateZ(0)' }}
     >
-      <div className="relative h-48 bg-gray-200 flex-shrink-0">
+      <div className={`relative h-48 bg-gray-200 flex-shrink-0 ${shouldBlur ? 'blur-sm' : ''}`}>
         {project.image_url ? (
           <Image
             src={project.image_url}
@@ -37,8 +54,10 @@ export default function ProjectCard({ project }) {
           </div>
         )}
       </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 h-16">{project.name}</h3>
+      <div className={`p-6 flex flex-col flex-grow ${shouldBlur ? 'blur-sm' : ''}`}>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 h-16">
+          {project.name}
+        </h3>
         <p className="text-gray-600 mb-2">
           <span className="font-medium">Location:</span> {project.location}
         </p>
@@ -59,4 +78,3 @@ export default function ProjectCard({ project }) {
     </Link>
   )
 }
-

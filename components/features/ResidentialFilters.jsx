@@ -10,7 +10,8 @@ export default function ResidentialFilters({
   types = [],
   showDeveloperFilter = true,
   showTypeFilter = false,
-  basePath = '/apartments'
+  basePath = '/apartments',
+  buttonWrapperClassName = ''
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -66,7 +67,7 @@ export default function ResidentialFilters({
   return (
     <>
       {/* Filter Button - Hamburger Menu */}
-      <div className="flex justify-end mb-6">
+      <div className={`flex justify-end mb-6 ${buttonWrapperClassName}`}>
         <button
           onClick={() => setIsOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition"

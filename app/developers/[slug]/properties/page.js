@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import Link from 'next/link'
-import ProjectCard from '@/components/ProjectCard'
-import ResidentialFilters from '@/components/ResidentialFilters'
+import ProjectCard from '@/components/ui/ProjectCard'
+import ResidentialFilters from '@/components/features/ResidentialFilters'
 import { developerNameToSlug, getDeveloperLogo } from '@/lib/developerUtils'
 import Image from 'next/image'
 

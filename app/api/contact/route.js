@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
 import { contactFormLimiter, getClientIdentifier } from '@/lib/rateLimit'
 import { validateName, validateEmail, validatePhone, validateMessage } from '@/lib/inputValidation'
 
@@ -105,6 +106,82 @@ export async function POST(request) {
         { error: 'Failed to submit form. Please try again.' },
         { status: 500 }
       )
+    }
+
+    // Send email notification using Resend
+    try {
+      const resendApiKey = process.env.RESEND_API_KEY
+      const recipientEmail = process.env.CONTACT_EMAIL || 'sahil@rkgproperties.in'
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+
+      if (resendApiKey) {
+        const resend = new Resend(resendApiKey)
+
+        // Create HTML email template
+        const emailHtml = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>New Property Inquiry</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h1 style="color: #AB090A; margin-top: 0;">New Property Inquiry</h1>
+                <p style="color: #666; margin-bottom: 0;">You have received a new inquiry through the contact form.</p>
+              </div>
+              
+              <div style="background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px;">
+                <h2 style="color: #333; border-bottom: 2px solid #AB090A; padding-bottom: 10px; margin-top: 0;">Contact Details</h2>
+                
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; font-weight: bold; color: #555; width: 120px;">Name:</td>
+                    <td style="padding: 10px 0; color: #333;">${sanitizedName}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; font-weight: bold; color: #555;">Email:</td>
+                    <td style="padding: 10px 0; color: #333;">
+                      <a href="mailto:${sanitizedEmail}" style="color: #AB090A; text-decoration: none;">${sanitizedEmail}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; font-weight: bold; color: #555;">Phone:</td>
+                    <td style="padding: 10px 0; color: #333;">
+                      <a href="tel:${sanitizedPhone}" style="color: #AB090A; text-decoration: none;">${sanitizedPhone}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; font-weight: bold; color: #555; vertical-align: top;">Message:</td>
+                    <td style="padding: 10px 0; color: #333; white-space: pre-wrap;">${sanitizedMessage}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; text-align: center; color: #666; font-size: 12px;">
+                <p style="margin: 0;">This email was sent from the RKG Properties contact form.</p>
+                <p style="margin: 5px 0 0 0;">Timestamp: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+              </div>
+            </body>
+          </html>
+        `
+
+        await resend.emails.send({
+          from: fromEmail,
+          to: recipientEmail,
+          subject: `New Property Inquiry from ${sanitizedName}`,
+          html: emailHtml,
+        })
+
+        console.log('Email sent successfully to', recipientEmail)
+      } else {
+        console.warn('RESEND_API_KEY not configured. Email notification skipped.')
+      }
+    } catch (emailError) {
+      // Log email error but don't fail the request if email sending fails
+      console.error('Error sending email notification:', emailError)
+      // Continue with success response even if email fails
     }
 
     return NextResponse.json(

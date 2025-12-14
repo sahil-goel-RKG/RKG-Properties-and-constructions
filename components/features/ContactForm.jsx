@@ -153,7 +153,7 @@ export default function ContactForm({ size = 'md' }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`w-full bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition disabled:opacity-50 disabled:cursor-not-allowed ${buttonClass}`}
+        className={`w-full bg-[#AB090A] text-white rounded-lg font-semibold hover:bg-[#8a0708] transition disabled:opacity-50 disabled:cursor-not-allowed ${buttonClass}`}
       >
         {isSubmitting ? 'Submitting...' : 'Submit'}
       </button>

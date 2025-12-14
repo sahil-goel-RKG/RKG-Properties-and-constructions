@@ -7,10 +7,11 @@ import LocationsSlider from '@/components/LocationsSlider'
 import ProjectsSlider from '@/components/ProjectsSlider'
 import DevelopersSlider from '@/components/DevelopersSlider'
 import CountUpStats from '@/components/CountUpStats'
-import ContactForm from '@/components/ContactForm'
+import ContactForm from '@/components/features/ContactForm'
 
 // Add revalidation for ISR
-export const revalidate = 1800 // Revalidate every 30 minutes
+//export const revalidate = 1800 // Revalidate every 30 minutes
+export const revalidate = 0 // Revalidate every 0 minutes
 
 // Cache project fetches for faster loads
 const getResidentialProjects = cache(async () => {
@@ -40,10 +41,24 @@ const getBuilderFloorProjects = cache(async () => {
   try {
     const supabase = createServerSupabaseClient()
     const { data, error } = await supabase
-      .from('projects')
-      .select('id, name, slug, location, developer, area, price, image_url, type, short_description, bhk_config, project_status, is_featured')
-      .in('type', ['builder-floor', 'builder floor', 'builder_floor'])
-      .order('is_featured', { ascending: false })
+      .from('builder_floors')
+      .select(`
+        id,
+        name,
+        slug,
+        location,
+        plot_size,
+        price_top,
+        price_mid1,
+        price_mid2,
+        price_ug,
+        building_config,
+        image_url,
+        comments,
+        short_description,
+        full_description,
+        status
+      `)
       .order('created_at', { ascending: false })
       .limit(12)
 
@@ -52,12 +67,100 @@ const getBuilderFloorProjects = cache(async () => {
       return []
     }
 
-    return data || []
+    // Map to the same shape ProjectCard / ProjectsSlider expects
+    return (data || []).map((floor) => {
+      // Parse building_config if it exists
+      let buildingConfig = null
+      if (floor.building_config) {
+        try {
+          buildingConfig = typeof floor.building_config === 'string' 
+            ? JSON.parse(floor.building_config) 
+            : floor.building_config
+          if (!Array.isArray(buildingConfig)) {
+            buildingConfig = null
+          }
+        } catch (e) {
+          console.error('Error parsing building_config:', e)
+          buildingConfig = null
+        }
+      }
+
+      // Calculate lowest price from all buildings and all floor types
+      let lowestPrice = null
+      if (buildingConfig && buildingConfig.length > 0) {
+        const allPrices = []
+        buildingConfig.forEach((building) => {
+          if (building.price_ug) allPrices.push(Number(building.price_ug))
+          if (building.price_mid1) allPrices.push(Number(building.price_mid1))
+          if (building.price_mid2) allPrices.push(Number(building.price_mid2))
+          if (building.price_top) allPrices.push(Number(building.price_top))
+        })
+        if (allPrices.length > 0) {
+          lowestPrice = Math.min(...allPrices)
+        }
+      } else {
+        // Fallback to legacy individual fields
+        const legacyPrices = []
+        if (floor.price_ug) legacyPrices.push(Number(floor.price_ug))
+        if (floor.price_mid1) legacyPrices.push(Number(floor.price_mid1))
+        if (floor.price_mid2) legacyPrices.push(Number(floor.price_mid2))
+        if (floor.price_top) legacyPrices.push(Number(floor.price_top))
+        if (legacyPrices.length > 0) {
+          lowestPrice = Math.min(...legacyPrices)
+        }
+      }
+
+      // Calculate area range from all buildings
+      let areaRange = null
+      if (buildingConfig && buildingConfig.length > 0) {
+        const allAreas = []
+        buildingConfig.forEach((building) => {
+          if (building.plot_size) {
+            // Extract numeric value from plot_size (e.g., "263 sqyd" -> 263)
+            const match = building.plot_size.toString().match(/([\d.]+)/)
+            if (match) {
+              allAreas.push(parseFloat(match[1]))
+            }
+          }
+        })
+        if (allAreas.length > 0) {
+          const minArea = Math.min(...allAreas)
+          const maxArea = Math.max(...allAreas)
+          if (minArea === maxArea) {
+            areaRange = `${minArea} sqyd`
+          } else {
+            areaRange = `${minArea}-${maxArea} sqyd`
+          }
+        }
+      }
+      
+      // Fallback to single plot_size if no building_config
+      if (!areaRange && floor.plot_size) {
+        areaRange = floor.plot_size
+      }
+
+      return {
+        id: floor.id,
+        name: floor.name,
+        slug: floor.slug,
+        location: floor.location,
+        developer: null, // not used for builder floors on card
+        area: areaRange, // show area range as "lowest-highest sqyd"
+        price: lowestPrice, // lowest price from all buildings and floors
+        image_url: floor.image_url,
+        type: 'builder-floor', // 👈 IMPORTANT for routing
+        short_description: floor.short_description || floor.comments || null,
+        bhk_config: null,
+        project_status: floor.status || null,
+        is_featured: false, // or true later if you add a column
+      }
+    })
   } catch (error) {
     console.error('Error fetching builder floor projects:', error)
     return []
   }
 })
+
 
 const getHeroImages = cache(async () => {
   try {
@@ -86,18 +189,33 @@ const getHeroImages = cache(async () => {
 const getUniqueLocations = cache(async () => {
   try {
     const supabase = createServerSupabaseClient()
-    const { data, error } = await supabase
-      .from('projects')
-      .select('location')
-      .eq('type', 'apartment')
-      .not('location', 'is', null)
+    
+    // Fetch locations from both projects (apartments) and builder_floors tables
+    const [projectsResult, builderFloorsResult] = await Promise.all([
+      supabase
+        .from('projects')
+        .select('location')
+        .eq('type', 'apartment')
+        .not('location', 'is', null)
+        .neq('location', ''),
+      supabase
+        .from('builder_floors')
+        .select('location')
+        .not('location', 'is', null)
+        .neq('location', '')
+    ])
 
-    if (error) {
-      console.error('Error fetching locations:', error)
-      return []
+    // Combine locations from both tables
+    const allLocations = []
+    if (!projectsResult.error && projectsResult.data) {
+      allLocations.push(...projectsResult.data.map(item => item.location).filter(Boolean))
+    }
+    if (!builderFloorsResult.error && builderFloorsResult.data) {
+      allLocations.push(...builderFloorsResult.data.map(item => item.location).filter(Boolean))
     }
 
-    const uniqueLocations = [...new Set(data.map(item => item.location).filter(Boolean))]
+    // Get unique locations and sort
+    const uniqueLocations = [...new Set(allLocations)]
     return uniqueLocations.sort()
   } catch (error) {
     console.error('Error fetching locations:', error)
@@ -242,6 +360,7 @@ export default async function Home() {
         allowEmpty
         emptyMessage="We are curating the finest builder floor listings. Leave your details and we'll notify you as soon as they go live."
         bgColor="bg-gray-100"
+        variant="builder-floor"
       />
 
       {/* Features Section */}

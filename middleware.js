@@ -30,6 +30,8 @@ export default clerkMiddleware(async (auth, request) => {
     const { userId } = await auth();
     if (!userId) {
       const signInUrl = new URL('/admin/login', request.url);
+      // Preserve the original URL as returnUrl so user is redirected back after login
+      signInUrl.searchParams.set('returnUrl', request.nextUrl.pathname + request.nextUrl.search);
       return NextResponse.redirect(signInUrl);
     }
   }

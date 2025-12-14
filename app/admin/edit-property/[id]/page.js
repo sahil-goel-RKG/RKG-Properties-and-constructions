@@ -128,29 +128,59 @@ export default function EditPropertyDetailPage() {
   useEffect(() => {
     async function fetchOptions() {
       try {
-        // Fetch unique locations
-        const { data: locationData, error: locationError } = await supabase
-          .from('projects')
-          .select('location')
-          .not('location', 'is', null)
-          .neq('location', '')
+        // Fetch unique locations from both projects and builder_floors tables
+        const [projectsResult, builderFloorsResult] = await Promise.all([
+          supabase
+            .from('projects')
+            .select('location')
+            .not('location', 'is', null)
+            .neq('location', ''),
+          supabase
+            .from('builder_floors')
+            .select('location')
+            .not('location', 'is', null)
+            .neq('location', '')
+        ])
 
-        if (!locationError && locationData) {
-          const uniqueLocations = [...new Set(locationData.map(item => item.location).filter(Boolean))]
-          setLocations(uniqueLocations.sort())
+        // Combine locations from both tables
+        const allLocations = []
+        if (!projectsResult.error && projectsResult.data) {
+          allLocations.push(...projectsResult.data.map(item => item.location).filter(Boolean))
+        }
+        if (!builderFloorsResult.error && builderFloorsResult.data) {
+          allLocations.push(...builderFloorsResult.data.map(item => item.location).filter(Boolean))
         }
 
-        // Fetch unique developers
-        const { data: developerData, error: developerError } = await supabase
-          .from('projects')
-          .select('developer')
-          .not('developer', 'is', null)
-          .neq('developer', '')
+        // Get unique locations and sort
+        const uniqueLocations = [...new Set(allLocations)]
+        setLocations(uniqueLocations.sort())
 
-        if (!developerError && developerData) {
-          const uniqueDevelopers = [...new Set(developerData.map(item => item.developer).filter(Boolean))]
-          setDevelopers(uniqueDevelopers.sort())
+        // Fetch unique developers from both projects and builder_floors tables
+        const [projectsDevResult, builderFloorsDevResult] = await Promise.all([
+          supabase
+            .from('projects')
+            .select('developer')
+            .not('developer', 'is', null)
+            .neq('developer', ''),
+          supabase
+            .from('builder_floors')
+            .select('developer')
+            .not('developer', 'is', null)
+            .neq('developer', '')
+        ])
+
+        // Combine developers from both tables
+        const allDevelopers = []
+        if (!projectsDevResult.error && projectsDevResult.data) {
+          allDevelopers.push(...projectsDevResult.data.map(item => item.developer).filter(Boolean))
         }
+        if (!builderFloorsDevResult.error && builderFloorsDevResult.data) {
+          allDevelopers.push(...builderFloorsDevResult.data.map(item => item.developer).filter(Boolean))
+        }
+
+        // Get unique developers and sort
+        const uniqueDevelopers = [...new Set(allDevelopers)]
+        setDevelopers(uniqueDevelopers.sort())
       } catch (err) {
         console.error('Error fetching options:', err)
       } finally {
@@ -192,7 +222,9 @@ export default function EditPropertyDetailPage() {
         .from('projects')
         .select('*')
         .eq('id', projectId)
-        .single()
+        .eq('type', 'apartment')   // 👈 only apartments
+        .maybeSingle()             // 👈 safer than .single()
+
 
       if (projectError) {
         console.error('Project fetch error:', projectError)
@@ -200,7 +232,7 @@ export default function EditPropertyDetailPage() {
       }
       
       if (!project) {
-        setError('Project not found')
+        setError('Apartment not found for this ID')
         setLoading(false)
         return
       }
@@ -1998,7 +2030,7 @@ export default function EditPropertyDetailPage() {
                     handleSubmit(e)
                   }}
                   disabled={saving}
-                  className="px-6 py-2 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 bg-[#AB090A] text-white rounded-lg font-semibold hover:bg-[#8a0708] transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
