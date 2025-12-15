@@ -158,12 +158,14 @@ export default function SyncDevelopersPage() {
             <div className="space-y-2 text-sm text-gray-700">
               <p><strong>Using curl:</strong></p>
               <code className="block bg-white p-2 rounded border">
-                curl -X POST http://localhost:3000/api/developers/sync-from-projects
+                curl -X POST https://your-domain.com/api/developers/sync-from-projects
               </code>
+              <p className="mt-2 text-xs text-gray-500">Note: For localhost development, use http://localhost:3000</p>
               <p className="mt-4"><strong>Using PowerShell:</strong></p>
               <code className="block bg-white p-2 rounded border">
-                Invoke-WebRequest -Uri "http://localhost:3000/api/developers/sync-from-projects" -Method POST
+                Invoke-WebRequest -Uri "https://your-domain.com/api/developers/sync-from-projects" -Method POST
               </code>
+              <p className="mt-2 text-xs text-gray-500">Note: For localhost development, use http://localhost:3000</p>
               <p className="mt-4"><strong>Or use SQL directly in Supabase:</strong></p>
               <code className="block bg-white p-2 rounded border text-xs">
                 INSERT INTO developers (name, slug, is_featured, display_order, is_active)<br/>
