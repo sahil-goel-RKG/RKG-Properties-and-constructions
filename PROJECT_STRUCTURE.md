@@ -64,7 +64,7 @@ RKG_Properties_and_Constructions/
 │   ├── img/                  # Images
 │   └── pdf/                  # PDF files
 │
-├── middleware.js              # Next.js middleware (auth, routing)
+├── proxy.js                   # Next.js proxy (auth, routing)
 ├── next.config.js            # Next.js configuration
 ├── package.json              # Dependencies and scripts
 └── README.md                 # Project documentation
@@ -132,7 +132,7 @@ All API routes follow RESTful conventions:
 2. **Constants**: All magic numbers and strings are in `config/constants.js`
 3. **Type Safety**: Use consistent naming and structure
 4. **Error Handling**: All API routes include proper error handling
-5. **Security**: Authentication and authorization are handled via middleware
+5. **Security**: Authentication and authorization are handled via proxy
 6. **Performance**: Images are optimized via Next.js Image component
 7. **SEO**: Metadata is configured for all pages
 

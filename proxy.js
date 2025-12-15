@@ -24,12 +24,14 @@ const isPublicAdminRoute = createRouteMatcher([
   '/admin/login(.*)'  // Catch-all pattern to match all login sub-routes
 ]);
 
-export default clerkMiddleware(async (auth, request) => {
+export const proxy = clerkMiddleware(async (auth, request) => {
   // Protect admin routes - require authentication (except login page)
   if (isAdminRoute(request) && !isPublicAdminRoute(request)) {
     const { userId } = await auth();
     if (!userId) {
-      const signInUrl = new URL('/admin/login', request.url);
+      // Use request.nextUrl.origin to ensure correct domain is used (works with custom domains)
+      // This ensures the redirect URL uses the same domain as the current request
+      const signInUrl = new URL('/admin/login', request.nextUrl.origin);
       // Preserve the original URL as returnUrl so user is redirected back after login
       signInUrl.searchParams.set('returnUrl', request.nextUrl.pathname + request.nextUrl.search);
       return NextResponse.redirect(signInUrl);
@@ -52,3 +54,4 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
+
