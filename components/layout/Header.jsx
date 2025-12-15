@@ -47,7 +47,7 @@ export default function Header() {
               className="flex items-center gap-2 golden-text logo-hover-group transition-all duration-300"
             >
               <Image
-                src="/img/Logo4.PNG"
+                src="/img/Logo4.png"
                 alt="RKG Properties & Constructions Logo"
                 width={100}
                 height={100}
