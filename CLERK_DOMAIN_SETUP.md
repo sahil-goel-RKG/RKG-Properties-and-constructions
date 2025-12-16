@@ -46,10 +46,32 @@ In Clerk Dashboard:
 ### 4. Configure Sign-In/Sign-Up URLs
 
 In Clerk Dashboard:
-1. Go to **User & Authentication** → **Email, Phone, Username**
-2. Ensure **Redirect URLs** include:
-   - `https://yourdomain.com/admin/login`
-   - `https://yourdomain.com/admin`
+1. Go to **Settings** → **Paths** (or **User & Authentication** → **Paths**)
+2. In the **Component paths** section:
+
+   **For `<SignIn />` component:**
+   - Select: **"Sign-in page on application domain"**
+   - Enter: `https://rkgproperties.in/admin/login`
+   - (NOT the Account Portal URL)
+
+   **For `<SignUp />` component:**
+   - Select: **"Sign-up page on application domain"**
+   - Enter: `https://rkgproperties.in/admin/login`
+   - (Use the same URL since your sign-up is on the login page)
+
+   **For "Signing Out" (after sign out):**
+   - Select: **"Sign-in page on application domain"**
+   - Enter: `https://rkgproperties.in/admin/login`
+   - (This redirects users back to login after they sign out)
+
+3. **Home URL** (Application paths section):
+   - Enter: `https://rkgproperties.in`
+   - (Or leave blank if your homepage is at root)
+
+**Important**: 
+- Use **"application domain"** options, NOT "Account Portal"
+- Use your production domain (`rkgproperties.in`), not localhost
+- Use HTTPS, not HTTP
 
 ### 5. Clear Browser Cache & Cookies
 

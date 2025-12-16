@@ -6,12 +6,21 @@ export default async function AdminLoginPage({ searchParams }) {
   const params = await searchParams
   const returnUrl = params?.returnUrl || '/admin'
   
+  // Diagnostic: Check if Clerk key is available (only in development)
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+  const isClerkConfigured = !!clerkKey && clerkKey.startsWith('pk_')
+  
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-16">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Login</h1>
           <p className="text-gray-600">Sign in to access the admin dashboard</p>
+          {!isClerkConfigured && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              ⚠️ Clerk not configured. Check environment variables: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+            </div>
+          )}
         </div>
         <SignIn 
           routing="path"
