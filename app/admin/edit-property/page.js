@@ -32,16 +32,15 @@ export default function EditPropertyPage() {
   
 
   useEffect(() => {
-    if (isLoaded && !user) {
+    if (!isLoaded) return; // ⬅️ wait for Clerk
+    if (!user) {
       router.push('/admin/login')
       return
     }
-
-    if (user) {
-      fetchProjects()
-      fetchFilterOptions()
-    }
-  }, [user, isLoaded, router])
+    // User is authenticated, fetch data
+    fetchProjects()
+    fetchFilterOptions()
+  }, [isLoaded, user, router])
 
   
   const fetchProjects = async () => {
@@ -283,9 +282,7 @@ export default function EditPropertyPage() {
     )
   }
 
-  if (!user) {
-    return null
-  }
+  if (!isLoaded) return null; // ⬅️ wait for Clerk before rendering
 
   return (
     <div className="min-h-screen bg-gray-50 py-16">

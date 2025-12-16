@@ -631,23 +631,15 @@ export default function AddListingPage() {
     }
   }
 
-  // Show loading state
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c99700] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    )
-  }
+  // Production-ready auth check
+  useEffect(() => {
+    if (!isLoaded) return; // ⬅️ wait for Clerk
+    if (!user) {
+      router.push('/admin/login')
+    }
+  }, [isLoaded, user, router])
 
-  // Redirect if not authenticated
-  if (!user) {
-    router.push('/admin/login')
-    return null
-  }
+  if (!isLoaded) return null; // ⬅️ wait for Clerk before rendering
 
   // Navigation functions
   const nextStep = () => {

@@ -76,15 +76,18 @@ const [additionalPreviews, setAdditionalPreviews] = useState([]) // base64 previ
 
   // ------------- AUTH / FETCH -------------
 
+  // Production-ready auth check
   useEffect(() => {
-    if (isLoaded && !user) {
+    if (!isLoaded) return; // ⬅️ wait for Clerk
+    if (!user) {
       router.push('/admin/login')
       return
     }
-    if (user && builderFloorId) {
+    // User is authenticated, fetch builder floor data
+    if (builderFloorId) {
       fetchBuilderFloor()
     }
-  }, [user, isLoaded, router, builderFloorId])
+  }, [isLoaded, user, router, builderFloorId])
 
   // Fetch location and developer suggestions from both projects and builder_floors tables
   useEffect(() => {
@@ -354,6 +357,7 @@ const [additionalPreviews, setAdditionalPreviews] = useState([]) // base64 previ
     if (e && e.preventDefault) {
         e.preventDefault()
       }
+    // Authentication is already checked in useEffect, but double-check for safety
     if (!user) {
       setError('You must be logged in to update.')
       router.push('/admin/login')
@@ -525,7 +529,7 @@ const finalGalleryImages = [...existingImages, ...newGalleryUrls]
     )
   }
 
-  if (!user) return null
+  if (!isLoaded) return null; // ⬅️ wait for Clerk before rendering
 
   return (
     <div className="min-h-screen bg-gray-50 py-16">

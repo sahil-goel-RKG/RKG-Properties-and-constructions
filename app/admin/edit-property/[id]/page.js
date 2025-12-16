@@ -191,26 +191,22 @@ export default function EditPropertyDetailPage() {
     fetchOptions()
   }, [])
 
-  // Fetch project data
+  // Production-ready auth check
   useEffect(() => {
-    if (isLoaded && !user) {
-      const pushResult = router.push('/admin/login')
-      if (pushResult && typeof pushResult.catch === 'function') {
-        pushResult.catch(err => {
-          console.error('Navigation error:', err)
-        })
-      }
+    if (!isLoaded) return; // ⬅️ wait for Clerk
+    if (!user) {
+      router.push('/admin/login')
       return
     }
-
-    if (user && projectId) {
+    // User is authenticated, fetch project data
+    if (projectId) {
       fetchProject().catch(err => {
         console.error('Error fetching project:', err)
         setError('Failed to load project data')
         setLoading(false)
       })
     }
-  }, [user, isLoaded, router, projectId])
+  }, [isLoaded, user, router, projectId])
 
   const fetchProject = async () => {
     try {
@@ -458,7 +454,7 @@ export default function EditPropertyDetailPage() {
       return
     }
     
-    // Check authentication before submitting
+    // Authentication is already checked in useEffect, but double-check for safety
     if (!user) {
       setError('You must be logged in to update properties. Please sign in and try again.')
       router.push('/admin/login')
@@ -794,16 +790,7 @@ export default function EditPropertyDetailPage() {
     )
   }
 
-  // Redirect if not authenticated
-  if (!user) {
-    const pushResult = router.push('/admin/login')
-    if (pushResult && typeof pushResult.catch === 'function') {
-      pushResult.catch(err => {
-        console.error('Navigation error:', err)
-      })
-    }
-    return null
-  }
+  if (!isLoaded) return null; // ⬅️ wait for Clerk before rendering
 
   // Navigation functions
   const nextStep = () => {

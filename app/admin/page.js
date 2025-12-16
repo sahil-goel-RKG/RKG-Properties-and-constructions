@@ -16,15 +16,14 @@ export default function AdminDashboard() {
   const [success, setSuccess] = useState('')
 
   useEffect(() => {
-    if (isLoaded) {
-      if (!user) {
-        router.push('/admin/login')
-        return
-      }
-      // User is authenticated, fetch data
-      fetchContactSubmissions()
+    if (!isLoaded) return; // ⬅️ wait for Clerk
+    if (!user) {
+      router.push('/admin/login')
+      return
     }
-  }, [user, isLoaded, router])
+    // User is authenticated, fetch data
+    fetchContactSubmissions()
+  }, [isLoaded, user, router])
 
   const fetchContactSubmissions = async () => {
     try {
