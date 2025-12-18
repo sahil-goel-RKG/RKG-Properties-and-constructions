@@ -40,23 +40,23 @@ export default function Header() {
         }
       `}</style>
       <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-        <div className="container mx-auto px-2">
-          <div className="flex items-center justify-between h-16 py-0 ">
+        <div className="container mx-auto px-2 sm:px-4">
+          <div className="flex items-center justify-between h-14 sm:h-16 py-0">
             <Link
               href="/"
-              className="flex items-center gap-2 golden-text logo-hover-group transition-all duration-300"
+              className="flex items-center gap-1 sm:gap-2 golden-text logo-hover-group transition-all duration-300"
             >
               <Image
                 src="/img/Logo4.png"
                 alt="RKG Properties & Constructions Logo"
                 width={100}
                 height={100}
-                className="object-contain -mb-2 logo-image transition-all duration-300"
+                className="object-contain -mb-2 logo-image transition-all duration-300 w-12 h-12 sm:w-16 sm:h-16"
                 priority
               />
-               <div className="flex flex-col items-start -ml-5">
+               <div className="flex flex-col items-start -ml-3 sm:-ml-5">
                 <span 
-                  className="text-5xl font-extrabold tracking-wide leading-none logo-text transition-all duration-300" 
+                  className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-wide leading-none logo-text transition-all duration-300" 
                   style={{ letterSpacing: '0.05em', fontFamily: 'Georgia, serif', color: '#DEB63B' }}
                 >
                   RKG

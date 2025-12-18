@@ -261,7 +261,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-12 sm:py-16 md:py-20 overflow-hidden">
         {/* Background Image Carousel or Fallback */}
         {heroImages.length > 0 ? (
           <HeroCarousel images={heroImages} />
@@ -283,38 +283,38 @@ export default async function Home() {
         
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6 md:gap-12 items-start">
             <div className="text-white">
-              <h1 className="text-5xl font-bold mb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
               Your Trusted Real Estate Partner in Gurgaon
               </h1>
-              <p className="text-xl mb-6 text-gray-100">
-              With over a decade of hands-on experience in Gurgaon’s most premium corridors—Golf Course Road, Golf Course Extension, SPR, Sohna Road, Dwarka Expressway, and New Gurgaon—RKG brings a powerful blend of market knowledge, negotiation expertise, and personalised guidance that helps clients make confident decisions in a complex market.
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-gray-100">
+              With over a decade of hands-on experience in Gurgaon's most premium corridors—Golf Course Road, Golf Course Extension, SPR, Sohna Road, Dwarka Expressway, and New Gurgaon—RKG brings a powerful blend of market knowledge, negotiation expertise, and personalised guidance that helps clients make confident decisions in a complex market.
               </p>
-              <div className="flex flex-wrap gap-4 mb-8">
-                <Link href="/apartments" className="inline-block bg-white golden-text px-8 py-3 rounded-lg font-semibold hover:bg-[#fff2be] transition">
+              <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <Link href="/apartments" className="inline-block bg-white golden-text px-4 sm:px-6 md:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-[#fff2be] transition">
                   Browse Projects
                 </Link>
                 
               </div>
-              <div className="flex flex-wrap gap-8 mt-10">
+              <div className="flex flex-wrap gap-4 sm:gap-6 md:gap-8 mt-6 sm:mt-8 md:mt-10">
                 <div>
-                  <p className="text-3xl font-bold">10+</p>
-                  <p className="text-gray-200">Featured Projects</p>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">10+</p>
+                  <p className="text-xs sm:text-sm text-gray-200">Featured Projects</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold">500+</p>
-                  <p className="text-gray-200">Happy Clients</p>
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold">500+</p>
+                  <p className="text-xs sm:text-sm text-gray-200">Happy Clients</p>
                 </div>
               </div>
             </div>
-            <div className="w-full">
-              <div className="bg-white/95 rounded-2xl shadow-2xl p-6 md:p-8 max-w-sm ml-auto backdrop-blur">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+            <div className="w-full mt-6 md:mt-0">
+              <div className="bg-white/95 rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 max-w-sm mx-auto md:ml-auto backdrop-blur">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 text-center">
                   Book a Consultation
                 </h2>
-                <p className="text-sm text-gray-600 mb-6 text-center">
-                  Share your details and we’ll reach out with tailored property recommendations.
+                <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 text-center">
+                  Share your details and we'll reach out with tailored property recommendations.
                 </p>
                 <ContactForm size="xs" />
               </div>
@@ -364,10 +364,10 @@ export default async function Home() {
       />
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-8 sm:py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Why Work With Us</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 md:mb-12 text-center">Why Work With Us</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
             <div className="text-center p-8 bg-white rounded-xl hover:shadow-lg transition">
               <div className="text-5xl mb-4">🏡</div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Local Expertise</h3>
@@ -394,15 +394,15 @@ export default async function Home() {
       <DevelopersSlider developers={developers} />
 
       {/* CTA Section */}
-      <section className="bg-[#0f172a] text-white py-16">
+      <section className="bg-[#0f172a] text-white py-8 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="text-3xl font-bold mb-4">Ready to Move?</h2>
-          <p className="text-xl mb-8 text-gray-200">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Ready to Move?</h2>
+          <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-gray-200">
             Let's discuss your goals and build a tailored plan to get you there.
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-[#22c55e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
+            className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-[#16a34a] transition"
           >
             Get in Touch
           </Link>
