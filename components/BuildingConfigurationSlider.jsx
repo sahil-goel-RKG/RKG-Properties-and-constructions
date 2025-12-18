@@ -1,12 +1,18 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import { useUser } from '@clerk/nextjs'
+import BrochureDownloadModal from '@/components/features/BrochureDownloadModal'
 
-export default function BuildingConfigurationSlider({ buildingConfig, status, slug }) {
+export default function BuildingConfigurationSlider({ buildingConfig, status, slug, builderFloorName }) {
   const scrollContainerRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
   const [selectedBuilding, setSelectedBuilding] = useState(null)
+  const { user, isLoaded } = useUser()
+  const [showModal, setShowModal] = useState(false)
+  const [pendingDownloadUrl, setPendingDownloadUrl] = useState(null)
+  const [pendingProjectName, setPendingProjectName] = useState('')
 
   const checkScrollability = () => {
     if (scrollContainerRef.current) {
@@ -254,6 +260,16 @@ export default function BuildingConfigurationSlider({ buildingConfig, status, sl
                 <div className="pt-2 border-t border-gray-200">
                   <a
                     href={slug ? `/api/download-brochure?type=builder-floor&slug=${slug}&building=${index}` : building.brochure_url}
+                    onClick={(e) => {
+                      // If user is not authenticated, show modal
+                      if (!isLoaded || !user) {
+                        e.preventDefault()
+                        setPendingDownloadUrl(slug ? `/api/download-brochure?type=builder-floor&slug=${slug}&building=${index}` : building.brochure_url)
+                        setPendingProjectName(`${builderFloorName || 'Builder Floor'} - Building ${building.building_number || index + 1}`)
+                        setShowModal(true)
+                      }
+                      // If authenticated, allow default link behavior
+                    }}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center justify-center gap-2 w-full px-3 py-2 ${getBrochureButtonBgColor()} text-gray-800 rounded-lg text-xs font-semibold transition`}
@@ -445,6 +461,16 @@ export default function BuildingConfigurationSlider({ buildingConfig, status, sl
                 <div className="pt-3 border-t border-gray-200">
                   <a
                     href={slug ? `/api/download-brochure?type=builder-floor&slug=${slug}&building=${selectedBuilding.index}` : selectedBuilding.brochure_url}
+                    onClick={(e) => {
+                      // If user is not authenticated, show modal
+                      if (!isLoaded || !user) {
+                        e.preventDefault()
+                        setPendingDownloadUrl(slug ? `/api/download-brochure?type=builder-floor&slug=${slug}&building=${selectedBuilding.index}` : selectedBuilding.brochure_url)
+                        setPendingProjectName(`${builderFloorName || 'Builder Floor'} - Building ${selectedBuilding.building_number || selectedBuilding.index + 1}`)
+                        setShowModal(true)
+                      }
+                      // If authenticated, allow default link behavior
+                    }}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center justify-center gap-2 w-full px-4 py-3 ${getBrochureButtonBgColor()} text-gray-800 rounded-lg text-sm font-semibold transition`}
@@ -459,6 +485,24 @@ export default function BuildingConfigurationSlider({ buildingConfig, status, sl
             </div>
           </div>
         </div>
+      )}
+
+      {/* Brochure Download Modal */}
+      {showModal && (
+        <BrochureDownloadModal
+          isOpen={showModal}
+          onClose={() => {
+            setShowModal(false)
+            setPendingDownloadUrl(null)
+            setPendingProjectName('')
+          }}
+          onDownload={() => {
+            if (pendingDownloadUrl) {
+              window.open(pendingDownloadUrl, '_blank')
+            }
+          }}
+          projectName={pendingProjectName}
+        />
       )}
     </div>
   )

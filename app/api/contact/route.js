@@ -38,7 +38,7 @@ export async function POST(request) {
     }
 
     const body = await request.json()
-    const { name, email, phone, message } = body
+    const { name, email, phone, message, source } = body
 
     // Validate required fields
     if (!name || !email || !phone || !message) {
@@ -96,6 +96,7 @@ export async function POST(request) {
           email: sanitizedEmail,
           phone: sanitizedPhone,
           message: sanitizedMessage,
+          source: source || 'contact_form', // Track where the submission came from
         },
       ])
       .select()
@@ -128,8 +129,8 @@ export async function POST(request) {
             </head>
             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
               <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h1 style="color: #AB090A; margin-top: 0;">New Property Inquiry</h1>
-                <p style="color: #666; margin-bottom: 0;">You have received a new inquiry through the contact form.</p>
+                <h1 style="color: #AB090A; margin-top: 0;">${source === 'brochure_download' ? 'New Brochure Download Request' : 'New Property Inquiry'}</h1>
+                <p style="color: #666; margin-bottom: 0;">You have received a new inquiry${source === 'brochure_download' ? ' from a brochure download request' : ' through the contact form'}.</p>
               </div>
               
               <div style="background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px;">
