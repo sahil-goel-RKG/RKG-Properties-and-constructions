@@ -511,7 +511,7 @@ export default async function ProjectDetailPage({ params }) {
                     )}
                     {project.brochure_url && (
                       <a
-                        href={project.brochure_url}
+                        href={`/api/download-brochure?type=project&slug=${project.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-6 py-3 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition"

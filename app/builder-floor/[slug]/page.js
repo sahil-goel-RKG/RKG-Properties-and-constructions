@@ -420,7 +420,7 @@ export default async function BuilderFloorDetailPage({ params }) {
             <section className="bg-white py-8">
               <div className="px-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Building Configuration</h2>
-                <BuildingConfigurationSlider buildingConfig={buildingConfig} status={floor.status} />
+                <BuildingConfigurationSlider buildingConfig={buildingConfig} status={floor.status} slug={slug} />
               </div>
             </section>
           )}

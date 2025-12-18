@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 
-export default function BuildingConfigurationSlider({ buildingConfig, status }) {
+export default function BuildingConfigurationSlider({ buildingConfig, status, slug }) {
   const scrollContainerRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -253,7 +253,7 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
               {building.brochure_url && (
                 <div className="pt-2 border-t border-gray-200">
                   <a
-                    href={building.brochure_url}
+                    href={slug ? `/api/download-brochure?type=builder-floor&slug=${slug}&building=${index}` : building.brochure_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center justify-center gap-2 w-full px-3 py-2 ${getBrochureButtonBgColor()} text-gray-800 rounded-lg text-xs font-semibold transition`}
@@ -444,7 +444,7 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
               {selectedBuilding.brochure_url && (
                 <div className="pt-3 border-t border-gray-200">
                   <a
-                    href={selectedBuilding.brochure_url}
+                    href={slug ? `/api/download-brochure?type=builder-floor&slug=${slug}&building=${selectedBuilding.index}` : selectedBuilding.brochure_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center justify-center gap-2 w-full px-4 py-3 ${getBrochureButtonBgColor()} text-gray-800 rounded-lg text-sm font-semibold transition`}
