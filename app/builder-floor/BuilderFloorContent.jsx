@@ -12,11 +12,11 @@ export default function BuilderFloorContent({ children }) {
   const searchParams = useSearchParams()
   const [loadingTimeout, setLoadingTimeout] = useState(false)
 
-  // Set a timeout to prevent infinite loading (fallback after 5 seconds)
+  // Set a timeout to prevent infinite loading (fallback after 3 seconds)
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoadingTimeout(true)
-    }, 5000)
+    }, 3000)
 
     return () => clearTimeout(timer)
   }, [])
@@ -61,9 +61,11 @@ export default function BuilderFloorContent({ children }) {
 
   // If timeout reached and still not loaded, proceed anyway (Clerk might be having issues)
   // This prevents infinite loading
+  // After timeout, treat as if not authenticated (show contact form)
 
-  // If user is not authenticated, show login/contact form
-  if (!user) {
+  // If user is not authenticated (or timeout occurred), show login/contact form
+  // Note: Contact popup will still show from layout.js
+  if (!user || (!isLoaded && loadingTimeout)) {
     return (
       <div className="min-h-screen bg-gray-50 py-16">
         <div className="container mx-auto px-4">

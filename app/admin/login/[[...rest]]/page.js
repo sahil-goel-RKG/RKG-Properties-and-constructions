@@ -1,10 +1,11 @@
-import { SignIn } from '@clerk/nextjs'
+'use client'
 
-export default async function AdminLoginPage({ searchParams }) {
-  // Get returnUrl from query params, default to /admin if not provided
-  // In Next.js 15+, searchParams is a Promise
-  const params = await searchParams
-  const returnUrl = params?.returnUrl || '/admin'
+import { SignIn } from '@clerk/nextjs'
+import { useSearchParams } from 'next/navigation'
+
+export default function AdminLoginPage() {
+  const searchParams = useSearchParams()
+  const returnUrl = searchParams?.get('returnUrl') || '/admin'
   
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-16">

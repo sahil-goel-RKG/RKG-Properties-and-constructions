@@ -7,10 +7,12 @@ const isPublicRoute = createRouteMatcher([
   '/about',
   '/apartments',
   '/contact',
+  '/builder-floor(.*)',  // Make builder floor pages public
   '/projects(.*)',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/webhooks(.*)',
+  '/api/contact(.*)',  // Make contact API public
   '/admin/login(.*)'  // Catch-all for admin login routes
 ]);
 
