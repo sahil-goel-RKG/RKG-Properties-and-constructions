@@ -33,6 +33,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider
+      domain="rkgproperties.in"
       appearance={{
         variables: {
           colorPrimary: '#c99700',
