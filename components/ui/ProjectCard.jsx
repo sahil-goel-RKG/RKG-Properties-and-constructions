@@ -20,7 +20,8 @@ export default function ProjectCard({ project, variant }) {
   const priceInfo = formatPriceLabel(project.price)
 
   // For builder floors, blur if user is not signed in
-  const shouldBlur = isBuilderFloor && isLoaded && !isSignedIn
+  // Default to blur if not loaded yet (to prevent flash of unblurred content)
+  const shouldBlur = isBuilderFloor && (!isLoaded || !isSignedIn)
 
   return (
     <Link
@@ -28,7 +29,10 @@ export default function ProjectCard({ project, variant }) {
       className="block bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col"
       style={{ willChange: 'transform', transform: 'translateZ(0)' }}
     >
-      <div className={`relative h-48 bg-gray-200 flex-shrink-0 ${shouldBlur ? 'blur-sm' : ''}`}>
+      <div 
+        className={`relative h-48 bg-gray-200 flex-shrink-0 ${shouldBlur ? 'blur-sm' : ''}`}
+        style={shouldBlur ? { filter: 'blur(4px)', WebkitFilter: 'blur(4px)' } : {}}
+      >
         {project.image_url ? (
           <Image
             src={project.image_url}
@@ -54,7 +58,10 @@ export default function ProjectCard({ project, variant }) {
           </div>
         )}
       </div>
-      <div className={`p-6 flex flex-col flex-grow ${shouldBlur ? 'blur-sm' : ''}`}>
+      <div 
+        className={`p-6 flex flex-col flex-grow ${shouldBlur ? 'blur-sm' : ''}`}
+        style={shouldBlur ? { filter: 'blur(4px)', WebkitFilter: 'blur(4px)' } : {}}
+      >
         <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 h-16">
           {project.name}
         </h3>

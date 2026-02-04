@@ -2,7 +2,7 @@
 
 import { useUser } from '@clerk/nextjs'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ContactForm from '@/components/features/ContactForm'
 
 export default function BuilderFloorContent({ children }) {
@@ -10,6 +10,16 @@ export default function BuilderFloorContent({ children }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [loadingTimeout, setLoadingTimeout] = useState(false)
+
+  // Set a timeout to prevent infinite loading (fallback after 5 seconds)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingTimeout(true)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   // Handle redirect after authentication
   useEffect(() => {
@@ -37,8 +47,8 @@ export default function BuilderFloorContent({ children }) {
     }
   }, [isLoaded, user, pathname, router])
 
-  // Show loading state while checking authentication
-  if (!isLoaded) {
+  // Show loading state while checking authentication, but with timeout fallback
+  if (!isLoaded && !loadingTimeout) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -48,6 +58,9 @@ export default function BuilderFloorContent({ children }) {
       </div>
     )
   }
+
+  // If timeout reached and still not loaded, proceed anyway (Clerk might be having issues)
+  // This prevents infinite loading
 
   // If user is not authenticated, show login/contact form
   if (!user) {
