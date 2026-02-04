@@ -197,7 +197,7 @@ export default function ContactPopup() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition ${
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base text-gray-900 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition placeholder:text-gray-400 ${
                 errors.name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your full name"
@@ -220,7 +220,7 @@ export default function ContactPopup() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition ${
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base text-gray-900 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition placeholder:text-gray-400 ${
                 errors.email ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your email address"
@@ -244,7 +244,7 @@ export default function ContactPopup() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition ${
+              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base text-gray-900 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition placeholder:text-gray-400 ${
                 errors.phone ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your phone number"
