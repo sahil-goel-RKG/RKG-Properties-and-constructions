@@ -40,23 +40,23 @@ export default function Header() {
         }
       `}</style>
       <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-        <div className="container mx-auto px-2">
-          <div className="flex items-center justify-between h-16 py-0 ">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex items-center justify-between h-14 sm:h-16 py-0">
             <Link
               href="/"
-              className="flex items-center gap-2 golden-text logo-hover-group transition-all duration-300"
+              className="flex items-center gap-1 sm:gap-2 golden-text logo-hover-group transition-all duration-300"
             >
               <Image
                 src="/img/Logo4.png"
                 alt="RKG Properties & Constructions Logo"
                 width={100}
                 height={100}
-                className="object-contain -mb-2 logo-image transition-all duration-300"
+                className="object-contain -mb-2 logo-image transition-all duration-300 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24"
                 priority
               />
-               <div className="flex flex-col items-start -ml-5">
+               <div className="flex flex-col items-start -ml-3 sm:-ml-5">
                 <span 
-                  className="text-5xl font-extrabold tracking-wide leading-none logo-text transition-all duration-300" 
+                  className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-wide leading-none logo-text transition-all duration-300" 
                   style={{ letterSpacing: '0.05em', fontFamily: 'Georgia, serif', color: '#DEB63B' }}
                 >
                   RKG
@@ -142,7 +142,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -173,16 +173,16 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 space-y-2">
+          <nav className="md:hidden py-4 space-y-2 px-3 border-t border-gray-100">
             <Link
               href="/"
-              className="block py-2 text-gray-700 hover:text-[#c99700]"
+              className="block py-3 text-gray-700 hover:text-[#c99700] active:text-[#c99700] touch-manipulation min-h-[44px] flex items-center"
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <details className="group" open={false}>
-              <summary className="flex justify-between items-center py-2 text-gray-700 hover:text-[#c99700] cursor-pointer">
+              <summary className="flex justify-between items-center py-3 text-gray-700 hover:text-[#c99700] active:text-[#c99700] cursor-pointer touch-manipulation min-h-[44px]">
                 Properties
                 <span className="text-sm text-gray-500 group-open:rotate-180 transition-transform">▼</span>
               </summary>
@@ -196,7 +196,7 @@ export default function Header() {
                       <Link
                         key={item.href}
                         href={item.href}
-                        className="block py-1 pl-2 text-gray-700 hover:text-[#c99700]"
+                        className="block py-2 pl-4 text-gray-700 hover:text-[#c99700] active:text-[#c99700] touch-manipulation min-h-[44px] flex items-center"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {item.label}
@@ -208,14 +208,14 @@ export default function Header() {
             </details>
             <Link
               href="/about"
-              className="block py-2 text-gray-700 hover:text-[#c99700]"
+              className="block py-3 text-gray-700 hover:text-[#c99700] active:text-[#c99700] touch-manipulation min-h-[44px] flex items-center"
               onClick={() => setIsMenuOpen(false)}
             >
               About Us
             </Link>
             <Link
               href="/contact"
-              className="block py-2 text-gray-700 hover:text-[#c99700]"
+              className="block py-3 text-gray-700 hover:text-[#c99700] active:text-[#c99700] touch-manipulation min-h-[44px] flex items-center"
               onClick={() => setIsMenuOpen(false)}
             >
               Contact Us

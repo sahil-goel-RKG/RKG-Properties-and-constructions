@@ -4,7 +4,9 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import InactivityTimer from "@/components/features/InactivityTimer";
+import ContactPopup from "@/components/features/ContactPopup";
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +21,13 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "RKG Properties and Constructions | Excellence in Real Estate Solutions",
   description: "Premium residential and commercial properties in Gurgaon. Your trusted partner for real estate solutions.",
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({ children }) {
@@ -38,10 +47,12 @@ export default function RootLayout({ children }) {
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <InactivityTimer />
+          <ContactPopup />
           <Header />
           {children}
           <Footer />
           <Analytics />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
