@@ -98,6 +98,12 @@ export default function ContactPopup() {
       if (response.ok) {
         // Mark as submitted in session storage
         sessionStorage.setItem('contactPopupSubmitted', 'true')
+        // Fire Google Ads conversion only on successful lead submit (once per submission)
+        if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+          window.gtag('event', 'conversion', {
+            send_to: 'AW-17915227011/kW0TClJey7_MbEIPX0t5C',
+          })
+        }
         // Close popup
         setIsVisible(false)
       } else {
