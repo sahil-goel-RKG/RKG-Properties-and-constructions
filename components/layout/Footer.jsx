@@ -31,6 +31,11 @@ export default function Footer() {
                   Contact us
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy-policy" className="hover:text-white transition">
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -76,8 +81,11 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-sm text-center md:text-left">
               © RKG Properties and Constructions, All rights reserved.
+              <Link href="/privacy-policy" className="ml-2 hover:text-white transition">
+                Privacy Policy
+              </Link>
             </p>
             <Link
               href="/admin/login"
