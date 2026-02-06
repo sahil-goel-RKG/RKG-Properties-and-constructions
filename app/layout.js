@@ -48,14 +48,14 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {/* Google tag (gtag.js) - AW-17915227011 */}
+          {/* Google tag (gtag.js) - AW-17915227011 - load early so conversion hits can be sent */}
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=AW-17915227011"
-            strategy="afterInteractive"
+            strategy="beforeInteractive"
           />
           <Script
             id="gtag-config"
-            strategy="afterInteractive"
+            strategy="beforeInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 window.dataLayer = window.dataLayer || [];

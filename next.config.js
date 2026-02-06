@@ -25,7 +25,7 @@ const nextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com https://*.clerk.com https://clerk.rkgproperties.in",
               "img-src 'self' data: https: blob: https://www.googleads.g.doubleclick.net",
               "connect-src 'self' https://*.supabase.co https://*.clerk.com https://*.clerk.accounts.dev https://clerk.rkgproperties.in https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.recaptcha.net",
-              "frame-src 'self' https://*.clerk.com https://*.clerk.accounts.dev https://clerk.rkgproperties.in https://www.google.com https://www.gstatic.com https://www.recaptcha.net",
+              "frame-src 'self' https://*.clerk.com https://*.clerk.accounts.dev https://clerk.rkgproperties.in https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.recaptcha.net",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self' https://*.clerk.com https://*.clerk.accounts.dev",
