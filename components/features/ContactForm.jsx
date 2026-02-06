@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { fireGoogleAdsLeadConversion } from '@/lib/gtag'
 
 export default function ContactForm({ size = 'md' }) {
   const [formData, setFormData] = useState({
@@ -28,6 +29,7 @@ export default function ContactForm({ size = 'md' }) {
     setSubmitStatus({ type: null, message: '' })
 
     try {
+      // 1. User submits form → send to backend
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -38,24 +40,24 @@ export default function ContactForm({ size = 'md' }) {
 
       const data = await response.json()
 
-      if (response.ok) {
-        setSubmitStatus({
-          type: 'success',
-          message: 'Thank you! Your message has been submitted successfully.',
-        })
-        setFormData({ name: '', email: '', phone: '', message: '' })
-        // Fire Google Ads conversion only on successful lead submit (once per submission)
-        if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-          window.gtag('event', 'conversion', {
-            send_to: 'AW-17915227011/kW0TClJey7_MbEIPX0t5C',
-          })
-        }
-      } else {
+      if (!response.ok) {
         setSubmitStatus({
           type: 'error',
           message: data.error || 'Something went wrong. Please try again.',
         })
+        return
       }
+
+      // 2. Backend returned success
+      // 3. Fire gtag conversion once → Google Ads receives hit
+      fireGoogleAdsLeadConversion()
+
+      // 4. Update UI
+      setSubmitStatus({
+        type: 'success',
+        message: 'Thank you! Your message has been submitted successfully.',
+      })
+      setFormData({ name: '', email: '', phone: '', message: '' })
     } catch (error) {
       setSubmitStatus({
         type: 'error',

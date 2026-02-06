@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { fireGoogleAdsLeadConversion } from '@/lib/gtag'
 
 export default function ContactPopup() {
   const { user, isLoaded } = useUser()
@@ -85,6 +86,7 @@ export default function ContactPopup() {
     setIsSubmitting(true)
 
     try {
+      // 1. User submits form → send to backend
       const response = await fetch('/api/contact/popup', {
         method: 'POST',
         headers: {
@@ -95,20 +97,18 @@ export default function ContactPopup() {
 
       const data = await response.json()
 
-      if (response.ok) {
-        // Mark as submitted in session storage
-        sessionStorage.setItem('contactPopupSubmitted', 'true')
-        // Fire Google Ads conversion only on successful lead submit (once per submission)
-        if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-          window.gtag('event', 'conversion', {
-            send_to: 'AW-17915227011/kW0TClJey7_MbEIPX0t5C',
-          })
-        }
-        // Close popup
-        setIsVisible(false)
-      } else {
+      if (!response.ok) {
         setSubmitError(data.error || 'Something went wrong. Please try again.')
+        return
       }
+
+      // 2. Backend returned success
+      // 3. Fire gtag conversion once → Google Ads receives hit
+      fireGoogleAdsLeadConversion()
+
+      // 4. Update UI (mark submitted, close popup)
+      sessionStorage.setItem('contactPopupSubmitted', 'true')
+      setIsVisible(false)
     } catch (error) {
       setSubmitError('Network error. Please try again later.')
     } finally {
