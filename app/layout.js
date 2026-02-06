@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -47,6 +48,23 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          {/* Google tag (gtag.js) - AW-17915227011 */}
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=AW-17915227011"
+            strategy="afterInteractive"
+          />
+          <Script
+            id="gtag-config"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'AW-17915227011');
+              `,
+            }}
+          />
           <InactivityTimer />
           <ContactPopup />
           <Header />
