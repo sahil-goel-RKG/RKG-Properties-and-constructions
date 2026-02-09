@@ -7,8 +7,20 @@ import BuildingConfigurationSlider from '@/components/BuildingConfigurationSlide
 import { formatPriceLabel } from '@/lib/formatPrice'
 import BuilderFloorDetailContent from './BuilderFloorDetailContent'
 
-// Revalidate as you prefer
-export const revalidate = 0 // or 1800 in production
+// ISR: cache detail page to reduce TTFB; regenerate every 1 hour
+export const revalidate = 3600
+
+// Pre-render known builder floor slugs at build time for fast TTFB
+export async function generateStaticParams() {
+  try {
+    const supabase = createServerSupabaseClient()
+    const { data } = await supabase.from('builder_floors').select('slug').not('slug', 'is', null)
+    if (!data?.length) return []
+    return data.map(({ slug }) => ({ slug }))
+  } catch {
+    return []
+  }
+}
 
 // Fetch a single builder floor by slug
 const getBuilderFloor = cache(async (slug) => {

@@ -142,7 +142,7 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="md:hidden p-2 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-800 hover:text-[#c99700]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >

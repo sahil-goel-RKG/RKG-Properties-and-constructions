@@ -2,16 +2,18 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { cache } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import HeroCarousel from '@/components/HeroCarousel'
-import LocationsSlider from '@/components/LocationsSlider'
 import ProjectsSlider from '@/components/ProjectsSlider'
-import DevelopersSlider from '@/components/DevelopersSlider'
-import CountUpStats from '@/components/CountUpStats'
 import ContactForm from '@/components/features/ContactForm'
 
-// Add revalidation for ISR
-//export const revalidate = 1800 // Revalidate every 30 minutes
-export const revalidate = 0 // Revalidate every 0 minutes
+// Below-fold: lazy load to reduce initial bundle and improve TTFB/LCP
+const LocationsSlider = dynamic(() => import('@/components/LocationsSlider'), { ssr: true })
+const DevelopersSlider = dynamic(() => import('@/components/DevelopersSlider'), { ssr: true })
+const CountUpStats = dynamic(() => import('@/components/CountUpStats'), { ssr: true })
+
+// ISR: cache page for 5 min to reduce TTFB (was 0 = full SSR every request)
+export const revalidate = 300
 
 // Cache project fetches for faster loads
 const getResidentialProjects = cache(async () => {
@@ -260,26 +262,36 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+      {/* Hero Section - LCP: first image server-rendered so it's in initial HTML */}
       <section className="relative py-12 sm:py-16 md:py-20 overflow-hidden">
-        {/* Background Image Carousel or Fallback */}
-        {heroImages.length > 0 ? (
-          <HeroCarousel images={heroImages} />
-        ) : (
-          <div className="absolute inset-0 z-0">
-            <div className="relative w-full h-full">
+        <div className="absolute inset-0 z-0">
+          <div className="relative w-full h-full">
+            {heroImages.length > 0 ? (
+              <>
+                {/* Server-rendered LCP image: no wait for client hydration */}
+                <Image
+                  src={heroImages[0]}
+                  alt="Hero"
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover"
+                />
+                <HeroCarousel images={heroImages} serverRenderedFirstImageUrl={heroImages[0]} />
+              </>
+            ) : (
               <Image
                 src="/img/hero.jpg"
                 alt="Modern real estate property"
                 fill
                 priority
+                sizes="100vw"
                 className="object-cover"
               />
-            </div>
-            {/* Subtle Fade Overlay */}
-            <div className="absolute inset-0 bg-black/20"></div>
+            )}
           </div>
-        )}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-800/50 to-gray-900/60 z-[1]" aria-hidden />
+        </div>
         
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 sm:px-6">

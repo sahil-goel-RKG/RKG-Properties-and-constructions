@@ -38,6 +38,7 @@ export default function ProjectCard({ project, variant }) {
             src={project.image_url}
             alt={project.name}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-cover"
           />
         ) : (

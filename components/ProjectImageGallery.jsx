@@ -112,6 +112,7 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
           src={images[selectedImage]}
           alt={`${projectName} - Image ${selectedImage + 1}`}
           fill
+          sizes="(max-width: 1024px) 100vw, 1024px"
           className="object-cover transition-transform duration-300 hover:scale-105"
           priority={selectedImage === 0}
         />

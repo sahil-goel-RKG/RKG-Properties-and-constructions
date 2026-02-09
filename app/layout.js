@@ -4,19 +4,20 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import InactivityTimer from "@/components/features/InactivityTimer";
-import ContactPopup from "@/components/features/ContactPopup";
+import ClientOverlays from "@/components/layout/ClientOverlays";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -65,8 +66,7 @@ export default function RootLayout({ children }) {
               `,
             }}
           />
-          <InactivityTimer />
-          <ContactPopup />
+          <ClientOverlays />
           <Header />
           {children}
           <Footer />

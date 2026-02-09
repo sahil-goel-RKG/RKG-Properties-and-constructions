@@ -54,7 +54,6 @@ const getProjectImages = cache(async (projectId) => {
       return []
     }
 
-    console.log(`Fetched ${data?.length || 0} project images for project ${projectId}`)
     return data || []
   } catch (err) {
     console.error('Error fetching project images:', err)
@@ -62,9 +61,20 @@ const getProjectImages = cache(async (projectId) => {
   }
 })
 
-// Add revalidation for ISR (Incremental Static Regeneration)
-export const revalidate = 0 // Revalidate on every request (for development/testing)
-// Change to 3600 for production (revalidate every hour)
+// ISR: cache detail page to reduce TTFB; regenerate every 1 hour
+export const revalidate = 3600
+
+// Pre-render known project slugs at build time for fast TTFB
+export async function generateStaticParams() {
+  try {
+    const supabase = createServerSupabaseClient()
+    const { data } = await supabase.from('projects').select('slug').not('slug', 'is', null)
+    if (!data?.length) return []
+    return data.map(({ slug }) => ({ slug }))
+  } catch {
+    return []
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { slug } = await params

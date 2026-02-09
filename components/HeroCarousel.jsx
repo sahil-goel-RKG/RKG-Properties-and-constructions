@@ -3,18 +3,16 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
-export default function HeroCarousel({ images }) {
+export default function HeroCarousel({ images, serverRenderedFirstImageUrl }) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  // Rotate images every 5 seconds
   useEffect(() => {
     if (images && images.length > 0) {
       const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => 
+        setCurrentIndex((prevIndex) =>
           prevIndex === images.length - 1 ? 0 : prevIndex + 1
         )
-      }, 5000) // Change image every 5 seconds
-
+      }, 5000)
       return () => clearInterval(interval)
     }
   }, [images])
@@ -23,9 +21,11 @@ export default function HeroCarousel({ images }) {
     return null
   }
 
+  const isFirstServerRendered = Boolean(serverRenderedFirstImageUrl && serverRenderedFirstImageUrl === images[0])
+
   return (
     <>
-      {/* Background Images */}
+      {/* Carousel layers: when index 0 is server-rendered, don't duplicate it (keeps LCP fast) */}
       <div className="absolute inset-0 z-0">
         <div className="relative w-full h-full">
           {images.map((imgUrl, index) => (
@@ -35,18 +35,21 @@ export default function HeroCarousel({ images }) {
                 index === currentIndex ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <Image
-                src={imgUrl}
-                alt={`Hero image ${index + 1}`}
-                fill
-                priority={index === 0}
-                className="object-cover"
-              />
+              {index === 0 && isFirstServerRendered ? (
+                <div className="absolute inset-0" aria-hidden />
+              ) : (
+                <Image
+                  src={imgUrl}
+                  alt={`Hero image ${index + 1}`}
+                  fill
+                  priority={index === 1}
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              )}
             </div>
           ))}
         </div>
-        {/* Grey Blend Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-800/50 to-gray-900/60"></div>
       </div>
 
       {/* Image Indicators */}

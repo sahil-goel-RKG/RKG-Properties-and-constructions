@@ -12,6 +12,16 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Long cache for static assets (Vercel CDN)
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
         // Apply security headers to all routes
         source: '/:path*',
         headers: [
