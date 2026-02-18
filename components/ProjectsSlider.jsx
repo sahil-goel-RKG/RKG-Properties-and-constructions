@@ -60,14 +60,14 @@ export default function ProjectsSlider({
     if (!allowEmpty) return null
 
     return (
-      <section className={`${bgColor} py-16`}>
+      <section className={`${bgColor} py-8 sm:py-16`}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{title}</h2>
-            {description && <p className="text-xl text-gray-600">{description}</p>}
+          <div className="text-center mb-6 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">{title}</h2>
+            {description && <p className="text-base sm:text-xl text-gray-600">{description}</p>}
           </div>
-          <div className="bg-white rounded-xl shadow-md p-10 text-center max-w-3xl mx-auto">
-            <p className="text-gray-600 mb-6">{emptyMessage}</p>
+          <div className="bg-white rounded-xl shadow-md p-6 sm:p-10 text-center max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{emptyMessage}</p>
             <Link
               href={ctaHref}
               className="inline-block bg-[#22c55e] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
@@ -81,11 +81,11 @@ export default function ProjectsSlider({
   }
 
   return (
-    <section className={`${bgColor} py-16`}>
+    <section className={`${bgColor} py-8 sm:py-16`}>
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">{title}</h2>
-          {description && <p className="text-xl text-gray-600">{description}</p>}
+        <div className="text-center mb-6 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">{title}</h2>
+          {description && <p className="text-base sm:text-xl text-gray-600">{description}</p>}
         </div>
 
         <div className="relative">
@@ -109,20 +109,20 @@ export default function ProjectsSlider({
 
           <div
             ref={scrollContainerRef}
-            className="flex gap-8 overflow-x-auto overflow-y-visible px-12 pb-6 scroll-smooth hide-scrollbar items-stretch"
+            className="flex gap-4 sm:gap-8 overflow-x-auto overflow-y-visible px-4 sm:px-12 pb-4 sm:pb-6 scroll-smooth hide-scrollbar items-stretch"
             onScroll={checkScrollButtons}
           >
             {projects.map((project) => (
-              <div key={project.id} className="flex-shrink-0 w-80 self-stretch">
+              <div key={project.id} className="flex-shrink-0 w-72 sm:w-80 self-stretch">
                 <ProjectCard project={project} variant={variant} />
               </div>
             ))}
           </div>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-4 sm:mt-8">
             <Link
               href={ctaHref}
-              className="inline-block bg-[#22c55e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
+              className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-[#16a34a] transition"
             >
               {ctaLabel}
             </Link>

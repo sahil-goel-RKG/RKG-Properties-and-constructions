@@ -163,6 +163,46 @@ export async function POST(request) {
         })
 
         console.log('Email sent successfully to', recipientEmail)
+
+        // Send confirmation email to the person who submitted the form
+        const confirmationHtml = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>We received your details</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h1 style="color: #c99700; margin-top: 0;">Thank you for getting in touch</h1>
+                <p style="color: #666; margin-bottom: 0;">Hi ${sanitizedName}, we have received your contact details and will reach out to you soon.</p>
+              </div>
+              <div style="background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px;">
+                <p style="margin: 0 0 15px 0;">Our team typically responds within 1–2 business days. Need to speak with us now?</p>
+                <p style="margin: 0;"><strong>Phone:</strong> <a href="tel:+919220286089" style="color: #c99700;">+91-9220286089</a> / <a href="tel:+918851753005" style="color: #c99700;">+91-8851753005</a></p>
+                <p style="margin: 10px 0 0 0;"><strong>Email:</strong> <a href="mailto:sahil@rkgproperties.in" style="color: #c99700;">sahil@rkgproperties.in</a></p>
+              </div>
+              <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; text-align: center; color: #666; font-size: 12px;">
+                <p style="margin: 0;">RKG Properties and Constructions</p>
+                <p style="margin: 5px 0 0 0;">Sector 57, Sushant Lok, Gurugram, 122001</p>
+              </div>
+            </body>
+          </html>
+        `
+        const confirmResult = await resend.emails.send({
+          from: fromEmail,
+          to: sanitizedEmail,
+          subject: 'We received your details – RKG Properties and Constructions',
+          html: confirmationHtml,
+        })
+        if (confirmResult.error) {
+          console.error('Confirmation email failed:', confirmResult.error.message, 'to:', sanitizedEmail)
+          // Resend with from=onboarding@resend.dev often only allows sending to the account owner.
+          // Verify your domain in Resend and set RESEND_FROM_EMAIL e.g. noreply@rkgproperties.in to send to any recipient.
+        } else {
+          console.log('Confirmation email sent to', sanitizedEmail)
+        }
       } else {
         console.warn('RESEND_API_KEY not configured. Email notification skipped.')
       }

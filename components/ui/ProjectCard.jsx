@@ -30,7 +30,7 @@ export default function ProjectCard({ project, variant }) {
       style={{ willChange: 'transform', transform: 'translateZ(0)' }}
     >
       <div 
-        className={`relative h-48 bg-gray-200 flex-shrink-0 ${shouldBlur ? 'blur-sm' : ''}`}
+        className={`relative h-40 sm:h-48 bg-gray-200 flex-shrink-0 ${shouldBlur ? 'blur-sm' : ''}`}
         style={shouldBlur ? { filter: 'blur(4px)', WebkitFilter: 'blur(4px)' } : {}}
       >
         {project.image_url ? (
@@ -60,26 +60,26 @@ export default function ProjectCard({ project, variant }) {
         )}
       </div>
       <div 
-        className={`p-6 flex flex-col flex-grow ${shouldBlur ? 'blur-sm' : ''}`}
+        className={`p-4 sm:p-6 flex flex-col flex-grow ${shouldBlur ? 'blur-sm' : ''}`}
         style={shouldBlur ? { filter: 'blur(4px)', WebkitFilter: 'blur(4px)' } : {}}
       >
-        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 h-16">
+        <h3 className="text-base sm:text-xl font-semibold text-gray-900 mb-1.5 sm:mb-2 line-clamp-2 min-h-[2.5rem] sm:h-16">
           {project.name}
         </h3>
-        <p className="text-gray-600 mb-2">
+        <p className="text-sm sm:text-base text-gray-600 mb-1.5 sm:mb-2">
           <span className="font-medium">Location:</span> {project.location}
         </p>
         {project.area && (
-          <p className="text-gray-600 mb-2">
+          <p className="text-sm sm:text-base text-gray-600 mb-1.5 sm:mb-2">
             <span className="font-medium">Area:</span> {project.area}
           </p>
         )}
         {priceInfo?.label && (
-          <p className="font-semibold mb-2 text-[#f70000]">
+          <p className="text-sm sm:text-base font-semibold mb-1.5 sm:mb-2 text-[#f70000]">
             {priceInfo.label}
           </p>
         )}
-        <span className="inline-block mt-auto font-medium text-[rgb(0,37,122)] hover:text-[rgb(0,50,150)] hover:underline">
+        <span className="inline-block mt-auto text-sm sm:text-base font-medium text-[rgb(0,37,122)] hover:text-[rgb(0,50,150)] hover:underline">
           View Details →
         </span>
       </div>

@@ -23,6 +23,10 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "RKG Properties and Constructions | Excellence in Real Estate Solutions",
   description: "Premium residential and commercial properties in Gurgaon. Your trusted partner for real estate solutions.",
+  icons: {
+    icon: "/fevicon.png",
+    apple: "/fevicon.png",
+  },
 };
 
 export const viewport = {
@@ -46,6 +50,9 @@ export default function RootLayout({ children }) {
       }}
     >
       <html lang="en">
+        <head>
+          <link rel="icon" href="/fevicon.png" type="image/png" sizes="any" />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
