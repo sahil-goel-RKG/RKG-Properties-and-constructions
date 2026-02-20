@@ -36,6 +36,11 @@ export const viewport = {
   userScalable: true,
 };
 
+const supabaseOrigin =
+  typeof process.env.NEXT_PUBLIC_SUPABASE_URL === 'string' && process.env.NEXT_PUBLIC_SUPABASE_URL
+    ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+    : null
+
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider
@@ -52,6 +57,12 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <head>
           <link rel="icon" href="/fevicon.png" type="image/png" sizes="any" />
+          {supabaseOrigin && (
+            <>
+              <link rel="preconnect" href={supabaseOrigin} />
+              <link rel="dns-prefetch" href={supabaseOrigin} />
+            </>
+          )}
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -59,11 +70,11 @@ export default function RootLayout({ children }) {
           {/* Google tag (gtag.js) - AW-17915227011 - load early so conversion hits can be sent */}
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=AW-17915227011"
-            strategy="beforeInteractive"
+            strategy="afterInteractive"
           />
           <Script
             id="gtag-config"
-            strategy="beforeInteractive"
+            strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
                 window.dataLayer = window.dataLayer || [];

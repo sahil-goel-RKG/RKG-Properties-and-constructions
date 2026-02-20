@@ -262,19 +262,20 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section - LCP: first image server-rendered so it's in initial HTML */}
-      <section className="relative py-8 sm:py-16 md:py-20 overflow-hidden">
+      {/* Hero Section - LCP: first image server-rendered; min-height reserves space; remote = unoptimized for direct CDN fetch */}
+      <section className="relative min-h-[65vh] py-8 sm:py-16 md:py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full min-h-[65vh]">
             {heroImages.length > 0 ? (
               <>
-                {/* Server-rendered LCP image: no wait for client hydration */}
+                {/* Server-rendered LCP image: priority + lower quality for faster load */}
                 <Image
                   src={heroImages[0]}
                   alt="Hero"
                   fill
                   priority
                   sizes="100vw"
+                  quality={75}
                   className="object-cover"
                 />
                 <HeroCarousel images={heroImages} serverRenderedFirstImageUrl={heroImages[0]} />
@@ -286,6 +287,7 @@ export default async function Home() {
                 fill
                 priority
                 sizes="100vw"
+                quality={80}
                 className="object-cover"
               />
             )}
