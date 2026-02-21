@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import ClientOverlays from "@/components/layout/ClientOverlays";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -63,9 +64,25 @@ export default function RootLayout({ children }) {
               <link rel="dns-prefetch" href={supabaseOrigin} />
             </>
           )}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'RealEstateAgent',
+                name: 'RKG Properties and Constructions',
+                description: 'Premium residential and commercial properties in Gurgaon. Your trusted partner for real estate solutions.',
+                url: 'https://rkgproperties.in',
+                areaServed: { '@type': 'City', name: 'Gurgaon', containedInPlace: { '@type': 'State', name: 'Haryana' } },
+                address: { '@type': 'PostalAddress', streetAddress: 'Sector 57, Sushant Lok', addressLocality: 'Gurugram', postalCode: '122001' },
+                telephone: ['+91-8851753005', '+91-9220286089'],
+                email: 'sahil@rkgproperties.in',
+              }),
+            }}
+          />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden min-w-0`}
         >
           {/* Google tag (gtag.js) - AW-17915227011 - load early so conversion hits can be sent */}
           <Script
@@ -86,8 +103,21 @@ export default function RootLayout({ children }) {
           />
           <ClientOverlays />
           <Header />
-          {children}
+          <main className="min-w-0 overflow-x-hidden">{children}</main>
           <Footer />
+          <WhatsAppButton />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                document.body.addEventListener('click', function(e) {
+                  var a = e.target.closest('a[data-ga]');
+                  if (a && typeof gtag === 'function') {
+                    gtag('event', 'click', { event_category: 'CTA', event_label: a.getAttribute('data-ga') });
+                  }
+                });
+              `,
+            }}
+          />
           <Analytics />
           <SpeedInsights />
         </body>

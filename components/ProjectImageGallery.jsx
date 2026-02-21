@@ -115,6 +115,7 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
           sizes="(max-width: 1024px) 100vw, 1024px"
           className="object-cover transition-transform duration-300 hover:scale-105"
           priority={selectedImage === 0}
+          unoptimized
         />
       </div>
       
@@ -155,6 +156,7 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
                 sizes="100vw"
                 priority
                 draggable={false}
+                unoptimized
               />
             </div>
           </div>
@@ -332,6 +334,7 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
                   alt={`${projectName} - Thumbnail ${index + 1}`}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
               </button>
             ))}

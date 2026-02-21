@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { fireGoogleAdsLeadConversion } from '@/lib/gtag'
 
-export default function ContactForm({ size = 'md' }) {
+export default function ContactForm({ size = 'md', defaultMessage = '' }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    message: '',
+    message: defaultMessage,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState({
@@ -81,7 +81,7 @@ export default function ContactForm({ size = 'md' }) {
   const buttonClass = size === 'sm' || size === 'xs' ? 'py-2 text-sm' : 'py-3 text-base'
 
   return (
-    <form onSubmit={handleSubmit} className={spacingMap[size] ?? spacingMap.md}>
+    <form onSubmit={handleSubmit} className={`${spacingMap[size] ?? spacingMap.md} min-w-0 w-full max-w-full box-border`}>
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
         <label htmlFor="name" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
           Name *

@@ -45,6 +45,7 @@ export default function HeroCarousel({ images, serverRenderedFirstImageUrl }) {
                   priority={index === 1}
                   sizes="100vw"
                   className="object-cover"
+                  unoptimized
                 />
               )}
             </div>

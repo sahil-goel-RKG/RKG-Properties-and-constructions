@@ -153,8 +153,19 @@ export default async function ProjectDetailPage({ params }) {
   const statusInfo = formatProjectStatus(project.project_status)
   const developerSlug = project.developer ? developerNameToSlug(project.developer) : null
 
+  const projectJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Residence',
+    name: project.name,
+    description: project.short_description || project.full_description || `Residential project: ${project.name}`,
+    address: { '@type': 'PostalAddress', addressLocality: project.location },
+    ...(project.image_url && { image: project.image_url }),
+    ...(project.developer && { provider: { '@type': 'Organization', name: project.developer } }),
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd) }} />
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
@@ -253,6 +264,17 @@ export default async function ProjectDetailPage({ params }) {
                     </span>
                   </div>
                 )}
+              </div>
+
+              {/* Enquire CTA */}
+              <div className="mb-6">
+                <Link
+                  href={`/contact?enquiry=${encodeURIComponent(project.name)}`}
+                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#c99700] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#a67800] active:bg-[#a67800] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c99700] focus-visible:outline-offset-2 min-h-[48px]"
+                  data-ga="project_enquire"
+                >
+                  Enquire about {project.name}
+                </Link>
               </div>
 
               {/* Short Description */}

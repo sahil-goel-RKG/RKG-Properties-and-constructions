@@ -40,6 +40,7 @@ export default function ProjectCard({ project, variant }) {
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">

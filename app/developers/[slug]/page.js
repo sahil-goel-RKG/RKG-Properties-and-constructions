@@ -136,6 +136,7 @@ export default async function DeveloperDetailPage({ params }) {
                       alt={developerName}
                       fill
                       className="object-contain"
+                      unoptimized
                     />
                   </div>
                 )}
@@ -230,6 +231,7 @@ export default async function DeveloperDetailPage({ params }) {
                               alt={project.name}
                               fill
                               className="object-cover"
+                              unoptimized
                             />
                           </div>
                         )}

@@ -287,6 +287,17 @@ export default async function BuilderFloorDetailPage({ params }) {
                 )}
               </div>
 
+              {/* Enquire CTA */}
+              <div className="mb-6">
+                <Link
+                  href={`/contact?enquiry=${encodeURIComponent(floor.name)}`}
+                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#c99700] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#a67800] active:bg-[#a67800] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c99700] focus-visible:outline-offset-2 min-h-[48px]"
+                  data-ga="builder_floor_enquire"
+                >
+                  Enquire about {floor.name}
+                </Link>
+              </div>
+
               {/* Short Description */}
               {floor.short_description && (
                 <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">

@@ -15,6 +15,11 @@ const CountUpStats = dynamic(() => import('@/components/CountUpStats'), { ssr: t
 // ISR: cache page for 5 min to reduce TTFB (was 0 = full SSR every request)
 export const revalidate = 300
 
+export const metadata = {
+  title: 'RKG Properties and Constructions | Gurgaon Real Estate',
+  description: 'Your trusted real estate partner in Gurgaon. Premium apartments and builder floors on Golf Course Road, SPR, Sohna Road, Dwarka Expressway. 10+ projects, 500+ happy clients.',
+}
+
 // Cache project fetches for faster loads
 const getResidentialProjects = cache(async () => {
   try {
@@ -262,21 +267,25 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Preload LCP image so browser starts fetching immediately */}
+      {heroImages.length > 0 && (
+        <link rel="preload" as="image" href={heroImages[0]} />
+      )}
       {/* Hero Section - LCP: first image server-rendered; min-height reserves space; remote = unoptimized for direct CDN fetch */}
       <section className="relative min-h-[65vh] py-8 sm:py-16 md:py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="relative w-full h-full min-h-[65vh]">
             {heroImages.length > 0 ? (
               <>
-                {/* Server-rendered LCP image: priority + lower quality for faster load */}
+                {/* Server-rendered LCP: direct from Supabase CDN (unoptimized) for faster load */}
                 <Image
                   src={heroImages[0]}
                   alt="Hero"
                   fill
                   priority
                   sizes="100vw"
-                  quality={75}
                   className="object-cover"
+                  unoptimized
                 />
                 <HeroCarousel images={heroImages} serverRenderedFirstImageUrl={heroImages[0]} />
               </>
@@ -306,10 +315,12 @@ export default async function Home() {
               With over a decade of hands-on experience in Gurgaon's most premium corridors—Golf Course Road, Golf Course Extension, SPR, Sohna Road, Dwarka Expressway, and New Gurgaon—RKG brings a powerful blend of market knowledge, negotiation expertise, and personalised guidance that helps clients make confident decisions in a complex market.
               </p>
               <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <Link href="/apartments" className="inline-block bg-white golden-text px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#fff2be] active:bg-[#fff2be] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center">
+                <Link href="/apartments" className="inline-block bg-white golden-text px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#fff2be] active:bg-[#fff2be] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c99700] focus-visible:outline-offset-2" data-ga="hero_browse_projects">
                   Browse Projects
                 </Link>
-                
+                <Link href="/contact" className="inline-block border-2 border-white text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-white/10 active:bg-white/10 transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2" data-ga="hero_book_consultation">
+                  Book a Consultation
+                </Link>
               </div>
               <div className="flex flex-wrap gap-4 sm:gap-8 mt-4 sm:mt-10">
                 <div>
@@ -321,6 +332,7 @@ export default async function Home() {
                   <p className="text-xs sm:text-base text-gray-200">Happy Clients</p>
                 </div>
               </div>
+              <p className="text-xs sm:text-sm text-gray-300 mt-4">Trusted across Golf Course Road, SPR, Sohna Road &amp; New Gurgaon</p>
             </div>
             <div className="w-full mt-6 md:mt-0">
               <div className="bg-white/95 rounded-2xl shadow-2xl p-3 sm:p-6 md:p-8 max-w-sm mx-auto md:ml-auto backdrop-blur">
@@ -354,7 +366,8 @@ export default async function Home() {
               <div className="text-center">
                 <Link 
                   href="/about" 
-                  className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto"
+                  className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+                  data-ga="about_read_more"
                 >
                   Read More
                 </Link>
@@ -416,7 +429,8 @@ export default async function Home() {
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto"
+            className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+            data-ga="cta_get_in_touch"
           >
             Get in Touch
           </Link>

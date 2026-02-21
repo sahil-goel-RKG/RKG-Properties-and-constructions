@@ -60,6 +60,7 @@ export default function DevelopersSlider({ developers }) {
                           alt={developer}
                           fill
                           className="object-contain"
+                          unoptimized
                         />
                       </div>
                     ) : (
@@ -85,6 +86,7 @@ export default function DevelopersSlider({ developers }) {
                           alt={developer}
                           fill
                           className="object-contain"
+                          unoptimized
                         />
                       </div>
                     ) : (
@@ -110,6 +112,7 @@ export default function DevelopersSlider({ developers }) {
                           alt={developer}
                           fill
                           className="object-contain"
+                          unoptimized
                         />
                       </div>
                     ) : (
