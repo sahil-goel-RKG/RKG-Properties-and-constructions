@@ -262,16 +262,16 @@ export default async function DeveloperDetailPage({ params }) {
               </div>
 
               {/* CTA Section */}
-              <div className="mt-8 text-center">
+              <div className="mt-8 flex flex-wrap justify-center gap-4">
                 <Link
                   href={propertiesUrl}
-                  className="inline-block bg-[#c99700] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#a67800] transition mr-4"
+                  className="inline-block text-center bg-[#c99700] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#a67800] transition"
                 >
                   Browse All Properties
                 </Link>
                 <Link
                   href="/contact"
-                  className="inline-block border-2 border-[#c99700] text-[#c99700] px-8 py-3 rounded-lg font-semibold hover:bg-[#fff5d6] transition"
+                  className="inline-block text-center border-2 border-[#c99700] text-[#c99700] px-8 py-3 rounded-lg font-semibold hover:bg-[#fff5d6] transition"
                 >
                   Contact Us
                 </Link>
