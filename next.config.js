@@ -12,6 +12,16 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Homepage: allow CDN to cache HTML (ISR revalidate still applies)
+        source: '/',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=600, stale-while-revalidate=300',
+          },
+        ],
+      },
+      {
         // Long cache for static assets (Vercel CDN)
         source: '/_next/static/:path*',
         headers: [

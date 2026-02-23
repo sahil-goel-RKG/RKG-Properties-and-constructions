@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { cache } from 'react'
+import { cache, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -12,8 +12,8 @@ const LocationsSlider = dynamic(() => import('@/components/LocationsSlider'), { 
 const DevelopersSlider = dynamic(() => import('@/components/DevelopersSlider'), { ssr: true })
 const CountUpStats = dynamic(() => import('@/components/CountUpStats'), { ssr: true })
 
-// ISR: cache page for 5 min to reduce TTFB (was 0 = full SSR every request)
-export const revalidate = 300
+// ISR: cache page for 10 min to improve TTFB on repeat visits
+export const revalidate = 600
 
 export const metadata = {
   title: 'RKG Properties and Constructions | Gurgaon Real Estate',
@@ -179,7 +179,7 @@ const getHeroImages = cache(async () => {
       .not('image_url', 'is', null)
       .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(10)
+      .limit(5)
 
     if (error) {
       console.error('Error fetching hero images:', error)
@@ -255,23 +255,105 @@ const getUniqueDevelopers = cache(async () => {
 // Note: getDeveloperLogo is now imported from @/lib/developerUtils
 // This function is kept for backward compatibility but can be removed if not used elsewhere
 
-export default async function Home() {
-  // Fetch all data in parallel for faster loading
-  const [residentialProjects, builderFloorProjects, heroImages, locations, developers] = await Promise.all([
+// Below-fold content: fetches after hero so first byte can be sent sooner (streaming)
+async function HomeBelowFold() {
+  const [residentialProjects, builderFloorProjects, locations, developers] = await Promise.all([
     getResidentialProjects(),
     getBuilderFloorProjects(),
-    getHeroImages(),
     getUniqueLocations(),
     getUniqueDevelopers()
   ])
+  return (
+    <>
+      <ProjectsSlider projects={residentialProjects} bgColor="bg-gray-100" />
+      <section className="py-8 sm:py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="bg-gray-50 rounded-lg shadow-md p-4 sm:p-6 md:p-8">
+              <p className="text-sm sm:text-lg leading-relaxed text-gray-700 mb-4 sm:mb-8">
+                Let us get to know each other first. Well, if you&apos;re engaging with us, we guess you&apos;re seeking real estate agents. We are aware of how tiresome finding a realtor would be. We would say that you&apos;re on the verge of reaching &quot;The right place&quot; and making &quot;The Right Choice.&quot;
+              </p>
+              <CountUpStats />
+              <div className="text-center">
+                <Link
+                  href="/about"
+                  className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+                  data-ga="about_read_more"
+                >
+                  Read More
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <ProjectsSlider
+        projects={builderFloorProjects}
+        title="Builder Floor Projects"
+        description="Curated selection of premium builder floors with bespoke amenities."
+        ctaLabel="View All Builder Floor Listings"
+        ctaHref="/builder-floor"
+        allowEmpty
+        emptyMessage="We are curating the finest builder floor listings. Leave your details and we'll notify you as soon as they go live."
+        bgColor="bg-gray-100"
+        variant="builder-floor"
+      />
+      <section className="py-8 sm:py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-12 text-center">Why Work With Us</h2>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 max-w-5xl mx-auto">
+            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
+              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">🏡</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Local Expertise</h3>
+              <p className="text-sm sm:text-base text-gray-600">Deep knowledge of neighborhood trends, pricing, and inventory to guide smart decisions.</p>
+            </div>
+            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
+              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">🤝</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Negotiation Power</h3>
+              <p className="text-sm sm:text-base text-gray-600">Proven strategy to secure the best price and terms for buyers and sellers.</p>
+            </div>
+            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
+              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">⚡</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">End-to-End Service</h3>
+              <p className="text-sm sm:text-base text-gray-600">From staging and photography to financing and closing, we handle the details.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <LocationsSlider locations={locations} />
+      <DevelopersSlider developers={developers} />
+      <section className="bg-[#0f172a] text-white py-8 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
+          <h2 className="text-xl sm:text-3xl font-bold mb-2 sm:mb-4">Ready to Move?</h2>
+          <p className="text-base sm:text-xl mb-4 sm:mb-8 text-gray-200">
+            Let&apos;s discuss your goals and build a tailored plan to get you there.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+            data-ga="cta_get_in_touch"
+          >
+            Get in Touch
+          </Link>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function BelowFoldSkeleton() {
+  return <div className="min-h-[300px] bg-gray-100" aria-hidden />
+}
+
+export default async function Home() {
+  // Fetch only hero images first so we can send HTML sooner (better TTFB/LCP)
+  const heroImages = await getHeroImages()
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Preload LCP image so browser starts fetching immediately */}
       {heroImages.length > 0 && (
         <link rel="preload" as="image" href={heroImages[0]} />
       )}
-      {/* Hero Section - LCP: first image server-rendered; min-height reserves space; remote = unoptimized for direct CDN fetch */}
       <section className="relative min-h-[65vh] py-8 sm:py-16 md:py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="relative w-full h-full min-h-[65vh]">
@@ -349,93 +431,9 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Residential Property Cards Section */}
-      <ProjectsSlider projects={residentialProjects} bgColor="bg-gray-100" />
-
-      {/* RKG Properties and Constructions Summary Section */}
-      <section className="py-8 sm:py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="bg-gray-50 rounded-lg shadow-md p-4 sm:p-6 md:p-8">
-              <p className="text-sm sm:text-lg leading-relaxed text-gray-700 mb-4 sm:mb-8">
-                Let us get to know each other first. Well, if you&apos;re engaging with us, we guess you&apos;re seeking real estate agents. We are aware of how tiresome finding a realtor would be. We would say that you&apos;re on the verge of reaching &quot;The right place&quot; and making &quot;The Right Choice.&quot;
-              </p>
-              
-              <CountUpStats />
-
-              <div className="text-center">
-                <Link 
-                  href="/about" 
-                  className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
-                  data-ga="about_read_more"
-                >
-                  Read More
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Builder Floor Projects Section */}
-      <ProjectsSlider
-        projects={builderFloorProjects}
-        title="Builder Floor Projects"
-        description="Curated selection of premium builder floors with bespoke amenities."
-        ctaLabel="View All Builder Floor Listings"
-        ctaHref="/builder-floor"
-        allowEmpty
-        emptyMessage="We are curating the finest builder floor listings. Leave your details and we'll notify you as soon as they go live."
-        bgColor="bg-gray-100"
-        variant="builder-floor"
-      />
-
-      {/* Features Section */}
-      <section className="py-8 sm:py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-12 text-center">Why Work With Us</h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
-              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">🏡</div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Local Expertise</h3>
-              <p className="text-sm sm:text-base text-gray-600">Deep knowledge of neighborhood trends, pricing, and inventory to guide smart decisions.</p>
-            </div>
-            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
-              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">🤝</div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Negotiation Power</h3>
-              <p className="text-sm sm:text-base text-gray-600">Proven strategy to secure the best price and terms for buyers and sellers.</p>
-            </div>
-            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
-              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">⚡</div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">End-to-End Service</h3>
-              <p className="text-sm sm:text-base text-gray-600">From staging and photography to financing and closing, we handle the details.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Locations Section */}
-      <LocationsSlider locations={locations} />
-
-      {/* Developers Section */}
-      <DevelopersSlider developers={developers} />
-
-      {/* CTA Section */}
-      <section className="bg-[#0f172a] text-white py-8 sm:py-16">
-        <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
-          <h2 className="text-xl sm:text-3xl font-bold mb-2 sm:mb-4">Ready to Move?</h2>
-          <p className="text-base sm:text-xl mb-4 sm:mb-8 text-gray-200">
-            Let's discuss your goals and build a tailored plan to get you there.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
-            data-ga="cta_get_in_touch"
-          >
-            Get in Touch
-          </Link>
-        </div>
-      </section>
+      <Suspense fallback={<BelowFoldSkeleton />}>
+        <HomeBelowFold />
+      </Suspense>
     </div>
   )
 }
