@@ -5,10 +5,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getDeveloperLogo, developerNameToSlug } from '@/lib/developerUtils'
 
-export default function DevelopersSlider({ developers }) {
+/**
+ * @param {string[]} [developers] - from DB (fallback when logoEntries empty)
+ * @param {{ src: string, label: string, href: string, key: string }[]} [logoEntries] - from public/img/developers scan
+ */
+export default function DevelopersSlider({ developers = [], logoEntries }) {
   const developersRef = useRef(null)
 
-  // Memoize developers to prevent unnecessary re-renders
   const stableDevelopers = useMemo(() => {
     if (!developers || developers.length === 0) return []
     const developersStr = JSON.stringify(developers.sort())
@@ -19,13 +22,43 @@ export default function DevelopersSlider({ developers }) {
     return developers
   }, [developers])
 
-  // Filter developers that have logos
-  const developersWithLogos = useMemo(() => {
-    return stableDevelopers.filter(dev => getDeveloperLogo(dev))
-  }, [stableDevelopers])
+  const entries = useMemo(() => {
+    if (logoEntries && logoEntries.length > 0) {
+      return logoEntries
+    }
+    return stableDevelopers
+      .filter((dev) => getDeveloperLogo(dev))
+      .map((developer) => ({
+        src: getDeveloperLogo(developer),
+        label: developer,
+        href: `/developers/${developerNameToSlug(developer)}`,
+        key: developer,
+      }))
+  }, [logoEntries, stableDevelopers])
 
-  if (!developersWithLogos || developersWithLogos.length === 0) {
+  if (!entries || entries.length === 0) {
     return null
+  }
+
+  const renderCard = (item, keySuffix) => {
+    const { src, label, href } = item
+    return (
+      <Link
+        key={keySuffix}
+        href={href}
+        className="bg-white p-4 sm:p-8 rounded-lg shadow-sm hover:shadow-md transition flex-shrink-0 flex items-center justify-center h-[100px] sm:h-[140px] cursor-pointer border border-transparent hover:border-[#c99700]"
+      >
+        <div className="relative w-20 h-20 sm:w-32 sm:h-32">
+          <Image
+            src={src}
+            alt={label}
+            fill
+            className="object-contain"
+            unoptimized
+          />
+        </div>
+      </Link>
+    )
   }
 
   return (
@@ -43,84 +76,9 @@ export default function DevelopersSlider({ developers }) {
         <div className="relative">
           <div className="overflow-hidden group">
             <div className="flex animate-scroll-right gap-6 group-hover:[animation-play-state:paused]">
-              {/* First set */}
-              {developersWithLogos.map((developer) => {
-                const logo = getDeveloperLogo(developer)
-                const slug = developerNameToSlug(developer)
-                return (
-                  <Link
-                    key={developer}
-                    href={`/developers/${slug}`}
-                    className="bg-white p-4 sm:p-8 rounded-lg shadow-sm hover:shadow-md transition flex-shrink-0 flex items-center justify-center h-[100px] sm:h-[140px] cursor-pointer border border-transparent hover:border-[#c99700]"
-                  >
-                    {logo ? (
-                      <div className="relative w-20 h-20 sm:w-32 sm:h-32">
-                        <Image
-                          src={logo}
-                          alt={developer}
-                          fill
-                          className="object-contain"
-                          unoptimized
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-gray-700 font-medium text-center">{developer}</p>
-                    )}
-                  </Link>
-                )
-              })}
-              {/* Duplicate for seamless loop */}
-              {developersWithLogos.map((developer, index) => {
-                const logo = getDeveloperLogo(developer)
-                const slug = developerNameToSlug(developer)
-                return (
-                  <Link
-                    key={`duplicate-${index}`}
-                    href={`/developers/${slug}`}
-                    className="bg-white p-4 sm:p-8 rounded-lg shadow-sm hover:shadow-md transition flex-shrink-0 flex items-center justify-center h-[100px] sm:h-[140px] cursor-pointer border border-transparent hover:border-[#c99700]"
-                  >
-                    {logo ? (
-                      <div className="relative w-20 h-20 sm:w-32 sm:h-32">
-                        <Image
-                          src={logo}
-                          alt={developer}
-                          fill
-                          className="object-contain"
-                          unoptimized
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-gray-700 font-medium text-center">{developer}</p>
-                    )}
-                  </Link>
-                )
-              })}
-              {/* Second duplicate for extra smoothness */}
-              {developersWithLogos.map((developer, index) => {
-                const logo = getDeveloperLogo(developer)
-                const slug = developerNameToSlug(developer)
-                return (
-                  <Link
-                    key={`duplicate2-${index}`}
-                    href={`/developers/${slug}`}
-                    className="bg-white p-4 sm:p-8 rounded-lg shadow-sm hover:shadow-md transition flex-shrink-0 flex items-center justify-center h-[100px] sm:h-[140px] cursor-pointer border border-transparent hover:border-[#c99700]"
-                  >
-                    {logo ? (
-                      <div className="relative w-20 h-20 sm:w-32 sm:h-32">
-                        <Image
-                          src={logo}
-                          alt={developer}
-                          fill
-                          className="object-contain"
-                          unoptimized
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-gray-700 font-medium text-center">{developer}</p>
-                    )}
-                  </Link>
-                )
-              })}
+              {entries.map((item) => renderCard(item, item.key))}
+              {entries.map((item, index) => renderCard(item, `dup1-${item.key}-${index}`))}
+              {entries.map((item, index) => renderCard(item, `dup2-${item.key}-${index}`))}
             </div>
           </div>
         </div>

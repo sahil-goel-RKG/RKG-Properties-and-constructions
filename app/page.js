@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { getDeveloperLogoDisplayEntries } from '@/lib/developerLogosServer'
 import { cache, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -263,6 +264,7 @@ async function HomeBelowFold() {
     getUniqueLocations(),
     getUniqueDevelopers()
   ])
+  const developerLogoEntries = getDeveloperLogoDisplayEntries(developers)
   return (
     <>
       <ProjectsSlider projects={residentialProjects} bgColor="bg-gray-100" />
@@ -321,7 +323,7 @@ async function HomeBelowFold() {
         </div>
       </section>
       <LocationsSlider locations={locations} />
-      <DevelopersSlider developers={developers} />
+      <DevelopersSlider developers={developers} logoEntries={developerLogoEntries} />
       <section className="bg-[#0f172a] text-white py-8 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
           <h2 className="text-xl sm:text-3xl font-bold mb-2 sm:mb-4">Ready to Move?</h2>
