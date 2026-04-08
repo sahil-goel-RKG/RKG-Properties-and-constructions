@@ -1,7 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { getDeveloperLogoDisplayEntries } from '@/lib/developerLogosServer'
-import { getChannelVideos } from '@/lib/youtubeChannelServer'
-import YouTubeVideoSection from '@/components/YouTubeVideoSection'
+import YouTubeVideoSectionLoader from '@/components/YouTubeVideoSectionLoader'
 import { cache, Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -260,14 +259,12 @@ const getUniqueDevelopers = cache(async () => {
 
 // Below-fold content: fetches after hero so first byte can be sent sooner (streaming)
 async function HomeBelowFold() {
-  const [residentialProjects, builderFloorProjects, locations, developers, youtubeVideos] =
-    await Promise.all([
-      getResidentialProjects(),
-      getBuilderFloorProjects(),
-      getUniqueLocations(),
-      getUniqueDevelopers(),
-      getChannelVideos(6),
-    ])
+  const [residentialProjects, builderFloorProjects, locations, developers] = await Promise.all([
+    getResidentialProjects(),
+    getBuilderFloorProjects(),
+    getUniqueLocations(),
+    getUniqueDevelopers(),
+  ])
   const developerLogoEntries = getDeveloperLogoDisplayEntries(developers)
   return (
     <>
@@ -326,7 +323,7 @@ async function HomeBelowFold() {
           </div>
         </div>
       </section>
-      <YouTubeVideoSection videos={youtubeVideos} />
+      <YouTubeVideoSectionLoader />
       <LocationsSlider locations={locations} />
       <DevelopersSlider developers={developers} logoEntries={developerLogoEntries} />
       <section className="bg-[#0f172a] text-white py-8 sm:py-16">
