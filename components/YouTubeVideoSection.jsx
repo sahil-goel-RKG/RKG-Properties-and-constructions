@@ -60,11 +60,45 @@ function chunkVideosBySix(videos) {
 }
 
 export default function YouTubeVideoSection({ videos = [], channelUrl }) {
-  if (!videos.length) return null
+  const href =
+    channelUrl || 'https://www.youtube.com/channel/UCv_BbICqcxwpchi_hImuiXg'
 
-  const mobilePages = chunkVideosBySix(videos)
   const isDesktop = useIsDesktopLayout()
-  const href = channelUrl || 'https://www.youtube.com/channel/UCv_BbICqcxwpchi_hImuiXg'
+  const mobilePages = chunkVideosBySix(videos)
+
+  if (!videos.length) {
+    return (
+      <section
+        className="py-8 sm:py-16 bg-gray-100"
+        aria-labelledby="youtube-heading"
+      >
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-6 sm:mb-10 max-w-3xl mx-auto">
+            <h2
+              id="youtube-heading"
+              className="text-xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4"
+            >
+              Latest Videos
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600">
+              Videos are temporarily unavailable. Please check again in a few
+              minutes.
+            </p>
+          </div>
+          <div className="text-center">
+            <Link
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+            >
+              View channel on YouTube
+            </Link>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   const mobileGallery = (
     <div
