@@ -81,7 +81,15 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
   const buttonClass = size === 'sm' || size === 'xs' ? 'py-2 text-sm' : 'py-3 text-base'
 
   return (
-    <form onSubmit={handleSubmit} className={`${spacingMap[size] ?? spacingMap.md} min-w-0 w-full max-w-full box-border`}>
+    <form
+      id="contact-form"
+      name="contact"
+      method="post"
+      action="/api/contact"
+      encType="application/x-www-form-urlencoded"
+      onSubmit={handleSubmit}
+      className={`${spacingMap[size] ?? spacingMap.md} min-w-0 w-full max-w-full box-border`}
+    >
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
         <label htmlFor="name" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
           Name *

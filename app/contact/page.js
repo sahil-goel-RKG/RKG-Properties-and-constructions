@@ -1,5 +1,7 @@
 import ContactForm from '@/components/features/ContactForm'
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://rkgproperties.in'
+
 export const metadata = {
   title: 'Contact Us | RKG Properties and Constructions',
   description: 'Get in touch with RKG Properties and Constructions for expert real estate guidance',
@@ -9,9 +11,41 @@ export default async function ContactPage({ searchParams }) {
   const params = await searchParams
   const enquiry = typeof params?.enquiry === 'string' ? params.enquiry.trim() : ''
   const defaultMessage = enquiry ? `I am interested in: ${enquiry}` : ''
+  const thankyou = params?.thankyou === '1'
+  const contactError =
+    params?.contact_error === '1' || params?.contact_error === 'rate_limit'
+
+  const contactJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact Us',
+    url: `${SITE_URL.replace(/\/$/, '')}/contact`,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'RKG Properties and Constructions',
+      url: SITE_URL.replace(/\/$/, ''),
+    },
+    mainEntity: {
+      '@type': 'Organization',
+      name: 'RKG Properties and Constructions',
+      email: 'sahil@rkgproperties.in',
+      telephone: ['+91-8851753005', '+91-9220286089'],
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Sector 57, Sushant Lok',
+        addressLocality: 'Gurugram',
+        postalCode: '122001',
+        addressCountry: 'IN',
+      },
+    },
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 w-full max-w-[100vw] overflow-x-hidden box-border">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
+      />
       <div className="w-full max-w-[100vw] box-border px-4 sm:px-6 mx-auto">
         <div className="max-w-4xl mx-auto w-full min-w-0">
           <div className="text-center mb-12">
@@ -27,6 +61,24 @@ export default async function ContactPage({ searchParams }) {
               <h2 className="text-2xl font-semibold text-gray-900 mb-6">
                 Send us a Message
               </h2>
+              {thankyou && (
+                <div
+                  className="mb-6 p-4 rounded-lg bg-[#fff5d6] text-[#a67800] border border-[#f2cd6d]"
+                  role="status"
+                >
+                  Thank you! Your message has been submitted successfully.
+                </div>
+              )}
+              {contactError && (
+                <div
+                  className="mb-6 p-4 rounded-lg bg-red-50 text-red-800 border border-red-200"
+                  role="alert"
+                >
+                  {params?.contact_error === 'rate_limit'
+                    ? 'Too many submissions. Please try again in a few minutes.'
+                    : 'Something went wrong. Please check your details and try again.'}
+                </div>
+              )}
               <ContactForm defaultMessage={defaultMessage} />
             </div>
 

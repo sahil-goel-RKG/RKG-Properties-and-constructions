@@ -13,13 +13,70 @@ const supabase = createClient(
   supabaseServiceKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
+function contactFormRedirect(request, params) {
+  const u = new URL('/contact', request.url)
+  for (const [k, v] of Object.entries(params)) {
+    if (v != null && v !== '') u.searchParams.set(k, String(v))
+  }
+  return NextResponse.redirect(u, 303)
+}
+
+function contactFail(request, isBrowserFormPost, jsonBody, jsonStatus = 400) {
+  if (isBrowserFormPost) {
+    return contactFormRedirect(request, { contact_error: '1' })
+  }
+  return NextResponse.json(jsonBody, { status: jsonStatus })
+}
+
+async function parseContactBody(request, contentType) {
+  if (contentType.includes('application/json')) {
+    return await request.json()
+  }
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    const text = await request.text()
+    const sp = new URLSearchParams(text)
+    return {
+      name: sp.get('name') || '',
+      email: sp.get('email') || '',
+      phone: sp.get('phone') || '',
+      message: sp.get('message') || '',
+    }
+  }
+  if (contentType.includes('multipart/form-data')) {
+    const fd = await request.formData()
+    return {
+      name: String(fd.get('name') || ''),
+      email: String(fd.get('email') || ''),
+      phone: String(fd.get('phone') || ''),
+      message: String(fd.get('message') || ''),
+    }
+  }
+  const raw = await request.text()
+  if (!raw?.trim()) {
+    return null
+  }
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
 export async function POST(request) {
+  const contentType = request.headers.get('content-type') || ''
+  const isBrowserFormPost =
+    contentType.includes('application/x-www-form-urlencoded') ||
+    contentType.includes('multipart/form-data')
+
   try {
     // Rate limiting
     const clientId = getClientIdentifier(request)
     const rateLimitResult = await contactFormLimiter.limit(clientId)
     
     if (!rateLimitResult.success) {
+      if (isBrowserFormPost) {
+        return contactFormRedirect(request, { contact_error: 'rate_limit' })
+      }
       return NextResponse.json(
         { 
           error: 'Too many requests. Please try again later.',
@@ -37,48 +94,36 @@ export async function POST(request) {
       )
     }
 
-    const body = await request.json()
+    const body = await parseContactBody(request, contentType)
+    if (!body) {
+      return contactFail(request, isBrowserFormPost, { error: 'Invalid or empty request body' }, 400)
+    }
     const { name, email, phone, message } = body
 
     // Validate required fields
     if (!name || !email || !phone || !message) {
-      return NextResponse.json(
-        { error: 'All fields are required' },
-        { status: 400 }
-      )
+      return contactFail(request, isBrowserFormPost, { error: 'All fields are required' }, 400)
     }
 
     // Validate and sanitize inputs
     const nameValidation = validateName(name)
     if (!nameValidation.valid) {
-      return NextResponse.json(
-        { error: nameValidation.error },
-        { status: 400 }
-      )
+      return contactFail(request, isBrowserFormPost, { error: nameValidation.error }, 400)
     }
 
     const emailValidation = validateEmail(email)
     if (!emailValidation.valid) {
-      return NextResponse.json(
-        { error: emailValidation.error },
-        { status: 400 }
-      )
+      return contactFail(request, isBrowserFormPost, { error: emailValidation.error }, 400)
     }
 
     const phoneValidation = validatePhone(phone)
     if (!phoneValidation.valid) {
-      return NextResponse.json(
-        { error: phoneValidation.error },
-        { status: 400 }
-      )
+      return contactFail(request, isBrowserFormPost, { error: phoneValidation.error }, 400)
     }
 
     const messageValidation = validateMessage(message)
     if (!messageValidation.valid) {
-      return NextResponse.json(
-        { error: messageValidation.error },
-        { status: 400 }
-      )
+      return contactFail(request, isBrowserFormPost, { error: messageValidation.error }, 400)
     }
 
     // Use validated and sanitized values
@@ -102,9 +147,11 @@ export async function POST(request) {
 
     if (error) {
       console.error('Supabase error:', error)
-      return NextResponse.json(
+      return contactFail(
+        request,
+        isBrowserFormPost,
         { error: 'Failed to submit form. Please try again.' },
-        { status: 500 }
+        500
       )
     }
 
@@ -224,6 +271,10 @@ export async function POST(request) {
       // Continue with success response even if email fails
     }
 
+    if (isBrowserFormPost) {
+      return contactFormRedirect(request, { thankyou: '1' })
+    }
+
     return NextResponse.json(
       { message: 'Form submitted successfully', data },
       { 
@@ -236,6 +287,9 @@ export async function POST(request) {
     )
   } catch (error) {
     console.error('API error:', error)
+    if (isBrowserFormPost) {
+      return contactFormRedirect(request, { contact_error: '1' })
+    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
