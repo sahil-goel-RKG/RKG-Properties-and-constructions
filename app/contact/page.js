@@ -1,6 +1,7 @@
-import ContactForm from '@/components/features/ContactForm'
+import ContactFormStatic from '@/components/ContactFormStatic'
+import ContactLeadConversion from '@/components/ContactLeadConversion'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://rkgproperties.in'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.rkgproperties.in'
 
 export const metadata = {
   title: 'Contact Us | RKG Properties and Constructions',
@@ -42,6 +43,7 @@ export default async function ContactPage({ searchParams }) {
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 w-full max-w-[100vw] overflow-x-hidden box-border">
+      {thankyou ? <ContactLeadConversion /> : null}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
@@ -79,7 +81,7 @@ export default async function ContactPage({ searchParams }) {
                     : 'Something went wrong. Please check your details and try again.'}
                 </div>
               )}
-              <ContactForm defaultMessage={defaultMessage} />
+              <ContactFormStatic defaultMessage={defaultMessage} />
             </div>
 
             {/* Contact Information */}
