@@ -93,3 +93,6 @@ logs
 # Misc
 *.bak
 *.backup
+
+# Local CRM imports (do not commit)
+/public/excel/

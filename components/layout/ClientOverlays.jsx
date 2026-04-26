@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
 
 const InactivityTimer = dynamic(
   () => import('@/components/features/InactivityTimer'),
@@ -12,6 +13,10 @@ const ContactPopup = dynamic(
 )
 
 export default function ClientOverlays() {
+  const pathname = usePathname()
+  if (typeof pathname === 'string' && pathname.startsWith('/crm')) {
+    return null
+  }
   return (
     <>
       <InactivityTimer />

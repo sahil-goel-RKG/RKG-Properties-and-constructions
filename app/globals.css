@@ -161,3 +161,24 @@ input, textarea, select {
     font-size: 16px; /* Prevents zoom on iOS when focused */
   }
 }
+
+/* CRM: force readable form field text even if global styles override */
+.crm-scope input,
+.crm-scope textarea,
+.crm-scope select {
+  color: #111827 !important; /* gray-900 */
+  background-color: #ffffff !important;
+}
+
+.crm-scope input::placeholder,
+.crm-scope textarea::placeholder {
+  color: #6b7280 !important; /* gray-500 (darker for visibility) */
+  opacity: 1 !important;
+}
+
+/* Ensure cursor visible and autofill doesn't hide text */
+.crm-scope input,
+.crm-scope textarea {
+  caret-color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
