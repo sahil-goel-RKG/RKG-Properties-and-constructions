@@ -29,14 +29,17 @@ function buildCrmQueryString({ q, status, page }) {
 
 export default async function CrmLeadsPage({ searchParams }) {
   const sp = await Promise.resolve(searchParams)
-  const q =
-    typeof (sp && sp.q) === 'string'
-      ? sp.q.trim()
-      : ''
-  const status =
-    typeof (sp && sp.status) === 'string'
-      ? sp.status.trim()
-      : ''
+  const q = typeof (sp && sp.q) === 'string' ? sp.q.trim() : ''
+  const status = typeof (sp && sp.status) === 'string' ? sp.status.trim() : ''
+  const name = typeof (sp && sp.name) === 'string' ? sp.name.trim() : ''
+  const phone = typeof (sp && sp.phone) === 'string' ? sp.phone.trim() : ''
+  const source = typeof (sp && sp.source) === 'string' ? sp.source.trim() : ''
+  const assigned = typeof (sp && sp.assigned) === 'string' ? sp.assigned.trim() : ''
+  const followUpFrom =
+    typeof (sp && sp.followUpFrom) === 'string' ? sp.followUpFrom.trim() : ''
+  const followUpTo =
+    typeof (sp && sp.followUpTo) === 'string' ? sp.followUpTo.trim() : ''
+  const sort = typeof (sp && sp.sort) === 'string' ? sp.sort.trim() : ''
   const page = toPositiveInt(sp && sp.page, 1)
   const pageSize = 20
   const from = (page - 1) * pageSize
@@ -53,11 +56,26 @@ export default async function CrmLeadsPage({ searchParams }) {
     .order('created_at', { ascending: false })
     .range(from, to)
 
+  // Filtering
   if (status) query = query.eq('initial_assessment', status)
+  if (name) query = query.ilike('customer_name', `%${name}%`)
+  if (phone) query = query.ilike('phone', `%${phone}%`)
+  if (source) query = query.ilike('source', `%${source}%`)
+  if (assigned) query = query.ilike('assigned_to_name', `%${assigned}%`)
+  if (followUpFrom) query = query.gte('follow_up_date', followUpFrom)
+  if (followUpTo) query = query.lte('follow_up_date', followUpTo)
+
   if (q) {
     query = query.or(
       `customer_name.ilike.%${q}%,phone.ilike.%${q}%,source.ilike.%${q}%,remarks.ilike.%${q}%`
     )
+  }
+
+  // Sorting
+  if (sort === 'followup_desc') {
+    query = query.order('follow_up_date', { ascending: false, nullsFirst: false })
+  } else if (sort === 'followup_asc') {
+    query = query.order('follow_up_date', { ascending: true, nullsFirst: false })
   }
 
   const { data: leads, error, count } = await query
@@ -94,18 +112,18 @@ export default async function CrmLeadsPage({ searchParams }) {
           </p>
         </div>
 
-        <form className="flex flex-col sm:flex-row gap-2 sm:items-center">
+        <form className="flex flex-col sm:flex-row gap-2 sm:items-center" method="get" action="/crm">
           <input
             type="text"
             name="q"
             defaultValue={q}
             placeholder="Search name, phone, SM, remarks"
-            className="w-full sm:w-80 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
+            className="w-full sm:w-80 px-3 py-2 border border-gray-300 rounded-lg text-sm font-normal text-gray-600 placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
           />
           <select
             name="status"
             defaultValue={status}
-            className="w-full sm:w-56 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
+            className="w-full sm:w-56 px-3 py-2 border border-gray-300 rounded-lg text-sm font-normal text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
           >
             <option value="">All statuses</option>
             {statusValues.map((s) => (
@@ -114,9 +132,24 @@ export default async function CrmLeadsPage({ searchParams }) {
               </option>
             ))}
           </select>
+          <select
+            name="sort"
+            defaultValue={sort}
+            className="w-full sm:w-56 px-3 py-2 border border-gray-300 rounded-lg text-sm font-normal text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
+          >
+            <option value="">Sort: Created (latest)</option>
+            <option value="followup_desc">Sort: Follow up (latest)</option>
+            <option value="followup_asc">Sort: Follow up (earliest)</option>
+          </select>
           <button className="px-4 py-2 bg-[#c99700] text-white rounded-lg text-sm font-semibold hover:bg-[#a67800]">
             Search
           </button>
+          <Link
+            href="/crm"
+            className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 text-center"
+          >
+            Clear
+          </Link>
         </form>
       </div>
 
@@ -163,7 +196,8 @@ export default async function CrmLeadsPage({ searchParams }) {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
+          <form method="get" action="/crm">
+            <table className="w-full min-w-[1000px]">
             <thead className="bg-gray-50">
               <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 <th className="px-3 py-3">Created</th>
@@ -175,6 +209,96 @@ export default async function CrmLeadsPage({ searchParams }) {
                 <th className="px-3 py-3">Follow up</th>
                 <th className="px-3 py-3">Remarks</th>
                 <th className="px-3 py-3">Actions</th>
+              </tr>
+              <tr className="text-left text-xs text-gray-700">
+                <th className="px-3 pb-3">
+                  <span className="sr-only">Created</span>
+                </th>
+                <th className="px-3 pb-3">
+                  <input
+                    name="source"
+                    defaultValue={source}
+                    placeholder="Filter"
+                    className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs placeholder:text-gray-400"
+                    style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                  />
+                </th>
+                <th className="px-3 pb-3">
+                  <input
+                    name="name"
+                    defaultValue={name}
+                    placeholder="Search name"
+                    className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs placeholder:text-gray-400"
+                    style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                  />
+                </th>
+                <th className="px-3 pb-3">
+                  <input
+                    name="phone"
+                    defaultValue={phone}
+                    placeholder="Filter"
+                    className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs placeholder:text-gray-400"
+                    style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                  />
+                </th>
+                <th className="px-3 pb-3">
+                  <input
+                    name="assigned"
+                    defaultValue={assigned}
+                    placeholder="Filter"
+                    className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs placeholder:text-gray-400"
+                    style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                  />
+                </th>
+                <th className="px-3 pb-3">
+                  <select
+                    name="status"
+                    defaultValue={status}
+                    className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs"
+                    style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                  >
+                    <option value="">All</option>
+                    {statusValues.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </th>
+                <th className="px-3 pb-3">
+                  <div className="grid grid-rows-2 gap-2 min-w-[240px]">
+                    <input
+                      type="date"
+                      name="followUpFrom"
+                      defaultValue={followUpFrom}
+                      className="crm-filter w-full min-w-[118px] px-2 py-1.5 border border-gray-200 rounded bg-white text-xs"
+                      title="From"
+                      style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                    />
+                    <input
+                      type="date"
+                      name="followUpTo"
+                      defaultValue={followUpTo}
+                      className="crm-filter w-full min-w-[118px] px-2 py-1.5 border border-gray-200 rounded bg-white text-xs"
+                      title="To"
+                      style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                    />
+                  </div>
+                </th>
+                <th className="px-3 pb-3">
+                  <span className="sr-only">Remarks</span>
+                </th>
+                <th className="px-3 pb-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="submit"
+                      className="px-2 py-1 rounded bg-[#c99700] text-white text-xs font-semibold hover:bg-[#a67800]"
+                      title="Apply filters"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -215,7 +339,8 @@ export default async function CrmLeadsPage({ searchParams }) {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </form>
         </div>
       )}
     </div>

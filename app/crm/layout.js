@@ -37,6 +37,12 @@ export default function CrmLayout({ children }) {
             Leads
           </Link>
           <Link
+            href="/crm/add"
+            className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900"
+          >
+            Add Lead
+          </Link>
+          <Link
             href="/crm/import"
             className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900"
           >

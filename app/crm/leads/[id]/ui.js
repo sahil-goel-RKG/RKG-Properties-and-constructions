@@ -3,6 +3,11 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
+const INPUT =
+  'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
+const SELECT =
+  'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
+
 export default function CrmLeadEditor({ lead }) {
   const [initialAssessment, setInitialAssessment] = useState(
     lead.initial_assessment || ''
@@ -79,7 +84,7 @@ export default function CrmLeadEditor({ lead }) {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 w-full max-w-6xl space-y-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="text-xs font-semibold tracking-widest text-gray-500 uppercase">
@@ -103,7 +108,8 @@ export default function CrmLeadEditor({ lead }) {
               '-'
             )}
             <span className="mx-2">•</span>
-            <span className="font-semibold">Excel Name:</span> {lead.excel_name || '-'}{' '}
+            <span className="font-semibold">Excel Name:</span>{' '}
+            {lead.excel_name || '-'}
           </div>
         </div>
 
@@ -115,127 +121,143 @@ export default function CrmLeadEditor({ lead }) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              Projects Interested
-            </label>
-            <input
-              value={projectsInterested}
-              onChange={(e) => setProjectsInterested(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              placeholder="e.g. The Camellias, Elan The Statement"
-              style={{ color: '#111827' }}
-            />
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            Customer name
+          </label>
+          <input
+            value={lead.customer_name || ''}
+            readOnly
+            className={`${INPUT} bg-gray-50`}
+            style={{ color: '#111827' }}
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              Remarks
-            </label>
-            <textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              rows={6}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              placeholder="Add notes / remarks..."
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Phone</label>
+          <input
+            value={lead.phone || ''}
+            readOnly
+            className={`${INPUT} bg-gray-50`}
+            style={{ color: '#111827' }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Assigned to</label>
+          <input
+            value={assignedToName}
+            onChange={(e) => setAssignedToName(e.target.value)}
+            className={INPUT}
+            placeholder="e.g. Sahil / Mohit"
+            style={{ color: '#111827' }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            Initial Assesment
+          </label>
+          <select
+            value={initialAssessment}
+            onChange={(e) => setInitialAssessment(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          >
+            <option value="">Select</option>
+            <option value="hot">hot</option>
+            <option value="warm">warm</option>
+            <option value="cold">cold</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">UC/ RTM</label>
+          <select
+            value={ucRtm}
+            onChange={(e) => setUcRtm(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          >
+            <option value="">Select</option>
+            <option value="UC">UC</option>
+            <option value="RTM">RTM</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            Walk-in agreed?
+          </label>
+          <select
+            value={agreedWalkIn}
+            onChange={(e) => setAgreedWalkIn(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          >
+            <option value="">Select</option>
+            <option value="YES">YES</option>
+            <option value="NO">NO</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            End Use/ Investment
+          </label>
+          <select
+            value={endUseInvestment}
+            onChange={(e) => setEndUseInvestment(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          >
+            <option value="">Select</option>
+            <option value="End Use">End Use</option>
+            <option value="Investment">Investment</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            Follow up
+          </label>
+          <input
+            type="date"
+            value={followUpDate}
+            onChange={(e) => setFollowUpDate(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          />
+        </div>
+
+        <div className="sm:col-span-2 lg:col-span-3">
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            Projects Interested
+          </label>
+          <input
+            value={projectsInterested}
+            onChange={(e) => setProjectsInterested(e.target.value)}
+            className={INPUT}
+            placeholder="e.g. The Camellias, Elan The Statement"
+            style={{ color: '#111827' }}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div className="lg:col-span-2">
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Remarks</label>
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            rows={4}
+            className={`${INPUT} resize-y`}
+            placeholder="Add notes / remarks..."
+          />
         </div>
 
         <div className="space-y-3">
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              Initial Assesment
-            </label>
-            <select
-              value={initialAssessment}
-              onChange={(e) => setInitialAssessment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              style={{ color: '#111827' }}
-            >
-              <option value="">Select</option>
-              <option value="hot">hot</option>
-              <option value="warm">warm</option>
-              <option value="cold">cold</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              UC/ RTM
-            </label>
-            <select
-              value={ucRtm}
-              onChange={(e) => setUcRtm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              style={{ color: '#111827' }}
-            >
-              <option value="">Select</option>
-              <option value="UC">UC</option>
-              <option value="RTM">RTM</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              Walk-in agreed?
-            </label>
-            <select
-              value={agreedWalkIn}
-              onChange={(e) => setAgreedWalkIn(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              style={{ color: '#111827' }}
-            >
-              <option value="">Select</option>
-              <option value="YES">YES</option>
-              <option value="NO">NO</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              End Use/ Investment
-            </label>
-            <select
-              value={endUseInvestment}
-              onChange={(e) => setEndUseInvestment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              style={{ color: '#111827' }}
-            >
-              <option value="">Select</option>
-              <option value="End Use">End Use</option>
-              <option value="Investment">Investment</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              Follow up
-            </label>
-            <input
-              type="date"
-              value={followUpDate}
-              onChange={(e) => setFollowUpDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              style={{ color: '#111827' }}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-1">
-              Assigned to
-            </label>
-            <input
-              value={assignedToName}
-              onChange={(e) => setAssignedToName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-              placeholder="e.g. Sahil / Mohit"
-              style={{ color: '#111827' }}
-            />
-          </div>
-
           <div className="rounded-lg border border-gray-200 p-3 bg-gray-50 text-xs text-gray-700 space-y-1">
             <div>
               <span className="font-semibold">Created:</span>{' '}

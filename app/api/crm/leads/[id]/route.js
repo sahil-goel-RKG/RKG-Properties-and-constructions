@@ -11,6 +11,19 @@ function requireSupabaseAdmin() {
   return supabaseAdmin
 }
 
+function normalizeOptionalString(v) {
+  if (typeof v !== 'string') return null
+  const s = v.trim()
+  return s ? s : null
+}
+
+function normalizeEnumCI(v, allowedMap) {
+  const s = normalizeOptionalString(v)
+  if (!s) return null
+  const key = s.toLowerCase()
+  return allowedMap[key] ?? s
+}
+
 export async function PATCH(request, { params }) {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -26,39 +39,42 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const initialAssessment =
-    typeof body?.initial_assessment === 'string'
-      ? body.initial_assessment.trim().toLowerCase()
-      : null
-  const projectsInterested =
-    typeof body?.projects_interested === 'string'
-      ? body.projects_interested.trim()
-      : null
-  const ucRtm =
-    typeof body?.uc_rtm === 'string' ? body.uc_rtm.trim().toUpperCase() : null
-  const agreedWalkIn =
-    typeof body?.agreed_walk_in === 'string'
-      ? body.agreed_walk_in.trim().toUpperCase()
-      : null
-  const endUseInvestment =
-    typeof body?.end_use_investment === 'string'
-      ? body.end_use_investment.trim()
-      : null
-  const followUpDate =
-    typeof body?.follow_up_date === 'string' ? body.follow_up_date.trim() : null
-  const remarks = typeof body?.remarks === 'string' ? body.remarks.trim() : null
-  const assignedToName =
-    typeof body?.assigned_to_name === 'string' ? body.assigned_to_name.trim() : null
-
   const update = {}
-  if (initialAssessment != null) update.initial_assessment = initialAssessment
-  if (projectsInterested != null) update.projects_interested = projectsInterested
-  if (ucRtm != null) update.uc_rtm = ucRtm
-  if (agreedWalkIn != null) update.agreed_walk_in = agreedWalkIn
-  if (endUseInvestment != null) update.end_use_investment = endUseInvestment
-  if (followUpDate != null) update.follow_up_date = followUpDate || null
-  if (remarks != null) update.remarks = remarks
-  if (assignedToName != null) update.assigned_to_name = assignedToName
+  if (typeof body?.initial_assessment === 'string') {
+    update.initial_assessment = normalizeEnumCI(body.initial_assessment, {
+      hot: 'hot',
+      warm: 'warm',
+      cold: 'cold',
+    })
+  }
+  if (typeof body?.projects_interested === 'string') {
+    update.projects_interested = normalizeOptionalString(body.projects_interested)
+  }
+  if (typeof body?.uc_rtm === 'string') {
+    update.uc_rtm = normalizeEnumCI(body.uc_rtm, { uc: 'UC', rtm: 'RTM' })
+  }
+  if (typeof body?.agreed_walk_in === 'string') {
+    update.agreed_walk_in = normalizeEnumCI(body.agreed_walk_in, {
+      yes: 'YES',
+      no: 'NO',
+    })
+  }
+  if (typeof body?.end_use_investment === 'string') {
+    update.end_use_investment = normalizeEnumCI(body.end_use_investment, {
+      'end use': 'End Use',
+      enduse: 'End Use',
+      investment: 'Investment',
+    })
+  }
+  if (typeof body?.follow_up_date === 'string') {
+    update.follow_up_date = normalizeOptionalString(body.follow_up_date)
+  }
+  if (typeof body?.remarks === 'string') {
+    update.remarks = normalizeOptionalString(body.remarks)
+  }
+  if (typeof body?.assigned_to_name === 'string') {
+    update.assigned_to_name = normalizeOptionalString(body.assigned_to_name)
+  }
 
   if (!Object.keys(update).length) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 })

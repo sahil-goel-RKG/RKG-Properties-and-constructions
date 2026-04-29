@@ -1,0 +1,286 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+
+const INPUT =
+  'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
+const SELECT =
+  'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
+
+export default function CrmAddLeadPage() {
+  const today = new Date().toISOString().slice(0, 10)
+
+  const [customerName, setCustomerName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [source, setSource] = useState('')
+  const [initialAssessment, setInitialAssessment] = useState('')
+  const [projectsInterested, setProjectsInterested] = useState('')
+  const [ucRtm, setUcRtm] = useState('')
+  const [agreedWalkIn, setAgreedWalkIn] = useState('')
+  const [endUseInvestment, setEndUseInvestment] = useState('')
+  const [followUpDate, setFollowUpDate] = useState('')
+  const [assignedToName, setAssignedToName] = useState('')
+  const [remarks, setRemarks] = useState('')
+
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const canSave = useMemo(() => {
+    return !!customerName.trim() && !!phone.trim() && !saving
+  }, [customerName, phone, saving])
+
+  const reset = () => {
+    setCustomerName('')
+    setPhone('')
+    setSource('')
+    setInitialAssessment('')
+    setProjectsInterested('')
+    setUcRtm('')
+    setAgreedWalkIn('')
+    setEndUseInvestment('')
+    setFollowUpDate('')
+    setAssignedToName('')
+    setRemarks('')
+  }
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (!customerName.trim()) {
+      setError('Customer name is required.')
+      return
+    }
+    if (!phone.trim()) {
+      setError('Phone is required.')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const res = await fetch('/api/crm/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_name: customerName,
+          phone,
+          source,
+          initial_assessment: initialAssessment,
+          projects_interested: projectsInterested,
+          uc_rtm: ucRtm,
+          agreed_walk_in: agreedWalkIn,
+          end_use_investment: endUseInvestment,
+          follow_up_date: followUpDate,
+          assigned_to_name: assignedToName,
+          remarks,
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(json?.error || 'Failed to add lead')
+        return
+      }
+
+      const id = json?.lead?.id
+      if (typeof id === 'string' && id) {
+        // go to View/Edit page immediately
+        window.location.href = `/crm/leads/${id}`
+        return
+      }
+
+      reset()
+    } catch (err) {
+      setError(err?.message || 'Failed to add lead')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="min-w-0 w-full max-w-6xl">
+      <h2 className="text-xl font-bold text-gray-900 mb-1">Add Lead</h2>
+      <p className="text-sm text-gray-600 mb-3">
+        Add a lead manually. If phone already exists, it will update the existing lead.
+      </p>
+
+      {error ? (
+        <div className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+          {error}
+        </div>
+      ) : null}
+
+      <form onSubmit={onSubmit} className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Customer name <span className="text-red-600">*</span>
+            </label>
+            <input
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              className={INPUT}
+              placeholder="Prospect name"
+              autoFocus
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Phone <span className="text-red-600">*</span>
+            </label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className={INPUT}
+              placeholder="10-digit mobile"
+              inputMode="tel"
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">Source</label>
+            <input
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              className={INPUT}
+              placeholder="e.g. RKG / Website / Referral"
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Initial Assesment
+            </label>
+            <select
+              value={initialAssessment}
+              onChange={(e) => setInitialAssessment(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            >
+              <option value="">Select</option>
+              <option value="hot">hot</option>
+              <option value="warm">warm</option>
+              <option value="cold">cold</option>
+            </select>
+          </div>
+
+          <div className="sm:col-span-2 lg:col-span-3">
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Projects Interested
+            </label>
+            <input
+              value={projectsInterested}
+              onChange={(e) => setProjectsInterested(e.target.value)}
+              className={INPUT}
+              placeholder="e.g. Elan The Statement"
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">UC/ RTM</label>
+            <select
+              value={ucRtm}
+              onChange={(e) => setUcRtm(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            >
+              <option value="">Select</option>
+              <option value="UC">UC</option>
+              <option value="RTM">RTM</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Walk-in agreed?
+            </label>
+            <select
+              value={agreedWalkIn}
+              onChange={(e) => setAgreedWalkIn(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            >
+              <option value="">Select</option>
+              <option value="YES">YES</option>
+              <option value="NO">NO</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              End Use/ Investment
+            </label>
+            <select
+              value={endUseInvestment}
+              onChange={(e) => setEndUseInvestment(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            >
+              <option value="">Select</option>
+              <option value="End Use">End Use</option>
+              <option value="Investment">Investment</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Follow up
+            </label>
+            <input
+              type="date"
+              value={followUpDate}
+              onChange={(e) => setFollowUpDate(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Assigned to
+            </label>
+            <input
+              value={assignedToName}
+              onChange={(e) => setAssignedToName(e.target.value)}
+              className={INPUT}
+              placeholder="e.g. Sahil / Mohit"
+              style={{ color: '#111827' }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Remarks</label>
+          <textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            rows={4}
+            className={`${INPUT} resize-y`}
+            placeholder="Notes / comments..."
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="submit"
+            disabled={!canSave}
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm text-white bg-[#c99700] hover:bg-[#a67800] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? 'Saving…' : 'Save lead'}
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm text-gray-900 bg-white border border-gray-200 hover:bg-gray-50"
+          >
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+

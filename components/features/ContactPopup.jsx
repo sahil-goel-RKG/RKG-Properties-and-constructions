@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { usePathname } from 'next/navigation'
 import { fireGoogleAdsLeadConversion } from '@/lib/gtag'
 
 export default function ContactPopup() {
+  const pathname = usePathname()
   const { user, isLoaded } = useUser()
   const [isVisible, setIsVisible] = useState(false)
   const [formData, setFormData] = useState({
@@ -17,6 +19,11 @@ export default function ContactPopup() {
   const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
+    // Never show popup inside CRM routes
+    if (typeof pathname === 'string' && pathname.startsWith('/crm')) {
+      setIsVisible(false)
+      return
+    }
     // Check if user has already submitted in this session
     const hasSubmitted = sessionStorage.getItem('contactPopupSubmitted')
     
@@ -29,7 +36,7 @@ export default function ContactPopup() {
 
       return () => clearTimeout(timer)
     }
-  }, [])
+  }, [pathname])
 
   const handleChange = (e) => {
     const { name, value } = e.target
