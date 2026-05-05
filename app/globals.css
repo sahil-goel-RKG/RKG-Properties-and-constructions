@@ -189,3 +189,42 @@ input, textarea, select {
   font-weight: 400 !important;
   -webkit-text-fill-color: #4b5563 !important; /* gray-600 */
 }
+
+/* Clerk (CRM login): OTP boxes sometimes overlap digits */
+.crm-login-scope .cl-otpCodeFieldInputs {
+  gap: 0.5rem !important;
+}
+
+.crm-login-scope .cl-otpCodeFieldInput,
+.crm-login-scope input[autocomplete="one-time-code"] {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  box-sizing: border-box !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+  text-align: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* Fallback: Clerk may render OTP inputs with different classnames */
+.crm-login-scope [class*="otp"] input,
+.crm-login-scope [class*="Otp"] input,
+.crm-login-scope [class*="codeField"] input,
+.crm-login-scope [class*="CodeField"] input {
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  box-sizing: border-box !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  font-weight: 400 !important;
+  text-align: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  font-variant-ligatures: none !important;
+  -webkit-text-fill-color: #111827 !important;
+}
