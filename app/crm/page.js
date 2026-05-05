@@ -18,10 +18,32 @@ function toPositiveInt(value, fallback) {
   return n
 }
 
-function buildCrmQueryString({ q, status, page }) {
+function buildCrmQueryString({
+  q,
+  status,
+  name,
+  phone,
+  source,
+  location,
+  excelName,
+  assigned,
+  followUpFrom,
+  followUpTo,
+  sort,
+  page,
+}) {
   const params = new URLSearchParams()
   if (q) params.set('q', q)
   if (status) params.set('status', status)
+  if (name) params.set('name', name)
+  if (phone) params.set('phone', phone)
+  if (source) params.set('source', source)
+  if (location) params.set('location', location)
+  if (excelName) params.set('excelName', excelName)
+  if (assigned) params.set('assigned', assigned)
+  if (followUpFrom) params.set('followUpFrom', followUpFrom)
+  if (followUpTo) params.set('followUpTo', followUpTo)
+  if (sort) params.set('sort', sort)
   if (page && page > 1) params.set('page', String(page))
   const s = params.toString()
   return s ? `?${s}` : ''
@@ -104,8 +126,34 @@ export default async function CrmLeadsPage({ searchParams }) {
   const totalPages = total != null ? Math.max(1, Math.ceil(total / pageSize)) : null
   const hasPrev = page > 1
   const hasNext = totalPages != null ? page < totalPages : (leads?.length || 0) === pageSize
-  const prevHref = `/crm${buildCrmQueryString({ q, status, page: page - 1 })}`
-  const nextHref = `/crm${buildCrmQueryString({ q, status, page: page + 1 })}`
+  const prevHref = `/crm${buildCrmQueryString({
+    q,
+    status,
+    name,
+    phone,
+    source,
+    location,
+    excelName,
+    assigned,
+    followUpFrom,
+    followUpTo,
+    sort,
+    page: page - 1,
+  })}`
+  const nextHref = `/crm${buildCrmQueryString({
+    q,
+    status,
+    name,
+    phone,
+    source,
+    location,
+    excelName,
+    assigned,
+    followUpFrom,
+    followUpTo,
+    sort,
+    page: page + 1,
+  })}`
 
   return (
     <div className="min-w-0">
@@ -323,6 +371,13 @@ export default async function CrmLeadsPage({ searchParams }) {
                     >
                       Apply
                     </button>
+                    <Link
+                      href="/crm"
+                      className="px-2 py-1 rounded border border-gray-200 bg-white text-xs font-semibold text-gray-900 hover:bg-gray-50"
+                      title="Reset filters"
+                    >
+                      Reset
+                    </Link>
                   </div>
                 </th>
               </tr>
