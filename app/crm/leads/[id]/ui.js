@@ -9,6 +9,7 @@ const SELECT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 
 export default function CrmLeadEditor({ lead }) {
+  const [location, setLocation] = useState(lead.location || '')
   const [initialAssessment, setInitialAssessment] = useState(
     lead.initial_assessment || ''
   )
@@ -29,6 +30,7 @@ export default function CrmLeadEditor({ lead }) {
 
   const dirty = useMemo(() => {
     return (
+      (lead.location || '') !== location ||
       (lead.initial_assessment || '') !== initialAssessment ||
       (lead.projects_interested || '') !== projectsInterested ||
       (lead.uc_rtm || '') !== ucRtm ||
@@ -45,6 +47,7 @@ export default function CrmLeadEditor({ lead }) {
     followUpDate,
     initialAssessment,
     lead,
+    location,
     projectsInterested,
     remarks,
     ucRtm,
@@ -59,6 +62,7 @@ export default function CrmLeadEditor({ lead }) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          location,
           initial_assessment: initialAssessment,
           projects_interested: projectsInterested,
           uc_rtm: ucRtm,
@@ -140,6 +144,17 @@ export default function CrmLeadEditor({ lead }) {
             value={lead.phone || ''}
             readOnly
             className={`${INPUT} bg-gray-50`}
+            style={{ color: '#111827' }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Location</label>
+          <input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className={INPUT}
+            placeholder="e.g. Gurgaon"
             style={{ color: '#111827' }}
           />
         </div>

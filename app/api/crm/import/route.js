@@ -158,6 +158,7 @@ export async function POST(request) {
     const leadDateKeys = ['DATE', 'Date', 'date', 'Lead Date', 'lead_date']
     const excelNameKeys = ['Excel Name', 'excel_name']
     const sourceKeys = ['Source', 'source']
+    const locationKeys = ['Location', 'location', 'City', 'Area']
     const customerKeys = [
       'Customer Name',
       'Name',
@@ -218,6 +219,7 @@ export async function POST(request) {
           const leadDateRaw = pickFirst(row, leadDateKeys)
           const excelNameRaw = pickFirst(row, excelNameKeys)
           const sourceRaw = pickFirst(row, sourceKeys)
+          const locationRaw = pickFirst(row, locationKeys)
           const initialAssessmentRaw = pickFirst(row, initialAssessmentKeys)
           const remarksRaw = pickFirst(row, remarksKeys)
           const projectsInterestedRaw = pickFirst(row, projectsInterestedKeys)
@@ -293,6 +295,7 @@ export async function POST(request) {
             // If the CSV doesn't contain "DATE", use upload date
             lead_date: leadDate,
             source: sourceRaw != null ? String(sourceRaw).trim() : null,
+            location: locationRaw != null ? String(locationRaw).trim() : null,
             customer_name: customerNameClean,
             phone: phoneStr,
             phone_normalized: phoneNormalized,

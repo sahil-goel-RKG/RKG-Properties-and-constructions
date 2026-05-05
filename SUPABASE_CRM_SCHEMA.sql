@@ -19,6 +19,8 @@ create table if not exists public.crm_leads (
   lead_date date not null default current_date,
   -- From CSV: "Source"
   source text,
+  -- From CSV: "Location"
+  location text,
   customer_name text not null,
   phone text,
   phone_normalized text,
@@ -50,6 +52,7 @@ create unique index if not exists crm_leads_phone_normalized_unique
 create index if not exists crm_leads_created_at_idx on public.crm_leads(created_at desc);
 create index if not exists crm_leads_customer_name_idx on public.crm_leads(customer_name);
 create index if not exists crm_leads_source_idx on public.crm_leads(source);
+create index if not exists crm_leads_location_idx on public.crm_leads(location);
 create index if not exists crm_leads_excel_name_idx on public.crm_leads(excel_name);
 create index if not exists crm_leads_lead_date_idx on public.crm_leads(lead_date desc);
 create index if not exists crm_leads_initial_assessment_idx on public.crm_leads(initial_assessment);

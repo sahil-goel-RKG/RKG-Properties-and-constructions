@@ -40,6 +40,9 @@ export async function PATCH(request, { params }) {
   }
 
   const update = {}
+  if (typeof body?.location === 'string') {
+    update.location = normalizeOptionalString(body.location)
+  }
   if (typeof body?.initial_assessment === 'string') {
     update.initial_assessment = normalizeEnumCI(body.initial_assessment, {
       hot: 'hot',
@@ -86,7 +89,7 @@ export async function PATCH(request, { params }) {
     .update(update)
     .eq('id', id)
     .select(
-      'id, excel_name, source, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
     )
     .single()
 

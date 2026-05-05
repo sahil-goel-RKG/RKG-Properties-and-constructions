@@ -53,6 +53,8 @@ export async function POST(request) {
         ? toIsoDateOrNull(body.lead_date) || new Date().toISOString().slice(0, 10)
         : new Date().toISOString().slice(0, 10),
     source: typeof body?.source === 'string' ? body.source.trim() || null : null,
+    location:
+      typeof body?.location === 'string' ? body.location.trim() || null : null,
     customer_name: customerName,
     phone: phone || null,
     phone_normalized: phoneNormalized,
@@ -93,7 +95,7 @@ export async function POST(request) {
       .from('crm_leads')
       .upsert(lead, { onConflict: 'phone_normalized', ignoreDuplicates: false })
       .select(
-        'id, excel_name, lead_date, source, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
       )
       .single()
 
@@ -105,7 +107,7 @@ export async function POST(request) {
     .from('crm_leads')
     .insert(lead)
     .select(
-      'id, excel_name, lead_date, source, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
     )
     .single()
 

@@ -13,6 +13,7 @@ export default function CrmAddLeadPage() {
   const [customerName, setCustomerName] = useState('')
   const [phone, setPhone] = useState('')
   const [source, setSource] = useState('')
+  const [location, setLocation] = useState('')
   const [initialAssessment, setInitialAssessment] = useState('')
   const [projectsInterested, setProjectsInterested] = useState('')
   const [ucRtm, setUcRtm] = useState('')
@@ -33,6 +34,7 @@ export default function CrmAddLeadPage() {
     setCustomerName('')
     setPhone('')
     setSource('')
+    setLocation('')
     setInitialAssessment('')
     setProjectsInterested('')
     setUcRtm('')
@@ -64,6 +66,7 @@ export default function CrmAddLeadPage() {
           customer_name: customerName,
           phone,
           source,
+          location,
           initial_assessment: initialAssessment,
           projects_interested: projectsInterested,
           uc_rtm: ucRtm,
@@ -145,6 +148,19 @@ export default function CrmAddLeadPage() {
               onChange={(e) => setSource(e.target.value)}
               className={INPUT}
               placeholder="e.g. RKG / Website / Referral"
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Location
+            </label>
+            <input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className={INPUT}
+              placeholder="e.g. Gurgaon / Delhi"
               style={{ color: '#111827' }}
             />
           </div>

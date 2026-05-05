@@ -33,6 +33,7 @@ end $$;
 alter table public.crm_leads
   add column if not exists excel_name text,
   add column if not exists lead_date date not null default current_date,
+  add column if not exists location text,
   add column if not exists projects_interested text,
   add column if not exists uc_rtm text,
   add column if not exists agreed_walk_in text,

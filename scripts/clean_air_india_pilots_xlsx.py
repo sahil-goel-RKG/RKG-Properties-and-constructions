@@ -25,6 +25,16 @@ def is_blank_row(values) -> bool:
     return True
 
 
+def find_name_col(headers):
+    for idx, h in enumerate(headers):
+        hs = (str(h).strip().lower() if h is not None else "")
+        if not hs:
+            continue
+        if hs in ("prospect name", "customer name", "name") or "prospect name" in hs:
+            return idx
+    return None
+
+
 def find_phone_col(headers):
     candidates = []
     for idx, h in enumerate(headers):
@@ -49,6 +59,7 @@ def main():
     ws = wb.active
 
     headers = [c.value for c in ws[1]]
+    name_col = find_name_col(headers)
     phone_col = find_phone_col(headers)
     if phone_col is None:
         raise SystemExit(
@@ -63,6 +74,7 @@ def main():
     written = 0
     duplicated = 0
     removed_blank = 0
+    removed_blank_name = 0
 
     for row in ws.iter_rows(min_row=2, values_only=True):
         if is_blank_row(row):
@@ -70,6 +82,12 @@ def main():
             continue
 
         row_list = list(row)
+        if name_col is not None:
+            name_val = row_list[name_col]
+            if name_val is None or (isinstance(name_val, str) and name_val.strip() == ""):
+                removed_blank_name += 1
+                continue
+
         phone_val = row_list[phone_col]
         if phone_val is None or (isinstance(phone_val, str) and phone_val.strip() == ""):
             out_ws.append(row_list)
@@ -79,6 +97,7 @@ def main():
         phone_str = str(phone_val).strip()
         parts = [p for p in PHONE_SPLIT_RE.split(phone_str) if p and p.strip()]
         if len(parts) <= 1:
+            row_list[phone_col] = normalize_phone(phone_str)
             out_ws.append(row_list)
             written += 1
             continue
@@ -94,9 +113,11 @@ def main():
     out_wb.save(OUTPUT_PATH)
     print("Saved:", OUTPUT_PATH)
     print("phone_col_index:", phone_col, "header:", headers[phone_col])
+    print("name_col_index:", name_col, "header:", headers[name_col] if name_col is not None else None)
     print("written_rows:", written)
     print("split_rows_created:", duplicated)
     print("blank_rows_removed:", removed_blank)
+    print("blank_name_rows_removed:", removed_blank_name)
 
 
 if __name__ == "__main__":

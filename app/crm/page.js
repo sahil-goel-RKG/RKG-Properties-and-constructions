@@ -34,6 +34,8 @@ export default async function CrmLeadsPage({ searchParams }) {
   const name = typeof (sp && sp.name) === 'string' ? sp.name.trim() : ''
   const phone = typeof (sp && sp.phone) === 'string' ? sp.phone.trim() : ''
   const source = typeof (sp && sp.source) === 'string' ? sp.source.trim() : ''
+  const location =
+    typeof (sp && sp.location) === 'string' ? sp.location.trim() : ''
   const excelName =
     typeof (sp && sp.excelName) === 'string' ? sp.excelName.trim() : ''
   const assigned = typeof (sp && sp.assigned) === 'string' ? sp.assigned.trim() : ''
@@ -52,7 +54,7 @@ export default async function CrmLeadsPage({ searchParams }) {
   let query = db
     .from('crm_leads')
     .select(
-      'id, excel_name, source, customer_name, phone, initial_assessment, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
       { count: 'exact' }
     )
     .order('created_at', { ascending: false })
@@ -63,6 +65,7 @@ export default async function CrmLeadsPage({ searchParams }) {
   if (name) query = query.ilike('customer_name', `%${name}%`)
   if (phone) query = query.ilike('phone', `%${phone}%`)
   if (source) query = query.ilike('source', `%${source}%`)
+  if (location) query = query.ilike('location', `%${location}%`)
   if (excelName) query = query.ilike('excel_name', `%${excelName}%`)
   if (assigned) query = query.ilike('assigned_to_name', `%${assigned}%`)
   if (followUpFrom) query = query.gte('follow_up_date', followUpFrom)
@@ -70,7 +73,7 @@ export default async function CrmLeadsPage({ searchParams }) {
 
   if (q) {
     query = query.or(
-      `customer_name.ilike.%${q}%,phone.ilike.%${q}%,source.ilike.%${q}%,excel_name.ilike.%${q}%,remarks.ilike.%${q}%`
+      `customer_name.ilike.%${q}%,phone.ilike.%${q}%,source.ilike.%${q}%,location.ilike.%${q}%,excel_name.ilike.%${q}%,remarks.ilike.%${q}%`
     )
   }
 
@@ -205,6 +208,7 @@ export default async function CrmLeadsPage({ searchParams }) {
               <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 <th className="px-3 py-3">Created</th>
                 <th className="px-3 py-3">Source</th>
+                <th className="px-3 py-3">Location</th>
                 <th className="px-3 py-3">Excel Name</th>
                 <th className="px-3 py-3">Customer</th>
                 <th className="px-3 py-3">Phone</th>
@@ -222,6 +226,15 @@ export default async function CrmLeadsPage({ searchParams }) {
                   <input
                     name="source"
                     defaultValue={source}
+                    placeholder="Filter"
+                    className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs placeholder:text-gray-400"
+                    style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
+                  />
+                </th>
+                <th className="px-3 pb-3">
+                  <input
+                    name="location"
+                    defaultValue={location}
                     placeholder="Filter"
                     className="crm-filter w-full px-2 py-1 border border-gray-200 rounded bg-white text-xs placeholder:text-gray-400"
                     style={{ color: '#4b5563', fontWeight: 400, WebkitTextFillColor: '#4b5563' }}
@@ -322,6 +335,9 @@ export default async function CrmLeadsPage({ searchParams }) {
                   </td>
                   <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap">
                     {lead.source || '-'}
+                  </td>
+                  <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap max-w-[180px]">
+                    <span className="block truncate">{lead.location || '-'}</span>
                   </td>
                   <td className="px-3 py-3 text-sm text-gray-900 whitespace-nowrap max-w-[220px]">
                     <span className="block truncate">{lead.excel_name || '-'}</span>
