@@ -25,8 +25,11 @@ export const metadata = {
   title: "RKG Properties and Constructions | Excellence in Real Estate Solutions",
   description: "Premium residential and commercial properties in Gurgaon. Your trusted partner for real estate solutions.",
   icons: {
-    icon: "/fevicon.png",
-    apple: "/fevicon.png",
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
 };
 
@@ -57,7 +60,9 @@ export default function RootLayout({ children }) {
     >
       <html lang="en">
         <head>
-          <link rel="icon" href="/fevicon.png" type="image/png" sizes="any" />
+          <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+          <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
           {supabaseOrigin && (
             <>
               <link rel="preconnect" href={supabaseOrigin} />
