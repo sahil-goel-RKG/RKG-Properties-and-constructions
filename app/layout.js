@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import HeaderRouter from "@/components/layout/HeaderRouter";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import ClientOverlays from "@/components/layout/ClientOverlays";
@@ -102,7 +102,7 @@ export default function RootLayout({ children }) {
             }}
           />
           <ClientOverlays />
-          <Header />
+          <HeaderRouter />
           <main className="min-w-0 overflow-x-hidden">{children}</main>
           <Footer />
           <WhatsAppButton />

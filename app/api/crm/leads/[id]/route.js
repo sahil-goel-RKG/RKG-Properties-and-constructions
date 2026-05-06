@@ -45,7 +45,8 @@ export async function PATCH(request, { params }) {
   }
   if (typeof body?.initial_assessment === 'string') {
     update.initial_assessment = normalizeEnumCI(body.initial_assessment, {
-      hot: 'hot',
+      hot: 'running', // backward-compat: treat "hot" as "running"
+      running: 'running',
       warm: 'warm',
       cold: 'cold',
     })

@@ -244,10 +244,11 @@ export async function POST(request) {
           const phoneStr = phone != null ? String(phone).trim() : null
           const phoneNormalized = normalizePhone(phoneStr)
 
-          const initialAssessmentStr =
+          let initialAssessmentStr =
             initialAssessmentRaw != null
               ? String(initialAssessmentRaw).trim().toLowerCase()
               : null
+          if (initialAssessmentStr === 'hot') initialAssessmentStr = 'running'
           const remarksStr =
             remarksRaw != null ? String(remarksRaw).trim() : null
           const projectsInterestedStr =

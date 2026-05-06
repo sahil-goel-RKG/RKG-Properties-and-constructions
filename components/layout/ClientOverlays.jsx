@@ -16,21 +16,18 @@ const ContactPopup = dynamic(
 export default function ClientOverlays() {
   // Avoid hydration mismatch: server render can't reliably know pathname.
   // Render nothing until after the component mounts on the client.
+  const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
   }, [])
 
   if (!mounted) return null
-
-  const pathname = usePathname()
-  if (typeof pathname === 'string' && pathname.startsWith('/crm')) {
-    return null
-  }
+  const isCrm = typeof pathname === 'string' && pathname.startsWith('/crm')
   return (
     <>
       <InactivityTimer />
-      <ContactPopup />
+      {isCrm ? null : <ContactPopup />}
     </>
   )
 }

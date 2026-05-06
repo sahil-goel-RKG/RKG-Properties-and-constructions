@@ -60,7 +60,11 @@ export async function POST(request) {
     phone_normalized: phoneNormalized,
     initial_assessment:
       typeof body?.initial_assessment === 'string'
-        ? body.initial_assessment.trim().toLowerCase() || null
+        ? (() => {
+            const v = body.initial_assessment.trim().toLowerCase()
+            if (!v) return null
+            return v === 'hot' ? 'running' : v
+          })()
         : null,
     projects_interested:
       typeof body?.projects_interested === 'string'

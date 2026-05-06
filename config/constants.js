@@ -3,8 +3,8 @@
  * Centralized configuration for the application
  */
 
-// Inactivity timeout (5 minutes)
-export const INACTIVITY_TIMEOUT = 5 * 60 * 1000
+// Inactivity timeout (10 minutes)
+export const INACTIVITY_TIMEOUT = 10 * 60 * 1000
 
 // Pagination
 export const ITEMS_PER_PAGE = 12

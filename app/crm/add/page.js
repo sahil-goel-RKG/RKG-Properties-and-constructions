@@ -176,7 +176,7 @@ export default function CrmAddLeadPage() {
               style={{ color: '#111827' }}
             >
               <option value="">Select</option>
-              <option value="hot">hot</option>
+              <option value="running">running</option>
               <option value="warm">warm</option>
               <option value="cold">cold</option>
             </select>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
 const INPUT =
@@ -9,10 +10,19 @@ const SELECT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 
 export default function CrmLeadEditor({ lead }) {
+  const router = useRouter()
   const [location, setLocation] = useState(lead.location || '')
-  const [initialAssessment, setInitialAssessment] = useState(
-    lead.initial_assessment || ''
-  )
+
+  const initialAssessmentFromLead = (() => {
+    const raw = typeof lead.initial_assessment === 'string' ? lead.initial_assessment : ''
+    const v = raw.trim().toLowerCase()
+    if (!v) return ''
+    if (v === 'hot') return 'running'
+    if (v === 'running' || v === 'warm' || v === 'cold') return v
+    return ''
+  })()
+
+  const [initialAssessment, setInitialAssessment] = useState(initialAssessmentFromLead)
   const [projectsInterested, setProjectsInterested] = useState(
     lead.projects_interested || ''
   )
@@ -28,10 +38,12 @@ export default function CrmLeadEditor({ lead }) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
+  const assessmentOptions = ['running', 'warm', 'cold']
+
   const dirty = useMemo(() => {
     return (
       (lead.location || '') !== location ||
-      (lead.initial_assessment || '') !== initialAssessment ||
+      initialAssessmentFromLead !== initialAssessment ||
       (lead.projects_interested || '') !== projectsInterested ||
       (lead.uc_rtm || '') !== ucRtm ||
       (lead.agreed_walk_in || '') !== agreedWalkIn ||
@@ -54,6 +66,7 @@ export default function CrmLeadEditor({ lead }) {
   ])
 
   const save = async () => {
+    let navigated = false
     setSaving(true)
     setMessage('')
     setError('')
@@ -78,10 +91,17 @@ export default function CrmLeadEditor({ lead }) {
         setError(json?.error || 'Save failed')
         return
       }
-      setMessage('Saved')
+
+      // Redirect back to leads immediately after a successful save.
+      // Use hard navigation to be 100% reliable across environments.
+      navigated = true
+      router.replace('/crm')
+      window.location.replace('/crm')
+      return
     } catch (e) {
       setError(e?.message || 'Save failed')
     } finally {
+      if (navigated) return
       setSaving(false)
       setTimeout(() => setMessage(''), 2000)
     }
@@ -181,9 +201,11 @@ export default function CrmLeadEditor({ lead }) {
             style={{ color: '#111827' }}
           >
             <option value="">Select</option>
-            <option value="hot">hot</option>
-            <option value="warm">warm</option>
-            <option value="cold">cold</option>
+            {assessmentOptions.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
           </select>
         </div>
 

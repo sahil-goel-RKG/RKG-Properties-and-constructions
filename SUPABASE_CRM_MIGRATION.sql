@@ -43,11 +43,13 @@ alter table public.crm_leads
 -- Optional: constrain dropdown-like columns (kept permissive with NOT VALID)
 do $$
 begin
-  if not exists (select 1 from pg_constraint where conname='crm_leads_initial_assessment_check') then
-    alter table public.crm_leads
-      add constraint crm_leads_initial_assessment_check
-      check (initial_assessment is null or initial_assessment in ('warm','cold','hot')) not valid;
+  -- If the constraint exists with older allowed values (e.g. 'hot'), replace it.
+  if exists (select 1 from pg_constraint where conname='crm_leads_initial_assessment_check') then
+    alter table public.crm_leads drop constraint crm_leads_initial_assessment_check;
   end if;
+  alter table public.crm_leads
+    add constraint crm_leads_initial_assessment_check
+    check (initial_assessment is null or initial_assessment in ('warm','cold','running')) not valid;
 
   if not exists (select 1 from pg_constraint where conname='crm_leads_uc_rtm_check') then
     alter table public.crm_leads
