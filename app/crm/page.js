@@ -99,7 +99,7 @@ export default async function CrmLeadsPage({ searchParams }) {
   let query = db
     .from('crm_leads')
     .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, end_use_investment, bhk_interested_in, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
       { count: 'exact' }
     )
     .order('created_at', { ascending: false })
@@ -313,11 +313,12 @@ export default async function CrmLeadsPage({ searchParams }) {
             <thead className="bg-gray-200">
               <tr className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                 <th className="px-3 py-3">Location</th>
-                <th className="px-3 py-3">Excel Name</th>
                 <th className="px-3 py-3">Customer</th>
                 <th className="px-3 py-3">Phone</th>
                 <th className="px-3 py-3">Assigned</th>
                 <th className="px-3 py-3">Initial</th>
+                <th className="px-3 py-3 whitespace-nowrap">End Use/Investment</th>
+                <th className="px-3 py-3 whitespace-nowrap">BHK</th>
                 <th className="px-3 py-3">Follow up</th>
                 <th className="px-3 py-3">Remarks</th>
               </tr>
@@ -348,11 +349,6 @@ export default async function CrmLeadsPage({ searchParams }) {
                       {lead.location || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-900 whitespace-nowrap max-w-[220px]">
-                    <Link href={href} className={`${linkBase} truncate`}>
-                      {lead.excel_name || '-'}
-                    </Link>
-                  </td>
                   <td className="p-0 text-sm font-semibold text-gray-900 whitespace-nowrap max-w-[260px]">
                     <Link href={href} className={`${linkBase} truncate`}>
                       {lead.customer_name}
@@ -373,6 +369,16 @@ export default async function CrmLeadsPage({ searchParams }) {
                       {lead.initial_assessment === 'hot'
                         ? 'running'
                         : lead.initial_assessment || '-'}
+                    </Link>
+                  </td>
+                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                    <Link href={href} className={linkBase}>
+                      {lead.end_use_investment || '-'}
+                    </Link>
+                  </td>
+                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                    <Link href={href} className={linkBase}>
+                      {lead.bhk_interested_in || '-'}
                     </Link>
                   </td>
                   <td className="p-0 text-sm text-gray-700 whitespace-nowrap">

@@ -24,6 +24,15 @@ function normalizeEnumCI(v, allowedMap) {
   return allowedMap[key] ?? s
 }
 
+function normalizeBhkInterestedIn(v) {
+  const s = normalizeOptionalString(v)
+  if (!s) return null
+  const normalized = s.toUpperCase().replace(/\s+/g, ' ')
+  const m = normalized.match(/^([2-6])\s*BHK$/) || normalized.match(/^([2-6])$/)
+  if (m && m[1]) return `${m[1]} BHK`
+  return s
+}
+
 export async function PATCH(request, { params }) {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -70,6 +79,9 @@ export async function PATCH(request, { params }) {
       investment: 'Investment',
     })
   }
+  if (typeof body?.bhk_interested_in === 'string') {
+    update.bhk_interested_in = normalizeBhkInterestedIn(body.bhk_interested_in)
+  }
   if (typeof body?.follow_up_date === 'string') {
     update.follow_up_date = normalizeOptionalString(body.follow_up_date)
   }
@@ -90,7 +102,7 @@ export async function PATCH(request, { params }) {
     .update(update)
     .eq('id', id)
     .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
     )
     .single()
 

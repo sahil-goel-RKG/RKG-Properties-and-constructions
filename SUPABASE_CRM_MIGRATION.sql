@@ -38,6 +38,7 @@ alter table public.crm_leads
   add column if not exists uc_rtm text,
   add column if not exists agreed_walk_in text,
   add column if not exists end_use_investment text,
+  add column if not exists bhk_interested_in text,
   add column if not exists follow_up_date date;
 
 -- Optional: constrain dropdown-like columns (kept permissive with NOT VALID)
@@ -67,6 +68,12 @@ begin
     alter table public.crm_leads
       add constraint crm_leads_end_use_investment_check
       check (end_use_investment is null or end_use_investment in ('End Use','Investment')) not valid;
+  end if;
+
+  if not exists (select 1 from pg_constraint where conname='crm_leads_bhk_interested_in_check') then
+    alter table public.crm_leads
+      add constraint crm_leads_bhk_interested_in_check
+      check (bhk_interested_in is null or bhk_interested_in in ('2 BHK','3 BHK','4 BHK','5 BHK','6 BHK')) not valid;
   end if;
 end $$;
 

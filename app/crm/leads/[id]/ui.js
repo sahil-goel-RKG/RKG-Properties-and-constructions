@@ -31,6 +31,9 @@ export default function CrmLeadEditor({ lead }) {
   const [endUseInvestment, setEndUseInvestment] = useState(
     lead.end_use_investment || ''
   )
+  const [bhkInterestedIn, setBhkInterestedIn] = useState(
+    lead.bhk_interested_in || ''
+  )
   const [followUpDate, setFollowUpDate] = useState(lead.follow_up_date || '')
   const [remarks, setRemarks] = useState(lead.remarks || '')
   const [assignedToName, setAssignedToName] = useState(lead.assigned_to_name || '')
@@ -48,6 +51,7 @@ export default function CrmLeadEditor({ lead }) {
       (lead.uc_rtm || '') !== ucRtm ||
       (lead.agreed_walk_in || '') !== agreedWalkIn ||
       (lead.end_use_investment || '') !== endUseInvestment ||
+      (lead.bhk_interested_in || '') !== bhkInterestedIn ||
       (lead.follow_up_date || '') !== followUpDate ||
       (lead.remarks || '') !== remarks ||
       (lead.assigned_to_name || '') !== assignedToName
@@ -55,6 +59,7 @@ export default function CrmLeadEditor({ lead }) {
   }, [
     agreedWalkIn,
     assignedToName,
+    bhkInterestedIn,
     endUseInvestment,
     followUpDate,
     initialAssessment,
@@ -81,6 +86,7 @@ export default function CrmLeadEditor({ lead }) {
           uc_rtm: ucRtm,
           agreed_walk_in: agreedWalkIn,
           end_use_investment: endUseInvestment,
+          bhk_interested_in: bhkInterestedIn,
           follow_up_date: followUpDate,
           remarks,
           assigned_to_name: assignedToName,
@@ -252,6 +258,25 @@ export default function CrmLeadEditor({ lead }) {
             <option value="">Select</option>
             <option value="End Use">End Use</option>
             <option value="Investment">Investment</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            BHK Interested In
+          </label>
+          <select
+            value={bhkInterestedIn}
+            onChange={(e) => setBhkInterestedIn(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          >
+            <option value="">Select</option>
+            <option value="2 BHK">2 BHK</option>
+            <option value="3 BHK">3 BHK</option>
+            <option value="4 BHK">4 BHK</option>
+            <option value="5 BHK">5 BHK</option>
+            <option value="6 BHK">6 BHK</option>
           </select>
         </div>
 

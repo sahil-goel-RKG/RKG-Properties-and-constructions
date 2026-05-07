@@ -80,6 +80,18 @@ export async function POST(request) {
       typeof body?.end_use_investment === 'string'
         ? body.end_use_investment.trim() || null
         : null,
+    bhk_interested_in:
+      typeof body?.bhk_interested_in === 'string'
+        ? (() => {
+            const v = body.bhk_interested_in.trim()
+            if (!v) return null
+            const normalized = v.toUpperCase().replace(/\s+/g, ' ')
+            // Accept "2", "2bhk", "2 bhk" etc and store consistently as "2 BHK"
+            const m = normalized.match(/^([2-6])\s*BHK$/) || normalized.match(/^([2-6])$/)
+            if (m && m[1]) return `${m[1]} BHK`
+            return v
+          })()
+        : null,
     follow_up_date:
       typeof body?.follow_up_date === 'string'
         ? toIsoDateOrNull(body.follow_up_date) || null
@@ -99,7 +111,7 @@ export async function POST(request) {
       .from('crm_leads')
       .upsert(lead, { onConflict: 'phone_normalized', ignoreDuplicates: false })
       .select(
-        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
       )
       .single()
 
@@ -111,7 +123,7 @@ export async function POST(request) {
     .from('crm_leads')
     .insert(lead)
     .select(
-      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
     )
     .single()
 

@@ -197,6 +197,12 @@ export async function POST(request) {
       'End Use / Investment',
       'end_use_investment',
     ]
+    const bhkInterestedInKeys = [
+      'BHK Interested In',
+      'BHK Interested',
+      'bhk_interested_in',
+      'bhk_interested',
+    ]
     const followUpKeys = ['Follow UP', 'Follow Up', 'follow_up', 'follow_up_date']
     const assignedKeys = [
       'Assigned To',
@@ -226,6 +232,7 @@ export async function POST(request) {
           const ucRtmRaw = pickFirst(row, ucRtmKeys)
           const agreedWalkInRaw = pickFirst(row, agreedWalkInKeys)
           const endUseInvestmentRaw = pickFirst(row, endUseInvestmentKeys)
+          const bhkInterestedInRaw = pickFirst(row, bhkInterestedInKeys)
           const followUpRaw = pickFirst(row, followUpKeys)
           const assignedRaw = pickFirst(row, assignedKeys)
 
@@ -265,6 +272,14 @@ export async function POST(request) {
             endUseInvestmentRaw != null
               ? String(endUseInvestmentRaw).trim()
               : null
+          const bhkInterestedInStr =
+            bhkInterestedInRaw != null ? String(bhkInterestedInRaw).trim() : null
+          let bhkInterestedInNormalized = null
+          if (bhkInterestedInStr) {
+            const normalized = bhkInterestedInStr.toUpperCase().replace(/\s+/g, ' ')
+            const m = normalized.match(/^([2-6])\s*BHK$/) || normalized.match(/^([2-6])$/)
+            bhkInterestedInNormalized = m && m[1] ? `${m[1]} BHK` : bhkInterestedInStr
+          }
 
           const leadDate = toIsoDateOrNull(leadDateRaw) || uploadedLeadDate
 
@@ -305,6 +320,7 @@ export async function POST(request) {
             uc_rtm: ucRtmStr,
             agreed_walk_in: agreedWalkInStr,
             end_use_investment: endUseInvestmentStr,
+            bhk_interested_in: bhkInterestedInNormalized,
             follow_up_date: followUpDate,
             remarks: remarksStr,
             assigned_to_name: assignedName,

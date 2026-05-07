@@ -19,6 +19,7 @@ export default function CrmAddLeadPage() {
   const [ucRtm, setUcRtm] = useState('')
   const [agreedWalkIn, setAgreedWalkIn] = useState('')
   const [endUseInvestment, setEndUseInvestment] = useState('')
+  const [bhkInterestedIn, setBhkInterestedIn] = useState('')
   const [followUpDate, setFollowUpDate] = useState('')
   const [assignedToName, setAssignedToName] = useState('')
   const [remarks, setRemarks] = useState('')
@@ -40,6 +41,7 @@ export default function CrmAddLeadPage() {
     setUcRtm('')
     setAgreedWalkIn('')
     setEndUseInvestment('')
+    setBhkInterestedIn('')
     setFollowUpDate('')
     setAssignedToName('')
     setRemarks('')
@@ -72,6 +74,7 @@ export default function CrmAddLeadPage() {
           uc_rtm: ucRtm,
           agreed_walk_in: agreedWalkIn,
           end_use_investment: endUseInvestment,
+          bhk_interested_in: bhkInterestedIn,
           follow_up_date: followUpDate,
           assigned_to_name: assignedToName,
           remarks,
@@ -243,6 +246,25 @@ export default function CrmAddLeadPage() {
 
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-1">
+              BHK Interested In
+            </label>
+            <select
+              value={bhkInterestedIn}
+              onChange={(e) => setBhkInterestedIn(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            >
+              <option value="">Select</option>
+              <option value="2 BHK">2 BHK</option>
+              <option value="3 BHK">3 BHK</option>
+              <option value="4 BHK">4 BHK</option>
+              <option value="5 BHK">5 BHK</option>
+              <option value="6 BHK">6 BHK</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
               Follow up
             </label>
             <input
@@ -262,7 +284,7 @@ export default function CrmAddLeadPage() {
               value={assignedToName}
               onChange={(e) => setAssignedToName(e.target.value)}
               className={INPUT}
-              placeholder="e.g. Sahil / Mohit"
+              placeholder="e.g. Sahil / Anuj"
               style={{ color: '#111827' }}
             />
           </div>

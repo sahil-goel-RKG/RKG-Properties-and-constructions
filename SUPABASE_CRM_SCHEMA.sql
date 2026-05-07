@@ -34,6 +34,8 @@ create table if not exists public.crm_leads (
   agreed_walk_in text,
   -- From CSV: "End Use/ Investment" (End Use/Investment)
   end_use_investment text,
+  -- From CSV/UI: "BHK Interested In" (2/3/4/5/6 BHK)
+  bhk_interested_in text,
   -- From CSV: "Follow UP" (date)
   follow_up_date date,
   remarks text,
