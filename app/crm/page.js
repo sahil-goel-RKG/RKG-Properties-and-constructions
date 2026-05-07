@@ -72,6 +72,14 @@ function buildPageItems(currentPage, totalPages) {
   return items
 }
 
+function formatIsoDateToDmy(value) {
+  if (typeof value !== 'string') return null
+  const s = value.trim()
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return s || null
+  return `${m[3]}-${m[2]}-${m[1]}`
+}
+
 export default async function CrmLeadsPage({ searchParams }) {
   const sp = await Promise.resolve(searchParams)
   const q = typeof (sp && sp.q) === 'string' ? sp.q.trim() : ''
@@ -99,7 +107,7 @@ export default async function CrmLeadsPage({ searchParams }) {
   let query = db
     .from('crm_leads')
     .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, end_use_investment, bhk_interested_in, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, end_use_investment, bhk_interested_in, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
       { count: 'exact' }
     )
     .order('created_at', { ascending: false })
@@ -309,18 +317,20 @@ export default async function CrmLeadsPage({ searchParams }) {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1000px]">
+          <table className="w-full min-w-[1040px]">
             <thead className="bg-gray-200">
-              <tr className="text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                <th className="px-3 py-3">Location</th>
-                <th className="px-3 py-3">Customer</th>
-                <th className="px-3 py-3">Phone</th>
-                <th className="px-3 py-3">Assigned</th>
-                <th className="px-3 py-3">Initial</th>
-                <th className="px-3 py-3 whitespace-nowrap">End Use/Investment</th>
-                <th className="px-3 py-3 whitespace-nowrap">BHK</th>
-                <th className="px-3 py-3">Follow up</th>
-                <th className="px-3 py-3">Remarks</th>
+              <tr className="text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider">
+                <th className="px-2 py-2">Location</th>
+                <th className="px-2 py-2">Customer</th>
+                <th className="px-2 py-2">Phone</th>
+                <th className="px-2 py-2">Assigned</th>
+                <th className="px-2 py-2 whitespace-nowrap">UC/RTM</th>
+                <th className="px-2 py-2">Initial</th>
+                <th className="px-2 py-2 whitespace-nowrap">Projects</th>
+                <th className="px-2 py-2 whitespace-nowrap">End Use</th>
+                <th className="px-2 py-2 whitespace-nowrap">BHK</th>
+                <th className="px-2 py-2 whitespace-nowrap">Follow up</th>
+                <th className="px-2 py-2">Remarks</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-300/80">
@@ -328,7 +338,7 @@ export default async function CrmLeadsPage({ searchParams }) {
                 (() => {
                   const href = `/crm/leads/${lead.id}`
                   const linkBase =
-                    'block w-full h-full px-3 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd86b] focus-visible:ring-inset'
+                    'block w-full h-full px-2 py-2 text-left text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd86b] focus-visible:ring-inset'
                   return (
                 <tr
                   key={lead.id}
@@ -344,49 +354,59 @@ export default async function CrmLeadsPage({ searchParams }) {
                     'cursor-pointer hover:brightness-95 transition-[filter] duration-150',
                   ].join(' ')}
                 >
-                  <td className="p-0 text-sm text-gray-900 whitespace-nowrap max-w-[180px]">
+                  <td className="p-0 text-xs text-gray-900 whitespace-nowrap max-w-[160px]">
                     <Link href={href} className={`${linkBase} truncate`}>
                       {lead.location || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm font-semibold text-gray-900 whitespace-nowrap max-w-[260px]">
+                  <td className="p-0 text-xs font-semibold text-gray-900 whitespace-nowrap max-w-[210px]">
                     <Link href={href} className={`${linkBase} truncate`}>
                       {lead.customer_name}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
                     <Link href={href} className={linkBase}>
                       {lead.phone || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap max-w-[140px]">
                     <Link href={href} className={linkBase}>
                       {lead.assigned_to_name || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
+                    <Link href={href} className={linkBase}>
+                      {lead.uc_rtm || '-'}
+                    </Link>
+                  </td>
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
                     <Link href={href} className={linkBase}>
                       {lead.initial_assessment === 'hot'
                         ? 'running'
                         : lead.initial_assessment || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap max-w-[200px]">
+                    <Link href={href} className={`${linkBase} truncate`}>
+                      {lead.projects_interested || '-'}
+                    </Link>
+                  </td>
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
                     <Link href={href} className={linkBase}>
                       {lead.end_use_investment || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
                     <Link href={href} className={linkBase}>
                       {lead.bhk_interested_in || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
                     <Link href={href} className={linkBase}>
-                      {lead.follow_up_date || '-'}
+                      {formatIsoDateToDmy(lead.follow_up_date) || '-'}
                     </Link>
                   </td>
-                  <td className="p-0 text-sm text-gray-700 max-w-[380px] min-w-[240px]">
+                  <td className="p-0 text-xs text-gray-700 max-w-[300px] min-w-[200px]">
                     <Link href={href} className={`${linkBase} line-clamp-2`}>
                       {lead.remarks || '-'}
                     </Link>
