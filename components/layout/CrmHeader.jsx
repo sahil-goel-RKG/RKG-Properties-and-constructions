@@ -2,12 +2,31 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import UserButtonWrapper from '@/app/builder-floor/UserButtonWrapper'
 
 const navItem =
   'h-full px-3 sm:px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition whitespace-nowrap'
 
 export default function CrmHeader() {
+  const [isAdmin, setIsAdmin] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/crm/whoami')
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return
+        setIsAdmin(Boolean(j?.isAdmin))
+      })
+      .catch(() => {
+        if (cancelled) return
+        setIsAdmin(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="container mx-auto px-3 sm:px-4">
@@ -39,12 +58,16 @@ export default function CrmHeader() {
               <Link href="/crm" className={navItem}>
                 Leads
               </Link>
-              <Link href="/crm/add" className={navItem}>
-                Add Lead
-              </Link>
-              <Link href="/crm/import" className={navItem}>
-                Import CSV
-              </Link>
+              {isAdmin ? (
+                <>
+                  <Link href="/crm/add" className={navItem}>
+                    Add Lead
+                  </Link>
+                  <Link href="/crm/import" className={navItem}>
+                    Import CSV
+                  </Link>
+                </>
+              ) : null}
             </nav>
             <div className="flex items-center ml-2">
               <UserButtonWrapper afterSignOutUrl="/" />
@@ -59,18 +82,22 @@ export default function CrmHeader() {
           >
             Leads
           </Link>
-          <Link
-            href="/crm/add"
-            className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
-          >
-            Add Lead
-          </Link>
-          <Link
-            href="/crm/import"
-            className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
-          >
-            Import CSV
-          </Link>
+          {isAdmin ? (
+            <>
+              <Link
+                href="/crm/add"
+                className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
+              >
+                Add Lead
+              </Link>
+              <Link
+                href="/crm/import"
+                className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
+              >
+                Import CSV
+              </Link>
+            </>
+          ) : null}
         </nav>
       </div>
     </header>

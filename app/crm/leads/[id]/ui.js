@@ -2,23 +2,44 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useUser } from '@clerk/nextjs'
 
 const INPUT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 const SELECT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 
-export default function CrmLeadEditor({ lead }) {
+export default function CrmLeadEditor({ lead, isAdmin: isAdminProp }) {
   const router = useRouter()
+  const { user } = useUser()
+  const isAdmin = typeof isAdminProp === 'boolean' ? isAdminProp : user?.publicMetadata?.role === 'admin'
   const [location, setLocation] = useState(lead.location || '')
+
+  const [employees, setEmployees] = useState([])
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/crm/employees')
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return
+        setEmployees(Array.isArray(j?.employees) ? j.employees : [])
+      })
+      .catch(() => {
+        if (cancelled) return
+        setEmployees([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const initialAssessmentFromLead = (() => {
     const raw = typeof lead.initial_assessment === 'string' ? lead.initial_assessment : ''
     const v = raw.trim().toLowerCase()
     if (!v) return ''
     if (v === 'hot') return 'running'
-    if (v === 'running' || v === 'warm' || v === 'cold') return v
+    if (v === 'running' || v === 'warm' || v === 'cold' || v === 'closed') return v
     return ''
   })()
 
@@ -36,12 +57,15 @@ export default function CrmLeadEditor({ lead }) {
   )
   const [followUpDate, setFollowUpDate] = useState(lead.follow_up_date || '')
   const [remarks, setRemarks] = useState(lead.remarks || '')
-  const [assignedToName, setAssignedToName] = useState(lead.assigned_to_name || '')
+  const [assignedToEmployeeId, setAssignedToEmployeeId] = useState(
+    lead.assigned_to_employee_id || ''
+  )
+  const assignmentLocked = !isAdmin && !!(lead.assigned_to_employee_id || '').trim()
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  const assessmentOptions = ['running', 'warm', 'cold']
+  const assessmentOptions = ['running', 'warm', 'cold', 'closed']
 
   const dirty = useMemo(() => {
     return (
@@ -54,11 +78,11 @@ export default function CrmLeadEditor({ lead }) {
       (lead.bhk_interested_in || '') !== bhkInterestedIn ||
       (lead.follow_up_date || '') !== followUpDate ||
       (lead.remarks || '') !== remarks ||
-      (lead.assigned_to_name || '') !== assignedToName
+      (lead.assigned_to_employee_id || '') !== assignedToEmployeeId
     )
   }, [
     agreedWalkIn,
-    assignedToName,
+    assignedToEmployeeId,
     bhkInterestedIn,
     endUseInvestment,
     followUpDate,
@@ -89,7 +113,7 @@ export default function CrmLeadEditor({ lead }) {
           bhk_interested_in: bhkInterestedIn,
           follow_up_date: followUpDate,
           remarks,
-          assigned_to_name: assignedToName,
+          assigned_to_employee_id: assignedToEmployeeId,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -187,13 +211,25 @@ export default function CrmLeadEditor({ lead }) {
 
         <div>
           <label className="block text-sm font-semibold text-gray-900 mb-1">Assigned to</label>
-          <input
-            value={assignedToName}
-            onChange={(e) => setAssignedToName(e.target.value)}
-            className={INPUT}
-            placeholder="e.g. Sahil / Mohit"
+          <select
+            value={assignedToEmployeeId}
+            onChange={(e) => setAssignedToEmployeeId(e.target.value)}
+            className={SELECT}
             style={{ color: '#111827' }}
-          />
+            disabled={assignmentLocked}
+          >
+            <option value="">Select</option>
+            {employees.map((emp) => (
+              <option key={emp.employee_id} value={emp.employee_id}>
+                {emp.employee_id}_{emp.name}
+              </option>
+            ))}
+          </select>
+          {assignmentLocked ? (
+            <div className="mt-1 text-[11px] text-gray-500">
+              Only admin can change assignment.
+            </div>
+          ) : null}
         </div>
 
         <div>

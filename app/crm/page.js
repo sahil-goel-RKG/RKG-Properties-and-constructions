@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 
 function requireSupabaseAdmin() {
   if (!supabaseAdmin) {
@@ -11,6 +12,15 @@ function requireSupabaseAdmin() {
 }
 
 export const revalidate = 0
+
+function isWhitelistedAdminEmail(email) {
+  const list = String(process.env.CRM_ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  if (!list.length) return false
+  return list.includes(String(email || '').trim().toLowerCase())
+}
 
 function toPositiveInt(value, fallback) {
   const n = Number.parseInt(String(value ?? ''), 10)
@@ -81,6 +91,27 @@ function formatIsoDateToDmy(value) {
 }
 
 export default async function CrmLeadsPage({ searchParams }) {
+  const { userId, sessionClaims } = await auth()
+  let isAdmin =
+    sessionClaims?.publicMetadata?.role === 'admin' ||
+    sessionClaims?.metadata?.role === 'admin' ||
+    sessionClaims?.public_metadata?.role === 'admin'
+
+  // Most reliable in App Router: read role from the current user object.
+  if (userId) {
+    try {
+      const user = await currentUser()
+      if (user) {
+        const role = user?.publicMetadata?.role
+        const primaryEmail = user?.primaryEmailAddress?.emailAddress
+        isAdmin = role === 'admin' || isWhitelistedAdminEmail(primaryEmail)
+      }
+    } catch {
+      // fall back to claims
+    }
+  }
+  const restrictedEmployeeId = 'E001'
+
   const sp = await Promise.resolve(searchParams)
   const q = typeof (sp && sp.q) === 'string' ? sp.q.trim() : ''
   const status = typeof (sp && sp.status) === 'string' ? sp.status.trim() : ''
@@ -107,11 +138,22 @@ export default async function CrmLeadsPage({ searchParams }) {
   let query = db
     .from('crm_leads')
     .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, end_use_investment, bhk_interested_in, remarks, assigned_to_name, follow_up_date, created_at, updated_at',
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, end_use_investment, bhk_interested_in, remarks, assigned_to_employee_id, assigned_to_name, follow_up_date, created_at, updated_at',
       { count: 'exact' }
     )
     .order('created_at', { ascending: false })
     .range(from, to)
+
+  // Visibility rule:
+  // - Unassigned leads: visible to everyone
+  // - Assigned to E001: admin only
+  // - Assigned to others: visible to everyone
+  if (!isAdmin) {
+    // Be defensive: existing rows might have "E001", "E001 ", "e001", or other variants.
+    query = query.or(
+      `assigned_to_employee_id.is.null,assigned_to_employee_id.not.ilike.${restrictedEmployeeId}%`
+    )
+  }
 
   // Filtering
   if (status === 'running') {
@@ -125,7 +167,12 @@ export default async function CrmLeadsPage({ searchParams }) {
   if (source) query = query.ilike('source', `%${source}%`)
   if (location) query = query.ilike('location', `%${location}%`)
   if (excelName) query = query.ilike('excel_name', `%${excelName}%`)
-  if (assigned) query = query.ilike('assigned_to_name', `%${assigned}%`)
+  if (assigned) {
+    // Allow filtering by either employee id or employee name
+    query = query.or(
+      `assigned_to_employee_id.ilike.%${assigned}%,assigned_to_name.ilike.%${assigned}%`
+    )
+  }
   if (followUpFrom) query = query.gte('follow_up_date', followUpFrom)
   if (followUpTo) query = query.lte('follow_up_date', followUpTo)
 
@@ -152,7 +199,7 @@ export default async function CrmLeadsPage({ searchParams }) {
     )
   }
 
-  const statusValues = ['warm', 'running', 'cold']
+  const statusValues = ['warm', 'running', 'cold', 'closed']
 
   const total = typeof count === 'number' ? count : null
   const totalPages = total != null ? Math.max(1, Math.ceil(total / pageSize)) : null
@@ -309,11 +356,17 @@ export default async function CrmLeadsPage({ searchParams }) {
 
       {!leads?.length ? (
         <div className="text-sm text-gray-600">
-          No leads found. Import from{' '}
-          <Link href="/crm/import" className="font-semibold text-[#a67800] hover:underline">
-            Import CSV
-          </Link>
-          .
+          No leads found.
+          {isAdmin ? (
+            <>
+              {' '}
+              Import from{' '}
+              <Link href="/crm/import" className="font-semibold text-[#a67800] hover:underline">
+                Import CSV
+              </Link>
+              .
+            </>
+          ) : null}
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -339,18 +392,26 @@ export default async function CrmLeadsPage({ searchParams }) {
                   const href = `/crm/leads/${lead.id}`
                   const linkBase =
                     'block w-full h-full px-2 py-2 text-left text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd86b] focus-visible:ring-inset'
+                  const statusKey =
+                    typeof lead.initial_assessment === 'string'
+                      ? lead.initial_assessment.trim().toLowerCase()
+                      : ''
+                  const rowStyle =
+                    statusKey === 'closed' ? { backgroundColor: '#fecaca' } : undefined
                   return (
                 <tr
                   key={lead.id}
+                  style={rowStyle}
                   className={[
-                    lead.initial_assessment === 'warm'
-                      ? '!bg-yellow-200'
-                      : lead.initial_assessment === 'cold'
-                        ? '!bg-blue-200'
-                        : lead.initial_assessment === 'running' ||
-                            lead.initial_assessment === 'hot'
-                          ? '!bg-green-200'
-                          : 'bg-white',
+                    statusKey === 'closed'
+                      ? '!bg-red-200'
+                      : statusKey === 'warm'
+                        ? '!bg-yellow-200'
+                        : statusKey === 'cold'
+                          ? '!bg-blue-200'
+                          : statusKey === 'running' || statusKey === 'hot'
+                            ? '!bg-green-200'
+                            : 'bg-white',
                     'cursor-pointer hover:brightness-95 transition-[filter] duration-150',
                   ].join(' ')}
                 >
@@ -371,7 +432,12 @@ export default async function CrmLeadsPage({ searchParams }) {
                   </td>
                   <td className="p-0 text-xs text-gray-700 whitespace-nowrap max-w-[140px]">
                     <Link href={href} className={linkBase}>
-                      {lead.assigned_to_name || '-'}
+                      {lead.assigned_to_employee_id
+                        ? `${lead.assigned_to_employee_id}_${lead.assigned_to_name || ''}`.replace(
+                            /_$/,
+                            ''
+                          )
+                        : lead.assigned_to_name || '-'}
                     </Link>
                   </td>
                   <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
@@ -381,9 +447,9 @@ export default async function CrmLeadsPage({ searchParams }) {
                   </td>
                   <td className="p-0 text-xs text-gray-700 whitespace-nowrap">
                     <Link href={href} className={linkBase}>
-                      {lead.initial_assessment === 'hot'
+                      {statusKey === 'hot'
                         ? 'running'
-                        : lead.initial_assessment || '-'}
+                        : statusKey || '-'}
                     </Link>
                   </td>
                   <td className="p-0 text-xs text-gray-700 whitespace-nowrap max-w-[200px]">

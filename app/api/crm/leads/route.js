@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { normalizePhone } from '@/lib/crm/normalizePhone'
 
@@ -22,9 +22,29 @@ function toIsoDateOrNull(raw) {
   return null
 }
 
+function isWhitelistedAdminEmail(email) {
+  const list = String(process.env.CRM_ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  if (!list.length) return false
+  return list.includes(String(email || '').trim().toLowerCase())
+}
+
 export async function POST(request) {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  let isAdmin = sessionClaims?.publicMetadata?.role === 'admin'
+  try {
+    const user = await currentUser()
+    const role = user?.publicMetadata?.role
+    const primaryEmail = user?.primaryEmailAddress?.emailAddress
+    isAdmin = role === 'admin' || isWhitelistedAdminEmail(primaryEmail)
+  } catch {
+    // fall back to claims only
+  }
+  if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let body
   try {
@@ -45,6 +65,23 @@ export async function POST(request) {
   }
   const phoneNormalized = normalizePhone(phone)
 
+  const db = requireSupabaseAdmin()
+
+  const assignedEmployeeId =
+    typeof body?.assigned_to_employee_id === 'string'
+      ? body.assigned_to_employee_id.trim() || null
+      : null
+
+  let assignedEmployeeName = null
+  if (assignedEmployeeId) {
+    const { data: emp } = await db
+      .from('crm_employees')
+      .select('name')
+      .eq('employee_id', assignedEmployeeId)
+      .single()
+    assignedEmployeeName = emp?.name || null
+  }
+
   const lead = {
     excel_name:
       typeof body?.excel_name === 'string' ? body.excel_name.trim() || null : null,
@@ -63,6 +100,7 @@ export async function POST(request) {
         ? (() => {
             const v = body.initial_assessment.trim().toLowerCase()
             if (!v) return null
+            if (v === 'closed') return 'closed'
             return v === 'hot' ? 'running' : v
           })()
         : null,
@@ -97,13 +135,9 @@ export async function POST(request) {
         ? toIsoDateOrNull(body.follow_up_date) || null
         : null,
     remarks: typeof body?.remarks === 'string' ? body.remarks.trim() || null : null,
-    assigned_to_name:
-      typeof body?.assigned_to_name === 'string'
-        ? body.assigned_to_name.trim() || null
-        : null,
+    assigned_to_employee_id: assignedEmployeeId,
+    assigned_to_name: assignedEmployeeName,
   }
-
-  const db = requireSupabaseAdmin()
 
   // If we have a normalized phone, upsert to avoid duplicates.
   if (lead.phone_normalized) {
@@ -111,7 +145,7 @@ export async function POST(request) {
       .from('crm_leads')
       .upsert(lead, { onConflict: 'phone_normalized', ignoreDuplicates: false })
       .select(
-        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
       )
       .single()
 
@@ -123,7 +157,7 @@ export async function POST(request) {
     .from('crm_leads')
     .insert(lead)
     .select(
-      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
     )
     .single()
 

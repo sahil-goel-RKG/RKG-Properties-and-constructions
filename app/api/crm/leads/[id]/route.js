@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { clerkClient } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 
 function requireSupabaseAdmin() {
@@ -33,9 +34,42 @@ function normalizeBhkInterestedIn(v) {
   return s
 }
 
+function isWhitelistedAdminEmail(email) {
+  const list = String(process.env.CRM_ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  if (!list.length) return false
+  return list.includes(String(email || '').trim().toLowerCase())
+}
+
+async function employeeNameForId(db, employeeId) {
+  if (!employeeId) return null
+  const { data } = await db
+    .from('crm_employees')
+    .select('name')
+    .eq('employee_id', employeeId)
+    .single()
+  return data?.name || null
+}
+
 export async function PATCH(request, { params }) {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Prefer live user metadata (session claims can be stale until re-login).
+  let isAdmin =
+    sessionClaims?.publicMetadata?.role === 'admin' ||
+    sessionClaims?.metadata?.role === 'admin'
+  try {
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId)
+    const role = user?.publicMetadata?.role
+    const primaryEmail = user?.primaryEmailAddress?.emailAddress
+    isAdmin = role === 'admin' || isWhitelistedAdminEmail(primaryEmail)
+  } catch {
+    // If Clerk read fails, fall back to session claims.
+  }
 
   const p = await Promise.resolve(params)
   const id = p && typeof p.id === 'string' ? p.id : null
@@ -58,6 +92,7 @@ export async function PATCH(request, { params }) {
       running: 'running',
       warm: 'warm',
       cold: 'cold',
+      closed: 'closed',
     })
   }
   if (typeof body?.projects_interested === 'string') {
@@ -82,14 +117,14 @@ export async function PATCH(request, { params }) {
   if (typeof body?.bhk_interested_in === 'string') {
     update.bhk_interested_in = normalizeBhkInterestedIn(body.bhk_interested_in)
   }
+  if (typeof body?.assigned_to_employee_id === 'string') {
+    update.assigned_to_employee_id = normalizeOptionalString(body.assigned_to_employee_id)
+  }
   if (typeof body?.follow_up_date === 'string') {
     update.follow_up_date = normalizeOptionalString(body.follow_up_date)
   }
   if (typeof body?.remarks === 'string') {
     update.remarks = normalizeOptionalString(body.remarks)
-  }
-  if (typeof body?.assigned_to_name === 'string') {
-    update.assigned_to_name = normalizeOptionalString(body.assigned_to_name)
   }
 
   if (!Object.keys(update).length) {
@@ -97,12 +132,34 @@ export async function PATCH(request, { params }) {
   }
 
   const db = requireSupabaseAdmin()
+
+  // Permission: employees cannot change assignment once a lead is assigned
+  if (!isAdmin && Object.prototype.hasOwnProperty.call(update, 'assigned_to_employee_id')) {
+    const { data: existing, error: existingError } = await db
+      .from('crm_leads')
+      .select('assigned_to_employee_id')
+      .eq('id', id)
+      .single()
+    if (existingError) {
+      return NextResponse.json({ error: existingError.message }, { status: 500 })
+    }
+    const existingAssigned = existing?.assigned_to_employee_id || null
+    const nextAssigned = update.assigned_to_employee_id || null
+    if (existingAssigned !== nextAssigned) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  // If assigned_to_employee_id is provided, keep assigned_to_name consistent.
+  if (Object.prototype.hasOwnProperty.call(update, 'assigned_to_employee_id')) {
+    update.assigned_to_name = await employeeNameForId(db, update.assigned_to_employee_id)
+  }
   const { data, error } = await db
     .from('crm_leads')
     .update(update)
     .eq('id', id)
     .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_name, created_at, updated_at'
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
     )
     .single()
 

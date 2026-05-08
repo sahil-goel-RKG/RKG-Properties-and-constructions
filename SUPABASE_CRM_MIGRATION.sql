@@ -29,7 +29,7 @@ begin
   end if;
 end $$;
 
--- Add missing fields from CSV
+-- Add missing fields from CSV/UI
 alter table public.crm_leads
   add column if not exists excel_name text,
   add column if not exists lead_date date not null default current_date,
@@ -41,6 +41,46 @@ alter table public.crm_leads
   add column if not exists bhk_interested_in text,
   add column if not exists follow_up_date date;
 
+-- Employees table (for consistent assignment dropdown)
+create table if not exists public.crm_employees (
+  employee_id text primary key,
+  name text not null,
+  created_at timestamptz not null default now()
+);
+
+-- Leads: optional FK to employees
+alter table public.crm_leads
+  add column if not exists assigned_to_employee_id text;
+
+-- Normalize any existing assignment IDs (defensive cleanup)
+update public.crm_leads
+set assigned_to_employee_id = nullif(btrim(assigned_to_employee_id), '')
+where assigned_to_employee_id is not null;
+
+-- Backfill assigned_to_employee_id from assigned_to_name (for older rows)
+update public.crm_leads l
+set assigned_to_employee_id = e.employee_id
+from public.crm_employees e
+where (l.assigned_to_employee_id is null or btrim(l.assigned_to_employee_id) = '')
+  and l.assigned_to_name is not null
+  and lower(btrim(l.assigned_to_name)) = lower(btrim(e.name));
+
+do $$
+begin
+  if not exists (
+    select 1
+    from information_schema.table_constraints
+    where constraint_schema='public'
+      and table_name='crm_leads'
+      and constraint_name='crm_leads_assigned_to_employee_id_fkey'
+  ) then
+    alter table public.crm_leads
+      add constraint crm_leads_assigned_to_employee_id_fkey
+      foreign key (assigned_to_employee_id) references public.crm_employees(employee_id)
+      on delete set null;
+  end if;
+end $$;
+
 -- Optional: constrain dropdown-like columns (kept permissive with NOT VALID)
 do $$
 begin
@@ -50,7 +90,7 @@ begin
   end if;
   alter table public.crm_leads
     add constraint crm_leads_initial_assessment_check
-    check (initial_assessment is null or initial_assessment in ('warm','cold','running')) not valid;
+    check (initial_assessment is null or initial_assessment in ('warm','cold','running','closed')) not valid;
 
   if not exists (select 1 from pg_constraint where conname='crm_leads_uc_rtm_check') then
     alter table public.crm_leads

@@ -26,6 +26,12 @@ const isCrmRoute = createRouteMatcher([
   '/crm(.*)'
 ])
 
+// CRM routes that should be admin-only
+const isCrmAdminPageRoute = createRouteMatcher([
+  '/crm/add(.*)',
+  '/crm/import(.*)',
+])
+
 // Admin login page should be public (catch-all pattern)
 const isPublicAdminRoute = createRouteMatcher([
   '/admin/login(.*)'  // Catch-all pattern to match all login sub-routes
@@ -37,20 +43,24 @@ const isPublicCrmRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, request) => {
+  const { userId, sessionClaims } = await auth()
+  const role = sessionClaims?.publicMetadata?.role
+
   // Protect admin routes - require authentication (except login page)
   if (isAdminRoute(request) && !isPublicAdminRoute(request)) {
-    const { userId } = await auth();
     if (!userId) {
       const signInUrl = new URL('/admin/login', request.url);
       // Preserve the original URL as returnUrl so user is redirected back after login
       signInUrl.searchParams.set('returnUrl', request.nextUrl.pathname + request.nextUrl.search);
       return NextResponse.redirect(signInUrl);
     }
+    if (role !== 'admin') {
+      return NextResponse.redirect(new URL('/crm', request.url))
+    }
   }
 
   // Protect CRM routes - require authentication (except login page)
   if (isCrmRoute(request) && !isPublicCrmRoute(request)) {
-    const { userId } = await auth()
     if (!userId) {
       const signInUrl = new URL('/crm/login', request.url)
       signInUrl.searchParams.set(
@@ -58,6 +68,11 @@ export default clerkMiddleware(async (auth, request) => {
         request.nextUrl.pathname + request.nextUrl.search
       )
       return NextResponse.redirect(signInUrl)
+    }
+
+    // Admin-only CRM pages
+    if (isCrmAdminPageRoute(request) && role !== 'admin') {
+      return NextResponse.redirect(new URL('/crm', request.url))
     }
   }
   

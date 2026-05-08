@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const INPUT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
@@ -9,6 +9,24 @@ const SELECT =
 
 export default function CrmAddLeadPage() {
   const today = new Date().toISOString().slice(0, 10)
+
+  const [employees, setEmployees] = useState([])
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/crm/employees')
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return
+        setEmployees(Array.isArray(j?.employees) ? j.employees : [])
+      })
+      .catch(() => {
+        if (cancelled) return
+        setEmployees([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const [customerName, setCustomerName] = useState('')
   const [phone, setPhone] = useState('')
@@ -21,7 +39,7 @@ export default function CrmAddLeadPage() {
   const [endUseInvestment, setEndUseInvestment] = useState('')
   const [bhkInterestedIn, setBhkInterestedIn] = useState('')
   const [followUpDate, setFollowUpDate] = useState('')
-  const [assignedToName, setAssignedToName] = useState('')
+  const [assignedToEmployeeId, setAssignedToEmployeeId] = useState('')
   const [remarks, setRemarks] = useState('')
 
   const [saving, setSaving] = useState(false)
@@ -43,7 +61,7 @@ export default function CrmAddLeadPage() {
     setEndUseInvestment('')
     setBhkInterestedIn('')
     setFollowUpDate('')
-    setAssignedToName('')
+    setAssignedToEmployeeId('')
     setRemarks('')
   }
 
@@ -76,7 +94,7 @@ export default function CrmAddLeadPage() {
           end_use_investment: endUseInvestment,
           bhk_interested_in: bhkInterestedIn,
           follow_up_date: followUpDate,
-          assigned_to_name: assignedToName,
+          assigned_to_employee_id: assignedToEmployeeId,
           remarks,
         }),
       })
@@ -182,6 +200,7 @@ export default function CrmAddLeadPage() {
               <option value="running">running</option>
               <option value="warm">warm</option>
               <option value="cold">cold</option>
+              <option value="closed">closed</option>
             </select>
           </div>
 
@@ -280,13 +299,19 @@ export default function CrmAddLeadPage() {
             <label className="block text-sm font-semibold text-gray-900 mb-1">
               Assigned to
             </label>
-            <input
-              value={assignedToName}
-              onChange={(e) => setAssignedToName(e.target.value)}
-              className={INPUT}
-              placeholder="e.g. Sahil / Anuj"
+            <select
+              value={assignedToEmployeeId}
+              onChange={(e) => setAssignedToEmployeeId(e.target.value)}
+              className={SELECT}
               style={{ color: '#111827' }}
-            />
+            >
+              <option value="">Select</option>
+              {employees.map((emp) => (
+                <option key={emp.employee_id} value={emp.employee_id}>
+                  {emp.employee_id}_{emp.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

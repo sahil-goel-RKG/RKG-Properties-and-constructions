@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import Papa from 'papaparse'
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { normalizePhone } from '@/lib/crm/normalizePhone'
 
@@ -80,12 +80,31 @@ function toIsoDateOrNull(raw) {
   return null
 }
 
+function isWhitelistedAdminEmail(email) {
+  const list = String(process.env.CRM_ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  if (!list.length) return false
+  return list.includes(String(email || '').trim().toLowerCase())
+}
+
 export async function POST(request) {
   try {
-    const { userId } = await auth()
+    const { userId, sessionClaims } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    let isAdmin = sessionClaims?.publicMetadata?.role === 'admin'
+    try {
+      const user = await currentUser()
+      const role = user?.publicMetadata?.role
+      const primaryEmail = user?.primaryEmailAddress?.emailAddress
+      isAdmin = role === 'admin' || isWhitelistedAdminEmail(primaryEmail)
+    } catch {
+      // fall back to claims only
+    }
+    if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     let formData
     try {
@@ -129,6 +148,16 @@ export async function POST(request) {
     }
 
     const db = requireSupabaseAdmin()
+
+    const { data: employees } = await db
+      .from('crm_employees')
+      .select('employee_id, name')
+    const employeeById = new Map(
+      (employees || []).map((e) => [String(e.employee_id || '').trim().toLowerCase(), e])
+    )
+    const employeeByName = new Map(
+      (employees || []).map((e) => [String(e.name || '').trim().toLowerCase(), e])
+    )
 
     const { data: batch, error: batchError } = await db
       .from('crm_import_batches')
@@ -301,6 +330,19 @@ export async function POST(request) {
           const assignedName =
             assignedRaw != null ? String(assignedRaw).trim() : null
 
+          let assignedEmployeeId = null
+          let assignedEmployeeName = null
+          if (assignedName) {
+            const key = assignedName.toLowerCase()
+            const byId = employeeById.get(key)
+            const byName = employeeByName.get(key)
+            const emp = byId || byName
+            if (emp?.employee_id) {
+              assignedEmployeeId = String(emp.employee_id).trim()
+              assignedEmployeeName = String(emp.name || '').trim() || null
+            }
+          }
+
           return {
             import_batch_id: batch.id,
             // If the CSV doesn't contain "Excel Name", use uploaded file name
@@ -323,7 +365,8 @@ export async function POST(request) {
             bhk_interested_in: bhkInterestedInNormalized,
             follow_up_date: followUpDate,
             remarks: remarksStr,
-            assigned_to_name: assignedName,
+            assigned_to_employee_id: assignedEmployeeId,
+            assigned_to_name: assignedEmployeeName || assignedName,
           }
         })
         .filter(Boolean)

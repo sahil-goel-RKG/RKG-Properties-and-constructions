@@ -10,6 +10,12 @@ create table if not exists public.crm_import_batches (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.crm_employees (
+  employee_id text primary key,
+  name text not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.crm_leads (
   id uuid primary key default gen_random_uuid(),
   import_batch_id uuid references public.crm_import_batches(id) on delete set null,
@@ -40,6 +46,7 @@ create table if not exists public.crm_leads (
   follow_up_date date,
   remarks text,
   -- Assigned to: store a human-friendly name for small teams.
+  assigned_to_employee_id text references public.crm_employees(employee_id) on delete set null,
   assigned_to_name text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
