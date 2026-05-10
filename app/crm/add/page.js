@@ -128,14 +128,9 @@ export default function CrmAddLeadPage() {
         return
       }
 
-      const id = json?.lead?.id
-      if (typeof id === 'string' && id) {
-        // go to View/Edit page immediately
-        window.location.href = `/crm/leads/${id}`
-        return
-      }
-
-      reset()
+      // After a successful save, redirect back to leads list.
+      window.location.replace('/crm')
+      return
     } catch (err) {
       setError(err?.message || 'Failed to add lead')
     } finally {

@@ -73,7 +73,10 @@ export default function CrmImportPage() {
         return
       }
 
-      setResult(json)
+      // After a successful import, redirect back to leads list.
+      router.replace('/crm')
+      window.location.replace('/crm')
+      return
     } catch (err) {
       setError(err?.message || 'Import failed')
       setErrorDetails('')
