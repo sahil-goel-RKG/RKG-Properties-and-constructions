@@ -1,13 +1,37 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function CrmImportPage() {
+  const router = useRouter()
+  const [checkingAccess, setCheckingAccess] = useState(true)
   const [file, setFile] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [errorDetails, setErrorDetails] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/crm/whoami')
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return
+        if (!j?.isAdmin) {
+          router.replace('/crm')
+          return
+        }
+        setCheckingAccess(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        router.replace('/crm')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [router])
 
   const canSubmit = useMemo(() => !!file && !submitting, [file, submitting])
 
@@ -60,6 +84,9 @@ export default function CrmImportPage() {
 
   return (
     <div className="min-w-0">
+      {checkingAccess ? (
+        <div className="text-sm text-gray-600">Checking access…</div>
+      ) : null}
       <h2 className="text-xl font-bold text-gray-900 mb-1">Import CSV</h2>
       <p className="text-sm text-gray-600 mb-4">
         Upload a CSV file and we’ll import leads into Supabase. Duplicate phone

@@ -69,11 +69,6 @@ export default clerkMiddleware(async (auth, request) => {
       )
       return NextResponse.redirect(signInUrl)
     }
-
-    // Admin-only CRM pages
-    if (isCrmAdminPageRoute(request) && role !== 'admin') {
-      return NextResponse.redirect(new URL('/crm', request.url))
-    }
   }
   
   // For API routes, ensure auth context is available

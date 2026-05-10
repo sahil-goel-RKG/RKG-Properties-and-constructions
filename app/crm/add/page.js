@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const INPUT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
@@ -8,6 +9,7 @@ const SELECT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 
 export default function CrmAddLeadPage() {
+  const router = useRouter()
   const today = new Date().toISOString().slice(0, 10)
 
   const [employees, setEmployees] = useState([])
@@ -27,6 +29,28 @@ export default function CrmAddLeadPage() {
       cancelled = true
     }
   }, [])
+
+  const [checkingAccess, setCheckingAccess] = useState(true)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/crm/whoami')
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return
+        if (!j?.isAdmin) {
+          router.replace('/crm')
+          return
+        }
+        setCheckingAccess(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        router.replace('/crm')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [router])
 
   const [customerName, setCustomerName] = useState('')
   const [phone, setPhone] = useState('')
@@ -121,6 +145,9 @@ export default function CrmAddLeadPage() {
 
   return (
     <div className="min-w-0 w-full max-w-6xl">
+      {checkingAccess ? (
+        <div className="text-sm text-gray-600 mb-3">Checking access…</div>
+      ) : null}
       <h2 className="text-xl font-bold text-gray-900 mb-1">Add Lead</h2>
       <p className="text-sm text-gray-600 mb-3">
         Add a lead manually. If phone already exists, it will update the existing lead.
