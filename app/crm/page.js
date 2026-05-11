@@ -141,8 +141,6 @@ export default async function CrmLeadsPage({ searchParams }) {
       'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, end_use_investment, bhk_interested_in, remarks, assigned_to_employee_id, assigned_to_name, follow_up_date, created_at, updated_at',
       { count: 'exact' }
     )
-    .order('created_at', { ascending: false })
-    .range(from, to)
 
   // Visibility rule:
   // - Unassigned leads: visible to everyone
@@ -182,12 +180,18 @@ export default async function CrmLeadsPage({ searchParams }) {
     )
   }
 
-  // Sorting
+  // Sorting (apply before range)
   if (sort === 'followup_desc') {
     query = query.order('follow_up_date', { ascending: false, nullsFirst: false })
   } else if (sort === 'followup_asc') {
     query = query.order('follow_up_date', { ascending: true, nullsFirst: false })
+  } else if (sort === 'updated_desc') {
+    query = query.order('updated_at', { ascending: false, nullsFirst: false })
+  } else {
+    query = query.order('created_at', { ascending: false })
   }
+
+  query = query.range(from, to)
 
   const { data: leads, error, count } = await query
 
@@ -257,22 +261,28 @@ export default async function CrmLeadsPage({ searchParams }) {
                 </option>
               ))}
             </select>
-            <select
-              name="sort"
-              defaultValue={sort}
-              className="w-full sm:w-56 px-3 py-2 border border-gray-300 rounded-lg text-sm font-normal text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
-            >
-              <option value="">Sort: Created (latest)</option>
-              <option value="followup_desc">Sort: Follow up (latest)</option>
-              <option value="followup_asc">Sort: Follow up (earliest)</option>
-            </select>
-
             <details className="relative w-full sm:w-auto flex-none">
               <summary className="list-none cursor-pointer select-none inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-100 whitespace-nowrap w-full sm:w-auto">
-                Filters
+                Filters & sort
               </summary>
               <div className="absolute mt-2 right-0 w-[92vw] max-w-[560px] min-w-[320px] bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-20 max-h-[70vh] overflow-auto">
                 <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold text-gray-500 mb-1 whitespace-nowrap">
+                      Sort / recently updated
+                    </div>
+                    <select
+                      name="sort"
+                      defaultValue={sort}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-normal text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]"
+                    >
+                      <option value="">Created (latest first)</option>
+                      <option value="updated_desc">Recently updated (latest first)</option>
+                      <option value="followup_desc">Follow up (latest first)</option>
+                      <option value="followup_asc">Follow up (earliest first)</option>
+                    </select>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <input
                       type="text"
