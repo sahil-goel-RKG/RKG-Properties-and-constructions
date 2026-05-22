@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { getLeadsReturnFromStorage } from '@/lib/crm/leadsReturn'
 
 const INPUT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
@@ -128,8 +129,8 @@ export default function CrmAddLeadPage() {
         return
       }
 
-      // After a successful save, redirect back to leads list.
-      window.location.replace('/crm')
+      // After a successful save, return to the same leads list page/filters.
+      window.location.replace(getLeadsReturnFromStorage())
       return
     } catch (err) {
       setError(err?.message || 'Failed to add lead')

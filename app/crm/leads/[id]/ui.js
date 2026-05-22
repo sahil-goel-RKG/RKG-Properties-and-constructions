@@ -4,14 +4,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { getLeadsReturnFromStorage, parseLeadsReturnTo } from '@/lib/crm/leadsReturn'
 
 const INPUT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-500 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 const SELECT =
   'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#ffd86b] focus:border-[#ffd86b]'
 
-export default function CrmLeadEditor({ lead, isAdmin: isAdminProp }) {
+export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: returnHrefProp }) {
   const router = useRouter()
+  const returnHref = parseLeadsReturnTo(returnHrefProp || getLeadsReturnFromStorage())
   const { user } = useUser()
   const isAdmin = typeof isAdminProp === 'boolean' ? isAdminProp : user?.publicMetadata?.role === 'admin'
   const [location, setLocation] = useState(lead.location || '')
@@ -122,11 +124,10 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp }) {
         return
       }
 
-      // Redirect back to leads immediately after a successful save.
-      // Use hard navigation to be 100% reliable across environments.
+      // Redirect back to the same leads list page/filters the user came from.
       navigated = true
-      router.replace('/crm')
-      window.location.replace('/crm')
+      router.replace(returnHref)
+      window.location.replace(returnHref)
       return
     } catch (e) {
       setError(e?.message || 'Save failed')
@@ -168,7 +169,7 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp }) {
         </div>
 
         <Link
-          href="/crm"
+          href={returnHref}
           className="text-sm font-semibold text-[#a67800] hover:underline whitespace-nowrap"
         >
           ← Back

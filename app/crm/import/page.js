@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { getLeadsReturnFromStorage } from '@/lib/crm/leadsReturn'
 
 export default function CrmImportPage() {
   const router = useRouter()
@@ -73,9 +74,10 @@ export default function CrmImportPage() {
         return
       }
 
-      // After a successful import, redirect back to leads list.
-      router.replace('/crm')
-      window.location.replace('/crm')
+      // After a successful import, return to the same leads list page/filters.
+      const returnHref = getLeadsReturnFromStorage()
+      router.replace(returnHref)
+      window.location.replace(returnHref)
       return
     } catch (err) {
       setError(err?.message || 'Import failed')

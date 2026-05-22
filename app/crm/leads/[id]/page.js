@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import CrmLeadEditor from './ui'
+import { parseLeadsReturnTo } from '@/lib/crm/leadsReturn'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { auth, currentUser } from '@clerk/nextjs/server'
 
@@ -23,7 +24,7 @@ function isWhitelistedAdminEmail(email) {
   return list.includes(String(email || '').trim().toLowerCase())
 }
 
-export default async function CrmLeadDetailPage({ params }) {
+export default async function CrmLeadDetailPage({ params, searchParams }) {
   const { userId, sessionClaims } = await auth()
   let isAdmin =
     sessionClaims?.publicMetadata?.role === 'admin' ||
@@ -44,6 +45,11 @@ export default async function CrmLeadDetailPage({ params }) {
     }
   }
   const restrictedEmployeeId = 'E001'
+
+  const sp = await Promise.resolve(searchParams)
+  const returnHref = parseLeadsReturnTo(
+    typeof sp?.returnTo === 'string' ? sp.returnTo : ''
+  )
 
   const p = await Promise.resolve(params)
   const id = p && typeof p.id === 'string' ? p.id : null
@@ -99,6 +105,6 @@ export default async function CrmLeadDetailPage({ params }) {
     )
   }
 
-  return <CrmLeadEditor lead={lead} isAdmin={isAdmin} />
+  return <CrmLeadEditor lead={lead} isAdmin={isAdmin} returnHref={returnHref} />
 }
 

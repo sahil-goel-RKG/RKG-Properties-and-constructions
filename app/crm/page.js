@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
+import CrmClearFiltersLink from '@/components/crm/CrmClearFiltersLink'
+import CrmLeadsListPersist from '@/components/crm/CrmLeadsListPersist'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { auth, currentUser } from '@clerk/nextjs/server'
 
@@ -229,8 +232,27 @@ export default async function CrmLeadsPage({ searchParams }) {
   const lastHref = totalPages != null ? pageHref(totalPages) : null
   const pageItems = totalPages != null ? buildPageItems(page, totalPages) : []
 
+  const leadsListReturn = `/crm${buildCrmQueryString({
+    q,
+    status,
+    name,
+    phone,
+    source,
+    location,
+    excelName,
+    assigned,
+    followUpFrom,
+    followUpTo,
+    sort,
+    page,
+  })}`
+  const returnToQuery = encodeURIComponent(leadsListReturn)
+
   return (
     <div className="min-w-0">
+      <Suspense fallback={null}>
+        <CrmLeadsListPersist />
+      </Suspense>
       <div className="bg-gray-200 border border-gray-400 shadow-md rounded-xl p-4 sm:p-5 mb-4">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
@@ -354,12 +376,9 @@ export default async function CrmLeadsPage({ searchParams }) {
             <button className="px-4 py-2 bg-[#c99700] text-white rounded-lg text-sm font-semibold hover:bg-[#a67800]">
               Search
             </button>
-            <Link
-              href="/crm"
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-100 text-center"
-            >
+            <CrmClearFiltersLink className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-100 text-center">
               Clear
-            </Link>
+            </CrmClearFiltersLink>
           </form>
         </div>
       </div>
@@ -399,7 +418,7 @@ export default async function CrmLeadsPage({ searchParams }) {
             <tbody className="divide-y divide-gray-300/80">
               {leads.map((lead) => (
                 (() => {
-                  const href = `/crm/leads/${lead.id}`
+                  const href = `/crm/leads/${lead.id}?returnTo=${returnToQuery}`
                   const linkBase =
                     'block w-full h-full px-2 py-2 text-left text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd86b] focus-visible:ring-inset'
                   const statusKey =
