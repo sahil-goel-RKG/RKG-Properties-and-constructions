@@ -23,11 +23,13 @@ export default function ClientOverlays() {
   }, [])
 
   if (!mounted) return null
-  const isCrm = typeof pathname === 'string' && pathname.startsWith('/crm')
+  const hideContactPopup =
+    typeof pathname === 'string' &&
+    (pathname.startsWith('/crm') || pathname.startsWith('/admin'))
   return (
     <>
       <InactivityTimer />
-      {isCrm ? null : <ContactPopup />}
+      {hideContactPopup ? null : <ContactPopup />}
     </>
   )
 }

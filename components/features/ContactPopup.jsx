@@ -19,8 +19,11 @@ export default function ContactPopup() {
   const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
-    // Never show popup inside CRM routes
-    if (typeof pathname === 'string' && pathname.startsWith('/crm')) {
+    // Never show popup inside CRM or admin routes
+    if (
+      typeof pathname === 'string' &&
+      (pathname.startsWith('/crm') || pathname.startsWith('/admin'))
+    ) {
       setIsVisible(false)
       return
     }
