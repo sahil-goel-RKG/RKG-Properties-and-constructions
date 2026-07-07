@@ -9,6 +9,10 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
     email: '',
     phone: '',
     message: defaultMessage,
+    // spam defenses
+    company: '',
+    website: '',
+    ts: String(Date.now()),
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState({
@@ -90,6 +94,32 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
       onSubmit={handleSubmit}
       className={`${spacingMap[size] ?? spacingMap.md} min-w-0 w-full max-w-full box-border`}
     >
+      {/* Honeypot fields (bots often fill these). Keep visually hidden. */}
+      <div className="hidden" aria-hidden="true">
+        <label>
+          Company
+          <input
+            type="text"
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+            value={formData.company}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          Website
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={formData.website}
+            onChange={handleChange}
+          />
+        </label>
+        <input type="hidden" name="ts" value={formData.ts} />
+      </div>
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
         <label htmlFor="name" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
           Name *

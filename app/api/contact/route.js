@@ -40,6 +40,10 @@ async function parseContactBody(request, contentType) {
       email: sp.get('email') || '',
       phone: sp.get('phone') || '',
       message: sp.get('message') || '',
+      // honeypot fields (should be empty)
+      company: sp.get('company') || '',
+      website: sp.get('website') || '',
+      ts: sp.get('ts') || '',
     }
   }
   if (contentType.includes('multipart/form-data')) {
@@ -49,6 +53,9 @@ async function parseContactBody(request, contentType) {
       email: String(fd.get('email') || ''),
       phone: String(fd.get('phone') || ''),
       message: String(fd.get('message') || ''),
+      company: String(fd.get('company') || ''),
+      website: String(fd.get('website') || ''),
+      ts: String(fd.get('ts') || ''),
     }
   }
   const raw = await request.text()
@@ -60,6 +67,32 @@ async function parseContactBody(request, contentType) {
   } catch {
     return null
   }
+}
+
+function countUrls(text) {
+  if (typeof text !== 'string') return 0
+  const matches = text.match(/https?:\/\/|www\./gi)
+  return matches ? matches.length : 0
+}
+
+function isLikelyBotSubmission(body) {
+  const company = typeof body?.company === 'string' ? body.company.trim() : ''
+  const website = typeof body?.website === 'string' ? body.website.trim() : ''
+  if (company || website) return true
+
+  // Optional timestamp-based check (only applies when provided by client JS)
+  const tsRaw = typeof body?.ts === 'string' ? body.ts.trim() : ''
+  const ts = tsRaw ? Number(tsRaw) : NaN
+  if (Number.isFinite(ts)) {
+    const ageMs = Date.now() - ts
+    // Submitted unrealistically fast (likely bot/autofill)
+    if (ageMs >= 0 && ageMs < 2500) return true
+  }
+
+  const message = typeof body?.message === 'string' ? body.message : ''
+  // Too many links is almost always spam
+  if (countUrls(message) >= 3) return true
+  return false
 }
 
 export async function POST(request) {
@@ -99,6 +132,14 @@ export async function POST(request) {
       return contactFail(request, isBrowserFormPost, { error: 'Invalid or empty request body' }, 400)
     }
     const { name, email, phone, message } = body
+
+    // Honeypot / heuristics: silently accept but do not store or email.
+    if (isLikelyBotSubmission(body)) {
+      if (isBrowserFormPost) {
+        return contactFormRedirect(request, { thankyou: '1' })
+      }
+      return NextResponse.json({ message: 'Form submitted successfully' }, { status: 200 })
+    }
 
     // Validate required fields
     if (!name || !email || !phone || !message) {

@@ -13,6 +13,10 @@ export default function ContactPopup() {
     name: '',
     email: '',
     phone: '',
+    // spam defenses
+    company: '',
+    website: '',
+    ts: String(Date.now()),
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)

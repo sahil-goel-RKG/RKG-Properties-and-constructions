@@ -15,6 +15,17 @@ export default function ContactFormStatic({ defaultMessage = '' }) {
       encType="application/x-www-form-urlencoded"
       className="space-y-6 min-w-0 w-full max-w-full box-border"
     >
+      {/* Honeypot fields (bots often fill these). Visually hidden. */}
+      <div className="hidden" aria-hidden="true">
+        <label>
+          Company
+          <input type="text" name="company" tabIndex={-1} autoComplete="off" />
+        </label>
+        <label>
+          Website
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
       <div>
         <label htmlFor="name" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
           Name *

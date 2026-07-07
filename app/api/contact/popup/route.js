@@ -40,6 +40,18 @@ export async function POST(request) {
     const body = await request.json()
     const { name, email, phone } = body
 
+    const company = typeof body?.company === 'string' ? body.company.trim() : ''
+    const website = typeof body?.website === 'string' ? body.website.trim() : ''
+    const tsRaw = typeof body?.ts === 'string' ? body.ts.trim() : ''
+    const ts = tsRaw ? Number(tsRaw) : NaN
+    const submittedTooFast =
+      Number.isFinite(ts) && Date.now() - ts >= 0 && Date.now() - ts < 2500
+    const likelyBot = Boolean(company || website || submittedTooFast)
+    if (likelyBot) {
+      // Silently accept: don't store, don't email.
+      return NextResponse.json({ message: 'Form submitted successfully' }, { status: 200 })
+    }
+
     // Validate required fields (message is optional for popup)
     if (!name || !email || !phone) {
       return NextResponse.json(
