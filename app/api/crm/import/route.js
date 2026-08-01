@@ -80,6 +80,35 @@ function toIsoDateOrNull(raw) {
   return null
 }
 
+function toTimeOrNull(raw) {
+  if (raw == null) return null
+  const s = String(raw).trim()
+  if (!s) return null
+
+  // HH:MM or HH:MM:SS (24h)
+  const m24 = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+  if (m24) {
+    const hh = String(Math.min(23, Number(m24[1]))).padStart(2, '0')
+    const mm = String(Math.min(59, Number(m24[2]))).padStart(2, '0')
+    const ss =
+      m24[3] != null ? String(Math.min(59, Number(m24[3]))).padStart(2, '0') : '00'
+    return `${hh}:${mm}:${ss}`
+  }
+
+  // e.g. 3:30 PM / 3:30pm
+  const m12 = s.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
+  if (m12) {
+    let hh = Number(m12[1])
+    const mm = String(Math.min(59, Number(m12[2]))).padStart(2, '0')
+    const ap = m12[3].toUpperCase()
+    if (ap === 'PM' && hh < 12) hh += 12
+    if (ap === 'AM' && hh === 12) hh = 0
+    return `${String(hh).padStart(2, '0')}:${mm}:00`
+  }
+
+  return null
+}
+
 function isWhitelistedAdminEmail(email) {
   const list = String(process.env.CRM_ADMIN_EMAILS || '')
     .split(',')
@@ -233,6 +262,12 @@ export async function POST(request) {
       'bhk_interested',
     ]
     const followUpKeys = ['Follow UP', 'Follow Up', 'follow_up', 'follow_up_date']
+    const followUpTimeKeys = [
+      'Follow Up Time',
+      'Follow UP Time',
+      'Followup Time',
+      'follow_up_time',
+    ]
     const assignedKeys = [
       'Assigned To',
       'Assigned',
@@ -263,6 +298,7 @@ export async function POST(request) {
           const endUseInvestmentRaw = pickFirst(row, endUseInvestmentKeys)
           const bhkInterestedInRaw = pickFirst(row, bhkInterestedInKeys)
           const followUpRaw = pickFirst(row, followUpKeys)
+          const followUpTimeRaw = pickFirst(row, followUpTimeKeys)
           const assignedRaw = pickFirst(row, assignedKeys)
 
           const customerNameClean = customerName
@@ -327,6 +363,7 @@ export async function POST(request) {
               }
             }
           }
+          const followUpTime = toTimeOrNull(followUpTimeRaw)
           const assignedName =
             assignedRaw != null ? String(assignedRaw).trim() : null
 
@@ -364,6 +401,7 @@ export async function POST(request) {
             end_use_investment: endUseInvestmentStr,
             bhk_interested_in: bhkInterestedInNormalized,
             follow_up_date: followUpDate,
+            follow_up_time: followUpTime,
             remarks: remarksStr,
             assigned_to_employee_id: assignedEmployeeId,
             assigned_to_name: assignedEmployeeName || assignedName,

@@ -58,6 +58,11 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
     lead.bhk_interested_in || ''
   )
   const [followUpDate, setFollowUpDate] = useState(lead.follow_up_date || '')
+  const [followUpTime, setFollowUpTime] = useState(
+    typeof lead.follow_up_time === 'string'
+      ? lead.follow_up_time.slice(0, 5)
+      : ''
+  )
   const [remarks, setRemarks] = useState(lead.remarks || '')
   const [assignedToEmployeeId, setAssignedToEmployeeId] = useState(
     lead.assigned_to_employee_id || ''
@@ -79,6 +84,9 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
       (lead.end_use_investment || '') !== endUseInvestment ||
       (lead.bhk_interested_in || '') !== bhkInterestedIn ||
       (lead.follow_up_date || '') !== followUpDate ||
+      (typeof lead.follow_up_time === 'string'
+        ? lead.follow_up_time.slice(0, 5)
+        : '') !== followUpTime ||
       (lead.remarks || '') !== remarks ||
       (lead.assigned_to_employee_id || '') !== assignedToEmployeeId
     )
@@ -88,6 +96,7 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
     bhkInterestedIn,
     endUseInvestment,
     followUpDate,
+    followUpTime,
     initialAssessment,
     lead,
     location,
@@ -114,6 +123,7 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
           end_use_investment: endUseInvestment,
           bhk_interested_in: bhkInterestedIn,
           follow_up_date: followUpDate,
+          follow_up_time: followUpTime,
           remarks,
           assigned_to_employee_id: assignedToEmployeeId,
         }),
@@ -325,6 +335,19 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             type="date"
             value={followUpDate}
             onChange={(e) => setFollowUpDate(e.target.value)}
+            className={SELECT}
+            style={{ color: '#111827' }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">
+            Follow up time
+          </label>
+          <input
+            type="time"
+            value={followUpTime}
+            onChange={(e) => setFollowUpTime(e.target.value)}
             className={SELECT}
             style={{ color: '#111827' }}
           />

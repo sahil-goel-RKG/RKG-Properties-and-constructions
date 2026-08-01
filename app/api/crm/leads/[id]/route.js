@@ -123,6 +123,22 @@ export async function PATCH(request, { params }) {
   if (typeof body?.follow_up_date === 'string') {
     update.follow_up_date = normalizeOptionalString(body.follow_up_date)
   }
+  if (typeof body?.follow_up_time === 'string') {
+    const s = body.follow_up_time.trim()
+    if (!s) {
+      update.follow_up_time = null
+    } else {
+      const m = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+      if (m) {
+        const hh = String(Math.min(23, Number(m[1]))).padStart(2, '0')
+        const mm = String(Math.min(59, Number(m[2]))).padStart(2, '0')
+        const ss = m[3] != null ? String(Math.min(59, Number(m[3]))).padStart(2, '0') : '00'
+        update.follow_up_time = `${hh}:${mm}:${ss}`
+      } else {
+        update.follow_up_time = null
+      }
+    }
+  }
   if (typeof body?.remarks === 'string') {
     update.remarks = normalizeOptionalString(body.remarks)
   }
@@ -159,7 +175,7 @@ export async function PATCH(request, { params }) {
     .update(update)
     .eq('id', id)
     .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
+      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, follow_up_time, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
     )
     .single()
 

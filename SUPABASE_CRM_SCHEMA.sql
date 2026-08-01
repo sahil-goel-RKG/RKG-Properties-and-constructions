@@ -44,6 +44,8 @@ create table if not exists public.crm_leads (
   bhk_interested_in text,
   -- From CSV: "Follow UP" (date)
   follow_up_date date,
+  -- From CSV/UI: "Follow Up Time" (HH:MM)
+  follow_up_time time,
   remarks text,
   -- Assigned to: store a human-friendly name for small teams.
   assigned_to_employee_id text references public.crm_employees(employee_id) on delete set null,

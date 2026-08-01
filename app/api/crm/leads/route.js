@@ -134,6 +134,20 @@ export async function POST(request) {
       typeof body?.follow_up_date === 'string'
         ? toIsoDateOrNull(body.follow_up_date) || null
         : null,
+    follow_up_time:
+      typeof body?.follow_up_time === 'string'
+        ? (() => {
+            const s = body.follow_up_time.trim()
+            if (!s) return null
+            // Accept HH:MM or HH:MM:SS
+            const m = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/)
+            if (!m) return null
+            const hh = String(Math.min(23, Number(m[1]))).padStart(2, '0')
+            const mm = String(Math.min(59, Number(m[2]))).padStart(2, '0')
+            const ss = m[3] != null ? String(Math.min(59, Number(m[3]))).padStart(2, '0') : '00'
+            return `${hh}:${mm}:${ss}`
+          })()
+        : null,
     remarks: typeof body?.remarks === 'string' ? body.remarks.trim() || null : null,
     assigned_to_employee_id: assignedEmployeeId,
     assigned_to_name: assignedEmployeeName,
@@ -145,7 +159,7 @@ export async function POST(request) {
       .from('crm_leads')
       .upsert(lead, { onConflict: 'phone_normalized', ignoreDuplicates: false })
       .select(
-        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
+        'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, follow_up_time, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
       )
       .single()
 
@@ -157,7 +171,7 @@ export async function POST(request) {
     .from('crm_leads')
     .insert(lead)
     .select(
-      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
+      'id, excel_name, lead_date, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, follow_up_time, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
     )
     .single()
 

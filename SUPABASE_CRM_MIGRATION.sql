@@ -39,7 +39,8 @@ alter table public.crm_leads
   add column if not exists agreed_walk_in text,
   add column if not exists end_use_investment text,
   add column if not exists bhk_interested_in text,
-  add column if not exists follow_up_date date;
+  add column if not exists follow_up_date date,
+  add column if not exists follow_up_time time;
 
 -- Employees table (for consistent assignment dropdown)
 create table if not exists public.crm_employees (

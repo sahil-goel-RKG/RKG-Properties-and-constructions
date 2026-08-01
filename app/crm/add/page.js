@@ -64,6 +64,7 @@ export default function CrmAddLeadPage() {
   const [endUseInvestment, setEndUseInvestment] = useState('')
   const [bhkInterestedIn, setBhkInterestedIn] = useState('')
   const [followUpDate, setFollowUpDate] = useState('')
+  const [followUpTime, setFollowUpTime] = useState('')
   const [assignedToEmployeeId, setAssignedToEmployeeId] = useState('')
   const [remarks, setRemarks] = useState('')
 
@@ -86,6 +87,7 @@ export default function CrmAddLeadPage() {
     setEndUseInvestment('')
     setBhkInterestedIn('')
     setFollowUpDate('')
+    setFollowUpTime('')
     setAssignedToEmployeeId('')
     setRemarks('')
   }
@@ -119,6 +121,7 @@ export default function CrmAddLeadPage() {
           end_use_investment: endUseInvestment,
           bhk_interested_in: bhkInterestedIn,
           follow_up_date: followUpDate,
+          follow_up_time: followUpTime,
           assigned_to_employee_id: assignedToEmployeeId,
           remarks,
         }),
@@ -313,6 +316,19 @@ export default function CrmAddLeadPage() {
               type="date"
               value={followUpDate}
               onChange={(e) => setFollowUpDate(e.target.value)}
+              className={SELECT}
+              style={{ color: '#111827' }}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">
+              Follow up time
+            </label>
+            <input
+              type="time"
+              value={followUpTime}
+              onChange={(e) => setFollowUpTime(e.target.value)}
               className={SELECT}
               style={{ color: '#111827' }}
             />
