@@ -108,6 +108,21 @@ function toTimeSortKey(value) {
   return `${String(m[1]).padStart(2, '0')}:${m[2]}:${m[3] ? m[3] : '00'}`
 }
 
+/** Format HH:MM[:SS] as 12-hour with AM/PM (e.g. 3:30 PM). */
+function formatTimeAmPm(value) {
+  if (value == null) return ''
+  const s = String(value).trim()
+  const m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/)
+  if (!m) return s || ''
+  let hh = Number(m[1])
+  const mm = m[2]
+  if (!Number.isFinite(hh) || hh < 0 || hh > 23) return s
+  const ap = hh >= 12 ? 'PM' : 'AM'
+  hh = hh % 12
+  if (hh === 0) hh = 12
+  return `${hh}:${mm} ${ap}`
+}
+
 /** Calendar date in Asia/Kolkata as YYYY-MM-DD. */
 function indiaTodayIso() {
   // en-CA yields YYYY-MM-DD reliably
@@ -713,9 +728,7 @@ export default async function CrmLeadsPage({ searchParams }) {
                     style={urgencyStyle}
                   >
                     <Link href={href} className={linkBase}>
-                      {typeof lead.follow_up_time === 'string'
-                        ? lead.follow_up_time.slice(0, 5)
-                        : '-'}
+                      {formatTimeAmPm(lead.follow_up_time) || '-'}
                     </Link>
                   </td>
                   <td
