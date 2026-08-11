@@ -33,9 +33,10 @@ export default async function ContactPage({ searchParams }) {
       telephone: ['+91-8851753005', '+91-9220286089'],
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Sector 57, Sushant Lok',
+        streetAddress: '9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd',
         addressLocality: 'Gurugram',
-        postalCode: '122001',
+        addressRegion: 'Haryana',
+        postalCode: '122018',
         addressCountry: 'IN',
       },
     },
@@ -122,8 +123,8 @@ export default async function ContactPage({ searchParams }) {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">📍 Address</h3>
                     <p className="text-gray-600">
-                      Sector 57, Sushant Lok<br />
-                      Gurugram, 122001
+                      9th floor, Badshahpur Sohna Road Highway<br />
+                      Sohna - Gurgaon Rd, Gurugram, Haryana 122018
                     </p>
                   </div>
 

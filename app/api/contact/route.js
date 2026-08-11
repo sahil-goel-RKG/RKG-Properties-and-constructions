@@ -285,7 +285,7 @@ export async function POST(request) {
               </div>
               <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; text-align: center; color: #666; font-size: 12px;">
                 <p style="margin: 0;">RKG Properties and Constructions</p>
-                <p style="margin: 5px 0 0 0;">Sector 57, Sushant Lok, Gurugram, 122001</p>
+                <p style="margin: 5px 0 0 0;">9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd, Gurugram, Haryana 122018</p>
               </div>
             </body>
           </html>

@@ -74,7 +74,7 @@ export default function AboutPage() {
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-500 mb-1">📍 Location</p>
-                      <p className="text-gray-900 font-medium">Sector 57, Sushant Lok, Gurugram, 122001</p>
+                      <p className="text-gray-900 font-medium">9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd, Gurugram, Haryana 122018</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 mb-1">📧 Email</p>
@@ -116,7 +116,7 @@ export default function AboutPage() {
               <div className="min-w-0">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Sahil Goel</h3>
                 <p className="text-gray-600 mb-1 text-sm sm:text-base">Real Estate Consultant | Advisor</p>
-                <p className="text-gray-500 text-xs sm:text-sm mb-4 sm:mb-6">📍 Sector 57, Sushant Lok, Gurugram, 122001</p>
+                <p className="text-gray-500 text-xs sm:text-sm mb-4 sm:mb-6">📍 9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd, Gurugram, Haryana 122018</p>
                 <p className="text-gray-700 leading-relaxed mb-4 sm:mb-6 text-sm sm:text-base">
                   Dedicated real estate professional with deep knowledge of the local market and a commitment to delivering exceptional client experiences. Sahil brings strategic insight, negotiation expertise, and personalized attention to every transaction.
                 </p>

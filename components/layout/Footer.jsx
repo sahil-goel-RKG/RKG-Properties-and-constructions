@@ -12,8 +12,8 @@ export default function Footer() {
               Excellence in Real Estate Solutions
             </p>
             <div className="space-y-2 text-sm text-gray-400">
-              <p>Sector 57, Sushant Lok</p>
-              <p>Gurugram, 122001</p>
+              <p>9th floor, Badshahpur Sohna Road Highway</p>
+              <p>Sohna - Gurgaon Rd, Gurugram, Haryana 122018</p>
             </div>
           </div>
 

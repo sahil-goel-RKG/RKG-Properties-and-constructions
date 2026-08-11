@@ -79,7 +79,7 @@ export default function RootLayout({ children }) {
                 description: 'Premium residential and commercial properties in Gurgaon. Your trusted partner for real estate solutions.',
                 url: 'https://rkgproperties.in',
                 areaServed: { '@type': 'City', name: 'Gurgaon', containedInPlace: { '@type': 'State', name: 'Haryana' } },
-                address: { '@type': 'PostalAddress', streetAddress: 'Sector 57, Sushant Lok', addressLocality: 'Gurugram', postalCode: '122001' },
+                address: { '@type': 'PostalAddress', streetAddress: '9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd', addressLocality: 'Gurugram', addressRegion: 'Haryana', postalCode: '122018' },
                 telephone: ['+91-8851753005', '+91-9220286089'],
                 email: 'sahil@rkgproperties.in',
               }),
