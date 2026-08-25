@@ -1,0 +1,129 @@
+.testimonials-section {
+  overflow-x: hidden;
+}
+
+.testimonials-section__wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.testimonials-carousel {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  max-width: min(780px, 100%);
+  min-width: 0;
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.testimonials-carousel .testimonials-section-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 280px;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.testimonials-carousel .testimonials-section-stars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 18px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.testimonials-carousel .testimonials-section-star {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.testimonials-carousel .testimonials-section-feedback {
+  margin: 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  font-size: 14px;
+  line-height: 22px;
+  color: #c0c0c0;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.testimonials-carousel .testimonials-section-name {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid #2a2a2a;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #f5f5f5;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .testimonials-carousel {
+    min-height: 260px;
+    height: 260px;
+  }
+
+  .testimonials-carousel .testimonials-section-card {
+    grid-template-rows: 26px 1fr 38px;
+    gap: 12px;
+    min-height: 260px;
+    height: 260px;
+    padding: 20px 24px;
+  }
+
+  .testimonials-carousel .testimonials-section-stars {
+    gap: 5px;
+    height: 22px;
+  }
+
+  .testimonials-carousel .testimonials-section-star {
+    width: 22px;
+    height: 22px;
+  }
+
+  .testimonials-carousel .testimonials-section-feedback {
+    -webkit-line-clamp: 4;
+    font-size: 17px;
+    line-height: 26px;
+  }
+
+  .testimonials-carousel .testimonials-section-name {
+    padding-top: 10px;
+    -webkit-line-clamp: 1;
+    font-size: 16px;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+}

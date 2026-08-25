@@ -1,13 +1,14 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Cormorant_Garamond } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
 import "./globals.css";
 import HeaderRouter from "@/components/layout/HeaderRouter";
-import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
+import FooterRouter from "@/components/layout/FooterRouter";
+import WhatsAppRouter from "@/components/layout/WhatsAppRouter";
 import ClientOverlays from "@/components/layout/ClientOverlays";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { OFFICE_ADDRESS } from '@/config/constants';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +19,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -51,10 +59,15 @@ export default function RootLayout({ children }) {
       domain="rkgproperties.in"
       appearance={{
         variables: {
-          colorPrimary: '#c99700',
+          colorPrimary: '#c9a227',
+          colorBackground: '#141414',
+          colorText: '#f5f5f5',
+          colorInputBackground: '#1e1e1e',
+          colorInputText: '#f5f5f5',
         },
         elements: {
-          formButtonPrimary: 'bg-[#c99700] hover:bg-[#a67800]',
+          formButtonPrimary: 'bg-[#c9a227] hover:bg-[#e0b840] text-[#0a0a0a]',
+          card: 'bg-[#141414] border border-[#2a2a2a]',
         },
       }}
     >
@@ -79,7 +92,7 @@ export default function RootLayout({ children }) {
                 description: 'Premium residential and commercial properties in Gurgaon. Your trusted partner for real estate solutions.',
                 url: 'https://rkgproperties.in',
                 areaServed: { '@type': 'City', name: 'Gurgaon', containedInPlace: { '@type': 'State', name: 'Haryana' } },
-                address: { '@type': 'PostalAddress', streetAddress: '9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd', addressLocality: 'Gurugram', addressRegion: 'Haryana', postalCode: '122018' },
+                address: OFFICE_ADDRESS.postal,
                 telephone: ['+91-8851753005', '+91-9220286089'],
                 email: 'sahil@rkgproperties.in',
               }),
@@ -87,7 +100,7 @@ export default function RootLayout({ children }) {
           />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden min-w-0`}
+          className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} theme-luxury antialiased overflow-x-hidden min-w-0`}
         >
           {/* Google tag (gtag.js) - AW-17915227011 - load early so conversion hits can be sent */}
           <Script
@@ -109,8 +122,8 @@ export default function RootLayout({ children }) {
           <ClientOverlays />
           <HeaderRouter />
           <main className="min-w-0 overflow-x-hidden">{children}</main>
-          <Footer />
-          <WhatsAppButton />
+          <FooterRouter />
+          <WhatsAppRouter />
           <script
             dangerouslySetInnerHTML={{
               __html: `

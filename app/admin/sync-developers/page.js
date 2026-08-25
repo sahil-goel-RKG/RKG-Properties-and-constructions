@@ -65,12 +65,12 @@ export default function SyncDevelopersPage() {
   }
 
   if (!isLoaded) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+    return <div className="py-8 sm:py-10 flex items-center justify-center">Loading...</div>
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="py-8 sm:py-10 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-4">Please sign in to access this page.</p>
@@ -86,7 +86,7 @@ export default function SyncDevelopersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="py-8 sm:py-10">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-4">
           <Link

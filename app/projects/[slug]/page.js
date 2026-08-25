@@ -142,12 +142,12 @@ export default async function ProjectDetailPage({ params }) {
   const formatProjectStatus = (status) => {
     if (!status) return null
     const statusMap = {
-      'under-construction': { label: 'Under Construction', color: 'bg-yellow-100 text-yellow-800' },
-      'ready-to-move': { label: 'Ready to Move', color: 'bg-green-100 text-green-800' },
-      'upcoming': { label: 'Upcoming', color: 'bg-blue-100 text-blue-800' },
-      'completed': { label: 'Completed', color: 'bg-gray-100 text-gray-800' }
+      'under-construction': { label: 'Under Construction', color: 'bg-yellow-900/40 text-yellow-300 border border-yellow-800/50' },
+      'ready-to-move': { label: 'Ready to Move', color: 'bg-green-900/40 text-green-300 border border-green-800/50' },
+      'upcoming': { label: 'Upcoming', color: 'bg-blue-900/40 text-blue-300 border border-blue-800/50' },
+      'completed': { label: 'Completed', color: 'bg-[#2a2a2a] text-[#a3a3a3] border border-[#3a3a3a]' }
     }
-    return statusMap[status] || { label: status, color: 'bg-gray-100 text-gray-800' }
+    return statusMap[status] || { label: status, color: 'bg-[#2a2a2a] text-[#a3a3a3] border border-[#3a3a3a]' }
   }
 
   const statusInfo = formatProjectStatus(project.project_status)
@@ -164,41 +164,39 @@ export default async function ProjectDetailPage({ params }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-shell">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(projectJsonLd) }} />
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Breadcrumb */}
-          <nav className="py-8 text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#c99700]">
+          <nav className="py-8 text-sm text-[#a3a3a3]">
+            <Link href="/" className="golden-text hover:underline">
               Home
             </Link>
             {' / '}
             <Link
               href={`/${project.type}`}
-              className="hover:text-[#c99700] capitalize"
+              className="golden-text hover:underline capitalize"
             >
               {project.type.replace('-', ' ')}
             </Link>
             {' / '}
-            <span className="text-gray-900">{project.name}</span>
+            <span className="text-[#f5f5f5]">{project.name}</span>
           </nav>
 
-          {/* Section 1: Image Gallery - White Background */}
-          <section className="bg-white py-8">
-            <div className="rounded-lg shadow-lg overflow-hidden">
+          <section className="section-surface py-8">
+            <div className="rounded-lg overflow-hidden border border-[#2a2a2a]">
               <ProjectImageGallery images={allImages} projectName={project.name} />
             </div>
           </section>
 
-          {/* Section 2: Title and Header - White Background */}
-          <section className="bg-white py-8">
+          <section className="section-surface py-8">
             <div className="px-4">
               <div className="mb-6">
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                <h1 className="text-4xl font-bold font-serif-display text-[#f5f5f5] mb-4">
                   {project.name}
                 </h1>
-                <div className="flex flex-wrap gap-4 text-gray-600">
+                <div className="flex flex-wrap gap-4 text-[#a3a3a3]">
                   <span className="flex items-center">
                     <svg
                     className="w-5 h-5 mr-2 golden-text"
@@ -242,16 +240,15 @@ export default async function ProjectDetailPage({ params }) {
                 </div>
               </div>
 
-              {/* Price and Status Banner */}
               <div className="mb-6 flex flex-wrap gap-4 items-center">
                 {priceInfo?.label && (
-                  <div className="flex-1 p-4 bg-[#fff5d6] rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Starting Price</p>
-                    <p className="text-2xl font-bold text-[#f70000]">
+                  <div className="flex-1 p-4 surface-elevated rounded-lg border border-[#2a2a2a]">
+                    <p className="text-sm text-[#737373] mb-1">Starting Price</p>
+                    <p className="text-2xl font-bold golden-text">
                       {priceInfo.label}
                     </p>
                     {project.price_min && project.price_max && project.price_min !== project.price_max && (
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-[#737373] mt-1">
                         ₹ {project.price_min.toLocaleString('en-IN')} - ₹ {project.price_max.toLocaleString('en-IN')}
                       </p>
                     )}
@@ -266,21 +263,19 @@ export default async function ProjectDetailPage({ params }) {
                 )}
               </div>
 
-              {/* Enquire CTA */}
               <div className="mb-6">
                 <Link
                   href={`/contact?enquiry=${encodeURIComponent(project.name)}`}
-                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#c99700] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#a67800] active:bg-[#a67800] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c99700] focus-visible:outline-offset-2 min-h-[48px]"
+                  className="btn-primary inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px]"
                   data-ga="project_enquire"
                 >
                   Enquire about {project.name}
                 </Link>
               </div>
 
-              {/* Short Description */}
               {project.short_description && (
-                <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                  <p className="text-lg text-gray-800 font-medium">
+                <div className="mb-6 p-4 surface-elevated border-l-4 border-[#c9a227] rounded">
+                  <p className="text-lg text-[#f5f5f5] font-medium">
                     {project.short_description}
                   </p>
                 </div>
@@ -289,104 +284,104 @@ export default async function ProjectDetailPage({ params }) {
           </section>
 
           {/* Section 3: Project Information - Gray Background */}
-          <section className="bg-gray-100 py-8">
+          <section className="section-muted py-8">
             <div className="px-4">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Project Information</h2>
+                <h2 className="text-2xl font-bold font-serif-display text-[#f5f5f5] mb-6">Project Information</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
+                <div className="card-luxury p-6 rounded-lg">
+                  <h3 className="font-semibold text-[#f5f5f5] mb-2 flex items-center">
                     <svg className="w-5 h-5 mr-2 golden-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     Location
                   </h3>
-                  <p className="text-gray-700">{project.location}</p>
+                  <p className="text-[#a3a3a3]">{project.location}</p>
                 </div>
 
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
+                <div className="card-luxury p-6 rounded-lg">
+                  <h3 className="font-semibold text-[#f5f5f5] mb-2 flex items-center">
                     <svg className="w-5 h-5 mr-2 golden-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                     Total Parcel area
                   </h3>
-                  <p className="text-gray-700">{formatAreaDisplay()}</p>
+                  <p className="text-[#a3a3a3]">{formatAreaDisplay()}</p>
                   {project.carpet_area_min && project.carpet_area_max && (
-                    <p className="text-sm text-gray-500 mt-1">Carpet Area</p>
+                    <p className="text-sm text-[#737373] mt-1">Carpet Area</p>
                   )}
                   {project.super_area_min && project.super_area_max && (
-                    <p className="text-sm text-gray-500 mt-1">Super Area</p>
+                    <p className="text-sm text-[#737373] mt-1">Super Area</p>
                   )}
                 </div>
 
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-2">Project Type</h3>
-                  <p className="text-gray-700 capitalize">
+                <div className="card-luxury p-6 rounded-lg">
+                  <h3 className="font-semibold text-[#f5f5f5] mb-2">Project Type</h3>
+                  <p className="text-[#a3a3a3] capitalize">
                     {project.project_type_detail || project.type.replace('-', ' ')}
                   </p>
                 </div>
 
                 {project.developer && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Developer</h3>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Developer</h3>
                     {developerSlug ? (
                       <Link
                         href={`/developers/${developerSlug}`}
-                        className="text-[#c99700] hover:text-[#a67800] hover:underline font-medium"
+                        className="golden-text hover:underline font-medium"
                       >
                         {project.developer} →
                       </Link>
                     ) : (
-                      <p className="text-gray-700">{project.developer}</p>
+                      <p className="text-[#a3a3a3]">{project.developer}</p>
                     )}
                   </div>
                 )}
 
 
                 {project.possession_date && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Possession</h3>
-                    <p className="text-gray-700">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Possession</h3>
+                    <p className="text-[#a3a3a3]">
                       {project.possession_date}
                     </p>
                   </div>
                 )}
 
                 {project.rera_number && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">RERA Number</h3>
-                    <p className="text-gray-700 font-mono text-sm">{project.rera_number}</p>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">RERA Number</h3>
+                    <p className="text-[#a3a3a3] font-mono text-sm">{project.rera_number}</p>
                   </div>
                 )}
 
                 {project.total_towers && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Towers</h3>
-                    <p className="text-gray-700">{project.total_towers}</p>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Towers</h3>
+                    <p className="text-[#a3a3a3]">{project.total_towers}</p>
                   </div>
                 )}
 
                 {project.total_units && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Total Units</h3>
-                    <p className="text-gray-700">{project.total_units.toLocaleString('en-IN')}</p>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Total Units</h3>
+                    <p className="text-[#a3a3a3]">{project.total_units.toLocaleString('en-IN')}</p>
                   </div>
                 )}
 
 
                 {project.type === 'builder-floor' && project.facing && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Facing</h3>
-                    <p className="text-gray-700">{project.facing}</p>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Facing</h3>
+                    <p className="text-[#a3a3a3]">{project.facing}</p>
                   </div>
                 )}
 
                 {project.club_house && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Club House</h3>
-                    <p className="text-gray-700">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Club House</h3>
+                    <p className="text-[#a3a3a3]">
                       {project.club_house_area ? `${project.club_house_area} sqft` : 'Available'}
                     </p>
                   </div>
@@ -415,9 +410,9 @@ export default async function ProjectDetailPage({ params }) {
                 
                 return (
                   (hasTowerConfig || hasLegacyConfig) && (
-                    <section className="bg-white py-8">
+                    <section className="section-surface py-8">
                       <div className="px-4">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">BHK Configuration</h2>
+                        <h2 className="text-2xl font-bold font-serif-display text-[#f5f5f5] mb-6">BHK Configuration</h2>
                         <BHKConfigurationSlider 
                           towerConfig={hasTowerConfig ? towerConfig : null}
                           legacyConfig={hasLegacyConfig ? project.bhk_config : null}
@@ -430,13 +425,13 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 5: Full Description - Gray Background */}
           {(project.full_description || project.description) && (
-            <section className="bg-gray-100 py-8">
+            <section className="section-muted py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">
                     About {project.name}
                   </h2>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  <p className="text-[#a3a3a3] leading-relaxed whitespace-pre-line">
                     {project.full_description || project.description}
                   </p>
                 </div>
@@ -446,17 +441,17 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 6: Project Highlights - White Background */}
           {project.project_highlights && project.project_highlights.length > 0 && (
-            <section className="bg-white py-8">
+            <section className="section-surface py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Project Highlights</h2>
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">Project Highlights</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     {project.project_highlights.map((highlight, index) => (
                       <div key={index} className="flex items-start">
                         <svg className="w-5 h-5 mr-3 mt-1 golden-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <p className="text-gray-700">{highlight}</p>
+                        <p className="text-[#a3a3a3]">{highlight}</p>
                       </div>
                     ))}
                   </div>
@@ -467,17 +462,17 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 7: Amenities - Gray Background */}
           {project.amenities && project.amenities.length > 0 && (
-            <section className="bg-gray-100 py-8">
+            <section className="section-muted py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Amenities</h2>
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">Amenities</h2>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {project.amenities.map((amenity, index) => (
-                      <div key={index} className="flex items-center bg-gray-50 p-4 rounded-lg">
+                      <div key={index} className="flex items-center card-luxury p-4 rounded-lg">
                         <svg className="w-5 h-5 mr-3 golden-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <p className="text-gray-700">{amenity}</p>
+                        <p className="text-[#a3a3a3]">{amenity}</p>
                       </div>
                     ))}
                   </div>
@@ -488,15 +483,15 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 8: Nearby Landmarks - White Background */}
           {project.nearby_landmarks && project.nearby_landmarks.length > 0 && (
-            <section className="bg-white py-8">
+            <section className="section-surface py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Nearby Landmarks</h2>
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">Nearby Landmarks</h2>
                   <div className="flex flex-wrap gap-3">
                     {project.nearby_landmarks.map((landmark, index) => (
                       <span
                         key={index}
-                        className="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
+                        className="px-4 py-2 surface-elevated text-[#a3a3a3] border border-[#2a2a2a] rounded-full text-sm font-medium"
                       >
                         {landmark}
                       </span>
@@ -509,12 +504,12 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 9: Connectivity - Gray Background */}
           {project.connectivity && (
-            <section className="bg-gray-100 py-8">
+            <section className="section-muted py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Connectivity</h2>
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 leading-relaxed">{project.connectivity}</p>
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">Connectivity</h2>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <p className="text-[#a3a3a3] leading-relaxed">{project.connectivity}</p>
                   </div>
                 </div>
               </div>
@@ -523,17 +518,17 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 10: Documents & Media - White Background */}
           {(project.floor_plan_url || project.brochure_url || project.video_url) && (
-            <section className="bg-white py-8">
+            <section className="section-surface py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Documents & Media</h2>
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">Documents & Media</h2>
                   <div className="flex flex-wrap gap-4">
                     {project.floor_plan_url && (
                       <a
                         href={project.floor_plan_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-6 py-3 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition"
+                        className="btn-primary inline-flex items-center"
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -546,7 +541,7 @@ export default async function ProjectDetailPage({ params }) {
                         href={project.brochure_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-6 py-3 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition"
+                        className="btn-primary inline-flex items-center"
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -559,7 +554,7 @@ export default async function ProjectDetailPage({ params }) {
                         href={project.video_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-6 py-3 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition"
+                        className="btn-primary inline-flex items-center"
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -575,12 +570,12 @@ export default async function ProjectDetailPage({ params }) {
 
           {/* Section 11: Payment Plan - Gray Background */}
           {project.payment_plan && (
-            <section className="bg-gray-100 py-8">
+            <section className="section-muted py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Payment Plan</h2>
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-line">{project.payment_plan}</p>
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">Payment Plan</h2>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <p className="text-[#a3a3a3] leading-relaxed whitespace-pre-line">{project.payment_plan}</p>
                   </div>
                 </div>
               </div>
@@ -588,25 +583,25 @@ export default async function ProjectDetailPage({ params }) {
           )}
 
           {/* Section 12: CTA Buttons - White Background */}
-          <section className="bg-white py-8">
+          <section className="section-surface py-8">
             <div className="px-4">
               <div className="flex flex-wrap gap-4 pt-6">
                 <Link
                   href="/contact"
-                  className="bg-[#22c55e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
+                  className="btn-primary"
                 >
                   Book a Consultation
                 </Link>
                 <Link
                   href={`/${project.type}`}
-                  className="border-2 border-[#c99700] text-[#c99700] px-8 py-3 rounded-lg font-semibold hover:bg-[#fff5d6] transition"
+                  className="btn-secondary"
                 >
                   View All {project.type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </Link>
                 {developerSlug && (
                   <Link
                     href={`/developers/${developerSlug}`}
-                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    className="btn-outline-gold"
                   >
                     View Developer
                   </Link>

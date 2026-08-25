@@ -189,6 +189,7 @@ function urgencyTdStyle(statusKey, kind) {
   const blur = kind === 'today' ? 14 : 10
   return {
     backgroundColor: colors.backgroundColor,
+    color: '#111827',
     boxShadow: `inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -2px 0 rgba(0,0,0,0.12), 0 ${depth}px 0 ${colors.shadow}, 0 ${depth + 4}px ${blur}px rgba(0,0,0,0.2)`,
     transform: `translateY(${lift}px)`,
     borderTop: '1px solid rgba(255,255,255,0.5)',
@@ -429,7 +430,7 @@ export default async function CrmLeadsPage({ searchParams }) {
       <Suspense fallback={null}>
         <CrmLeadsListPersist />
       </Suspense>
-      <div className="relative z-30 bg-gray-200 border border-gray-400 shadow-md rounded-xl p-4 sm:p-5 mb-4 overflow-visible">
+      <div className="relative z-30 crm-toolbar rounded-xl p-4 sm:p-5 mb-4 overflow-visible">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 overflow-visible">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Leads</h2>
@@ -622,6 +623,7 @@ export default async function CrmLeadsPage({ searchParams }) {
                   key={lead.id}
                   style={rowStyle}
                   className={[
+                    urgencyKind ? `crm-leads-row--urgency crm-leads-row--urgency-${urgencyKind}` : '',
                     !urgencyKind
                       ? statusKey === 'closed'
                         ? '!bg-red-200'
@@ -634,7 +636,9 @@ export default async function CrmLeadsPage({ searchParams }) {
                               : 'bg-white'
                       : '',
                     'cursor-pointer hover:brightness-95 transition-[filter] duration-150',
-                  ].join(' ')}
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                 >
                   <td
                     className={`p-0 text-xs text-gray-900 whitespace-nowrap max-w-[160px] ${textWeightClass}`}

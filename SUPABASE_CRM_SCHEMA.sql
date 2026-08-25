@@ -46,6 +46,8 @@ create table if not exists public.crm_leads (
   follow_up_date date,
   -- From CSV/UI: "Follow Up Time" (HH:MM)
   follow_up_time time,
+  -- When a personal WhatsApp reminder was sent (~1h before follow-up)
+  follow_up_whatsapp_reminded_at timestamptz,
   remarks text,
   -- Assigned to: store a human-friendly name for small teams.
   assigned_to_employee_id text references public.crm_employees(employee_id) on delete set null,

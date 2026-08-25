@@ -71,10 +71,10 @@ export default function Pagination({
   return (
     <div className="mt-8 flex flex-col items-center gap-4">
       {/* Results info */}
-      <div className="text-sm text-gray-600">
-        Showing <span className="font-semibold">{startItem}</span> to{' '}
-        <span className="font-semibold">{endItem}</span> of{' '}
-        <span className="font-semibold">{totalItems}</span> properties
+      <div className="text-sm text-[#a3a3a3]">
+        Showing <span className="font-semibold text-[#f5f5f5]">{startItem}</span> to{' '}
+        <span className="font-semibold text-[#f5f5f5]">{endItem}</span> of{' '}
+        <span className="font-semibold text-[#f5f5f5]">{totalItems}</span> properties
       </div>
 
       {/* Pagination controls */}
@@ -83,12 +83,12 @@ export default function Pagination({
         {currentPage > 1 ? (
           <Link
             href={getPageUrl(currentPage - 1)}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition"
+            className="btn-outline-gold px-4 py-2"
           >
             Previous
           </Link>
         ) : (
-          <span className="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">
+          <span className="px-4 py-2 border border-[#2a2a2a] rounded-lg text-[#737373] cursor-not-allowed">
             Previous
           </span>
         )}
@@ -98,7 +98,7 @@ export default function Pagination({
           {pageNumbers.map((page, index) => {
             if (page === '...') {
               return (
-                <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
+                <span key={`ellipsis-${index}`} className="px-2 text-[#737373]">
                   ...
                 </span>
               )
@@ -112,8 +112,8 @@ export default function Pagination({
                 href={getPageUrl(page)}
                 className={`px-4 py-2 border rounded-lg transition ${
                   isActive
-                    ? 'bg-[#c99700] text-white border-[#c99700] font-semibold'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    ? 'btn-pagination-active'
+                    : 'border-[#2a2a2a] text-[#a3a3a3] hover:border-[#c9a227] hover:text-[#f5f5f5]'
                 }`}
               >
                 {page}
@@ -126,12 +126,12 @@ export default function Pagination({
         {currentPage < totalPages ? (
           <Link
             href={getPageUrl(currentPage + 1)}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition"
+            className="btn-outline-gold px-4 py-2"
           >
             Next
           </Link>
         ) : (
-          <span className="px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">
+          <span className="px-4 py-2 border border-[#2a2a2a] rounded-lg text-[#737373] cursor-not-allowed">
             Next
           </span>
         )}
@@ -139,4 +139,3 @@ export default function Pagination({
     </div>
   )
 }
-

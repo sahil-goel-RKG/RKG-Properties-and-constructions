@@ -3,74 +3,108 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
-export default function HeroCarousel({ images, serverRenderedFirstImageUrl }) {
+/*
+ * Image band spans 25% → 100% of the page container (same as ProjectsSlider, etc.).
+ * Local % within band = (global% - 25) / 75:
+ *   0–25% container  → black bg only
+ *   25–50% container → ghosted fade (~45% opacity)
+ *   50–70% container → fade → fully clear
+ *   70%+ container    → fully sharp
+ */
+const FADE_ZONE_END = '33.33%'
+const CLEAR_END = '60%'
+
+const FADE_MASK = {
+  WebkitMaskImage: `linear-gradient(to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 5%,
+    rgba(0, 0, 0, 0.45) ${FADE_ZONE_END},
+    rgba(0, 0, 0, 0.85) 55%,
+    black ${CLEAR_END},
+    black 100%)`,
+  maskImage: `linear-gradient(to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 5%,
+    rgba(0, 0, 0, 0.45) ${FADE_ZONE_END},
+    rgba(0, 0, 0, 0.85) 55%,
+    black ${CLEAR_END},
+    black 100%)`,
+}
+
+const IMAGE_STYLE = { objectPosition: '28% center' }
+
+function HeroSlide({ src, alt, priority = false, sizes = '50vw' }) {
+  return (
+    <div
+      className="hero-image-fade-layer"
+      style={{
+        ...FADE_MASK,
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      }}
+    >
+      <div className="relative h-full w-full overflow-hidden">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes={sizes}
+          className="object-cover"
+          style={IMAGE_STYLE}
+          unoptimized
+        />
+      </div>
+    </div>
+  )
+}
+
+export default function HeroCarousel({
+  images,
+  className = '',
+  imageSizes = '(min-width: 1280px) 960px, (min-width: 768px) 60vw, 100vw',
+}) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
-    if (images && images.length > 0) {
+    if (images?.length > 1) {
       const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) =>
-          prevIndex === images.length - 1 ? 0 : prevIndex + 1
-        )
+        setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
       }, 5000)
       return () => clearInterval(interval)
     }
   }, [images])
 
-  if (!images || images.length === 0) {
+  if (!images?.length) {
     return null
   }
 
-  const isFirstServerRendered = Boolean(serverRenderedFirstImageUrl && serverRenderedFirstImageUrl === images[0])
-
   return (
-    <>
-      {/* Carousel layers: when index 0 is server-rendered, don't duplicate it (keeps LCP fast) */}
-      <div className="absolute inset-0 z-0">
-        <div className="relative w-full h-full">
-          {images.map((imgUrl, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                index === currentIndex ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              {index === 0 && isFirstServerRendered ? (
-                <div className="absolute inset-0" aria-hidden />
-              ) : (
-                <Image
-                  src={imgUrl}
-                  alt={`Hero image ${index + 1}`}
-                  fill
-                  priority={index === 1}
-                  sizes="100vw"
-                  className="object-cover"
-                  unoptimized
-                />
-              )}
-            </div>
-          ))}
+    <div
+      className={className}
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+    >
+      {images.map((imgUrl, index) => (
+        <div
+          key={`${imgUrl}-${index}`}
+          className={`absolute transition-opacity duration-1000 ${
+            index === currentIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{ top: 0, right: 0, bottom: 0, left: 0 }}
+          aria-hidden={index !== currentIndex}
+        >
+          <HeroSlide
+            src={imgUrl}
+            alt={`Featured property ${index + 1}`}
+            priority={index === 0}
+            sizes={imageSizes}
+          />
         </div>
-      </div>
+      ))}
 
-      {/* Image Indicators */}
-      {images.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex 
-                  ? 'w-8 bg-white' 
-                  : 'w-2 bg-white/50 hover:bg-white/75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
-    </>
+    </div>
   )
 }
-

@@ -27,7 +27,7 @@ export default function ContactFormStatic({ defaultMessage = '' }) {
         </label>
       </div>
       <div>
-        <label htmlFor="name" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="name" className={`form-label ${labelClass}`}>
           Name *
         </label>
         <input
@@ -36,13 +36,13 @@ export default function ContactFormStatic({ defaultMessage = '' }) {
           name="name"
           autoComplete="name"
           required
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${inputClass}`}
+          className={`form-input ${inputClass}`}
           placeholder="Your Name"
         />
       </div>
 
       <div>
-        <label htmlFor="email" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="email" className={`form-label ${labelClass}`}>
           Email *
         </label>
         <input
@@ -51,13 +51,13 @@ export default function ContactFormStatic({ defaultMessage = '' }) {
           name="email"
           autoComplete="email"
           required
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${inputClass}`}
+          className={`form-input ${inputClass}`}
           placeholder="your.email@example.com"
         />
       </div>
 
       <div>
-        <label htmlFor="phone" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="phone" className={`form-label ${labelClass}`}>
           Phone *
         </label>
         <input
@@ -66,13 +66,13 @@ export default function ContactFormStatic({ defaultMessage = '' }) {
           name="phone"
           autoComplete="tel"
           required
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${inputClass}`}
+          className={`form-input ${inputClass}`}
           placeholder="+91-9999999999"
         />
       </div>
 
       <div>
-        <label htmlFor="message" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="message" className={`form-label ${labelClass}`}>
           Message *
         </label>
         <textarea
@@ -81,14 +81,14 @@ export default function ContactFormStatic({ defaultMessage = '' }) {
           required
           rows={5}
           defaultValue={defaultMessage}
-          className="w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 px-4 py-4"
+          className="form-input px-4 py-4"
           placeholder="Your Message"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full bg-[#AB090A] text-white rounded-lg font-semibold hover:bg-[#8a0708] transition py-3 text-base"
+        className="btn-primary w-full py-3 text-base"
       >
         Submit
       </button>

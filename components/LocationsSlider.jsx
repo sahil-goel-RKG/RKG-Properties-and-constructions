@@ -1,19 +1,15 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { resolveSectionClass, resolveSectionStyle } from '@/lib/resolveSectionClass'
 
-export default function LocationsSlider({ locations }) {
-  const scrollContainerRef = useRef(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(false)
+export default function LocationsSlider({ locations, bgColor = 'section-light' }) {
   const locationsRef = useRef(null)
 
-  // Memoize locations to prevent unnecessary re-renders
   const stableLocations = useMemo(() => {
     if (!locations || locations.length === 0) return []
-    const locationsStr = JSON.stringify(locations.sort())
+    const locationsStr = JSON.stringify([...locations].sort())
     if (locationsRef.current === locationsStr) {
       return locationsRef.current ? JSON.parse(locationsRef.current) : []
     }
@@ -21,91 +17,43 @@ export default function LocationsSlider({ locations }) {
     return locations
   }, [locations])
 
-  const checkScrollButtons = useCallback(() => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-    }
-  }, [])
-
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (container) {
-      // Check initially and on resize
-      checkScrollButtons()
-      const handleResize = () => {
-        setTimeout(checkScrollButtons, 100)
-      }
-      
-      window.addEventListener('resize', handleResize)
-      container.addEventListener('scroll', checkScrollButtons)
-      
-      return () => {
-        window.removeEventListener('resize', handleResize)
-        container.removeEventListener('scroll', checkScrollButtons)
-      }
-    }
-  }, [checkScrollButtons])
-
-  const scroll = (direction) => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 300
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      })
-    }
-  }
-
   if (!stableLocations || stableLocations.length === 0) {
     return null
   }
 
+  const renderLocation = (location, keySuffix) => (
+    <Link
+      key={keySuffix}
+      href={`/apartments?location=${encodeURIComponent(location)}`}
+      className="btn-pill-gold group flex-shrink-0 whitespace-nowrap text-sm sm:text-base sm:px-6 sm:py-3"
+    >
+      <span className="relative font-semibold transition-colors duration-200 group-hover:text-[#0a0a0a]">
+        {location}
+      </span>
+    </Link>
+  )
+
   return (
-    <section className="bg-gray-100 py-8 sm:py-16">
+    <section
+      className={`${resolveSectionClass(bgColor)} py-8 sm:py-16 overflow-hidden`}
+      style={resolveSectionStyle(bgColor)}
+    >
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-8 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold font-serif-display text-[#f5f5f5] mb-4 sm:mb-8 text-center">
           Locations
         </h2>
+
         <div className="relative">
-          {/* Left Arrow */}
-          {canScrollLeft && (
-            <button
-              onClick={() => scroll('left')}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition bg-white absolute left-0 top-1/2 -translate-y-1/2 z-10"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-700 hover:text-[rgb(0,37,122)]" />
-            </button>
-          )}
-
-          {/* Right Arrow */}
-          {canScrollRight && (
-            <button
-              onClick={() => scroll('right')}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition bg-white absolute right-0 top-1/2 -translate-y-1/2 z-10"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-700 hover:text-[rgb(0,37,122)]" />
-            </button>
-          )}
-
-          {/* Scrollable Container */}
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto pl-2 pr-12 scroll-smooth hide-scrollbar"
-            onScroll={checkScrollButtons}
-          >
-            {stableLocations.map((location) => (
-              <Link
-                key={location}
-                href={`/apartments?location=${encodeURIComponent(location)}`}
-                className="group px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-center text-sm sm:text-base transition-all duration-200 cursor-pointer border-2 border-[rgb(0,37,122)] hover:border-[rgb(0,50,150)] flex-shrink-0 whitespace-nowrap shadow-md hover:shadow-[0_10px_25px_rgba(0,37,122,0.4)] bg-transparent hover:bg-[rgb(0,37,122)]"
-              >
-                <p className="font-semibold text-[rgb(0,37,122)] transition-all duration-200 group-hover:text-white">
-                  {location}
-                </p>
-              </Link>
-            ))}
+          <div className="overflow-hidden group">
+            <div className="flex animate-scroll-right gap-4 sm:gap-6 group-hover:[animation-play-state:paused]">
+              {stableLocations.map((location) => renderLocation(location, location))}
+              {stableLocations.map((location, index) =>
+                renderLocation(location, `dup1-${location}-${index}`)
+              )}
+              {stableLocations.map((location, index) =>
+                renderLocation(location, `dup2-${location}-${index}`)
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -12,7 +12,6 @@ export default function BuilderFloorContent({ children }) {
   const searchParams = useSearchParams()
   const [loadingTimeout, setLoadingTimeout] = useState(false)
 
-  // Set a timeout to prevent infinite loading (fallback after 3 seconds)
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoadingTimeout(true)
@@ -21,24 +20,18 @@ export default function BuilderFloorContent({ children }) {
     return () => clearTimeout(timer)
   }, [])
 
-  // Handle redirect after authentication
   useEffect(() => {
     if (isLoaded && user) {
-      // Check if there's a returnUrl in the URL (from Clerk redirect or query param)
       const urlParams = new URLSearchParams(window.location.search)
       const returnUrl = urlParams.get('returnUrl')
-      
-      // Also check sessionStorage for returnUrl (stored before redirecting to login)
       const storedReturnUrl = typeof window !== 'undefined' ? sessionStorage.getItem('returnUrl') : null
       
       if (returnUrl && returnUrl !== pathname) {
-        // Clear sessionStorage and redirect
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('returnUrl')
         }
         router.replace(decodeURIComponent(returnUrl))
       } else if (storedReturnUrl && storedReturnUrl !== pathname) {
-        // Use stored returnUrl if no query param
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('returnUrl')
         }
@@ -47,36 +40,28 @@ export default function BuilderFloorContent({ children }) {
     }
   }, [isLoaded, user, pathname, router])
 
-  // Show loading state while checking authentication, but with timeout fallback
   if (!isLoaded && !loadingTimeout) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="page-shell flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c99700] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c9a227] mx-auto mb-4"></div>
+          <p className="text-[#a3a3a3]">Loading...</p>
         </div>
       </div>
     )
   }
 
-  // If timeout reached and still not loaded, proceed anyway (Clerk might be having issues)
-  // This prevents infinite loading
-  // After timeout, treat as if not authenticated (show contact form)
-
-  // If user is not authenticated (or timeout occurred), show login/contact form
-  // Note: Contact popup will still show from layout.js
   if (!user || (!isLoaded && loadingTimeout)) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
+      <div className="page-shell py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-start">
-              {/* Left Section - Message and Contact Form */}
-              <div className="bg-white rounded-lg shadow-lg p-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <div className="card-luxury p-8">
+                <h1 className="text-3xl font-bold font-serif-display text-[#f5f5f5] mb-4">
                   Builder Floor Projects
                 </h1>
-                <p className="text-lg text-gray-700 mb-6">
+                <p className="text-lg text-[#a3a3a3] mb-6">
                   Builder floors are currently under admin&apos;s control. Please fill the contact form below to get in touch with us.
                 </p>
                 <div className="mt-8">
@@ -84,26 +69,23 @@ export default function BuilderFloorContent({ children }) {
                 </div>
               </div>
 
-              {/* Right Section - Login Button */}
-              <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center justify-center min-h-[400px]">
+              <div className="card-luxury p-8 flex flex-col items-center justify-center min-h-[400px]">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-bold font-serif-display text-[#f5f5f5] mb-4">
                     Admin Access
                   </h2>
-                  <p className="text-gray-600 mb-8">
+                  <p className="text-[#a3a3a3] mb-8">
                     If you are an admin, please sign in to access the builder floor listings.
                   </p>
                   <button
                     onClick={() => {
-                      // Get the full current path including search params
                       const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '')
-                      // Store returnUrl in sessionStorage as backup
                       if (typeof window !== 'undefined') {
                         sessionStorage.setItem('returnUrl', currentPath)
                       }
                       router.push(`/admin/login?returnUrl=${encodeURIComponent(currentPath)}`)
                     }}
-                    className="w-full px-8 py-3 bg-[#c99700] text-white rounded-lg font-semibold hover:bg-[#a67800] transition"
+                    className="btn-primary w-full"
                   >
                     Sign In
                   </button>
@@ -116,7 +98,5 @@ export default function BuilderFloorContent({ children }) {
     )
   }
 
-  // If user is authenticated, show the normal builder floor listing
   return <>{children}</>
 }
-

@@ -132,12 +132,20 @@ export async function PATCH(request, { params }) {
       if (m) {
         const hh = String(Math.min(23, Number(m[1]))).padStart(2, '0')
         const mm = String(Math.min(59, Number(m[2]))).padStart(2, '0')
-        const ss = m[3] != null ? String(Math.min(59, Number(m[3]))).padStart(2, '0') : '00'
+        const ss =
+          m[3] != null ? String(Math.min(59, Number(m[3]))).padStart(2, '0') : '00'
         update.follow_up_time = `${hh}:${mm}:${ss}`
       } else {
         update.follow_up_time = null
       }
     }
+  }
+  // If follow-up schedule changed, allow a fresh WhatsApp reminder
+  if (
+    Object.prototype.hasOwnProperty.call(update, 'follow_up_date') ||
+    Object.prototype.hasOwnProperty.call(update, 'follow_up_time')
+  ) {
+    update.follow_up_whatsapp_reminded_at = null
   }
   if (typeof body?.remarks === 'string') {
     update.remarks = normalizeOptionalString(body.remarks)

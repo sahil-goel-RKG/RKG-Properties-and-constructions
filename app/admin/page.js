@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser, UserButton } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="py-8 sm:py-10 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c99700] mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -140,14 +140,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="py-8 sm:py-10">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.firstName || 'Admin'}!</h1>
             <span className="px-3 py-1 bg-[#fff5d6] text-[#a67800] rounded-full text-sm font-medium">Admin Dashboard</span>
           </div>
-          <UserButton appearance={{ elements: { avatarBox: 'h-10 w-10' } }} />
         </div>
 
         {/* Quick Actions */}

@@ -1,5 +1,6 @@
 import ContactFormStatic from '@/components/ContactFormStatic'
 import ContactLeadConversion from '@/components/ContactLeadConversion'
+import { OFFICE_ADDRESS } from '@/config/constants'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.rkgproperties.in'
 
@@ -31,19 +32,12 @@ export default async function ContactPage({ searchParams }) {
       name: 'RKG Properties and Constructions',
       email: 'sahil@rkgproperties.in',
       telephone: ['+91-8851753005', '+91-9220286089'],
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: '9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd',
-        addressLocality: 'Gurugram',
-        addressRegion: 'Haryana',
-        postalCode: '122018',
-        addressCountry: 'IN',
-      },
+      address: OFFICE_ADDRESS.postal,
     },
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16 w-full max-w-[100vw] overflow-x-hidden box-border">
+    <div className="page-shell py-16 w-full max-w-[100vw] overflow-x-hidden box-border">
       {thankyou ? <ContactLeadConversion /> : null}
       <script
         type="application/ld+json"
@@ -52,31 +46,25 @@ export default async function ContactPage({ searchParams }) {
       <div className="w-full max-w-[100vw] box-border px-4 sm:px-6 mx-auto">
         <div className="max-w-4xl mx-auto w-full min-w-0">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-600">
+            <h1 className="text-4xl font-bold font-serif-display text-[#f5f5f5] mb-4">Contact Us</h1>
+            <p className="text-xl text-[#a3a3a3]">
               Get expert guidance for your successful real estate journey.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 min-w-0">
             {/* Contact Form */}
-            <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md min-w-0 overflow-hidden">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+            <div className="card-luxury p-4 sm:p-6 md:p-8 min-w-0 overflow-hidden">
+              <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-6">
                 Send us a Message
               </h2>
               {thankyou && (
-                <div
-                  className="mb-6 p-4 rounded-lg bg-[#fff5d6] text-[#a67800] border border-[#f2cd6d]"
-                  role="status"
-                >
+                <div className="mb-6 alert-success" role="status">
                   Thank you! Your message has been submitted successfully.
                 </div>
               )}
               {contactError && (
-                <div
-                  className="mb-6 p-4 rounded-lg bg-red-50 text-red-800 border border-red-200"
-                  role="alert"
-                >
+                <div className="mb-6 alert-error" role="alert">
                   {params?.contact_error === 'rate_limit'
                     ? 'Too many submissions. Please try again in a few minutes.'
                     : 'Something went wrong. Please check your details and try again.'}
@@ -87,13 +75,13 @@ export default async function ContactPage({ searchParams }) {
 
             {/* Contact Information */}
             <div className="space-y-8 min-w-0 overflow-hidden">
-              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md break-words">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              <div className="card-luxury p-4 sm:p-6 md:p-8 break-words">
+                <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-6">
                   Get in Touch
                 </h2>
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       📞 Phone Number
                     </h3>
                     <a
@@ -111,7 +99,7 @@ export default async function ContactPage({ searchParams }) {
                   </div>
                  
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">✉️ Email</h3>
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">✉️ Email</h3>
                     <a
                       href="mailto:sahil@rkgproperties.in"
                       className="golden-text hover:underline break-all"
@@ -121,18 +109,18 @@ export default async function ContactPage({ searchParams }) {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">📍 Address</h3>
-                    <p className="text-gray-600">
-                      9th floor, Badshahpur Sohna Road Highway<br />
-                      Sohna - Gurgaon Rd, Gurugram, Haryana 122018
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">📍 Address</h3>
+                    <p className="text-[#a3a3a3]">
+                      {OFFICE_ADDRESS.lines[0]}<br />
+                      {OFFICE_ADDRESS.lines[1]}
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       🏢 RERA Registration
                     </h3>
-                    <p className="text-gray-600 text-sm break-all">
+                    <p className="text-[#a3a3a3] text-sm break-all">
                       RC/HARERA/GGM/3244/2839/2025/121
                     </p>
                   </div>
@@ -140,11 +128,11 @@ export default async function ContactPage({ searchParams }) {
               </div>
 
               {/* Business Hours */}
-              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              <div className="card-luxury p-4 sm:p-6 md:p-8">
+                <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-6">
                   Business Hours
                 </h2>
-                <div className="space-y-2 text-gray-600">
+                <div className="space-y-2 text-[#a3a3a3]">
                   <p>Mon : 10:00 AM - 7:00 PM</p>
                   <p>Tue : Closed</p>
                   <p>Wed - Sun : 10:00 AM - 7:00 PM</p>
@@ -157,4 +145,3 @@ export default async function ContactPage({ searchParams }) {
     </div>
   )
 }
-

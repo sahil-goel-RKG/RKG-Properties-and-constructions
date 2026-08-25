@@ -170,7 +170,6 @@ export default function CrmAddLeadPage() {
               className={INPUT}
               placeholder="Prospect name"
               autoFocus
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -184,7 +183,6 @@ export default function CrmAddLeadPage() {
               className={INPUT}
               placeholder="10-digit mobile"
               inputMode="tel"
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -195,7 +193,6 @@ export default function CrmAddLeadPage() {
               onChange={(e) => setSource(e.target.value)}
               className={INPUT}
               placeholder="e.g. RKG / Website / Referral"
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -208,7 +205,6 @@ export default function CrmAddLeadPage() {
               onChange={(e) => setLocation(e.target.value)}
               className={INPUT}
               placeholder="e.g. Gurgaon / Delhi"
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -220,7 +216,6 @@ export default function CrmAddLeadPage() {
               value={initialAssessment}
               onChange={(e) => setInitialAssessment(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             >
               <option value="">Select</option>
               <option value="running">running</option>
@@ -239,7 +234,6 @@ export default function CrmAddLeadPage() {
               onChange={(e) => setProjectsInterested(e.target.value)}
               className={INPUT}
               placeholder="e.g. Elan The Statement"
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -249,7 +243,6 @@ export default function CrmAddLeadPage() {
               value={ucRtm}
               onChange={(e) => setUcRtm(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             >
               <option value="">Select</option>
               <option value="UC">UC</option>
@@ -265,7 +258,6 @@ export default function CrmAddLeadPage() {
               value={agreedWalkIn}
               onChange={(e) => setAgreedWalkIn(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             >
               <option value="">Select</option>
               <option value="YES">YES</option>
@@ -281,7 +273,6 @@ export default function CrmAddLeadPage() {
               value={endUseInvestment}
               onChange={(e) => setEndUseInvestment(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             >
               <option value="">Select</option>
               <option value="End Use">End Use</option>
@@ -297,7 +288,6 @@ export default function CrmAddLeadPage() {
               value={bhkInterestedIn}
               onChange={(e) => setBhkInterestedIn(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             >
               <option value="">Select</option>
               <option value="2 BHK">2 BHK</option>
@@ -317,7 +307,6 @@ export default function CrmAddLeadPage() {
               value={followUpDate}
               onChange={(e) => setFollowUpDate(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -330,7 +319,6 @@ export default function CrmAddLeadPage() {
               value={followUpTime}
               onChange={(e) => setFollowUpTime(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             />
           </div>
 
@@ -342,7 +330,6 @@ export default function CrmAddLeadPage() {
               value={assignedToEmployeeId}
               onChange={(e) => setAssignedToEmployeeId(e.target.value)}
               className={SELECT}
-              style={{ color: '#111827' }}
             >
               <option value="">Select</option>
               {employees.map((emp) => (

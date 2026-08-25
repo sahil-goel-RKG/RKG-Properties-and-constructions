@@ -2,17 +2,16 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { getDeveloperLogoDisplayEntries } from '@/lib/developerLogosServer'
 import YouTubeVideoSectionLoader from '@/components/YouTubeVideoSectionLoader'
 import { cache, Suspense } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import HeroCarousel from '@/components/HeroCarousel'
 import ProjectsSlider from '@/components/ProjectsSlider'
-import ContactForm from '@/components/features/ContactForm'
-
-// Below-fold: lazy load to reduce initial bundle and improve TTFB/LCP
-const LocationsSlider = dynamic(() => import('@/components/LocationsSlider'), { ssr: true })
+import LocationsSlider from '@/components/LocationsSlider'
+import { resolveSectionStyle } from '@/lib/resolveSectionClass'
 const DevelopersSlider = dynamic(() => import('@/components/DevelopersSlider'), { ssr: true })
 const CountUpStats = dynamic(() => import('@/components/CountUpStats'), { ssr: true })
+import WhyWorkWithUsSection from '@/components/WhyWorkWithUsSection'
+import TestimonialsSection from '@/components/TestimonialsSection'
 
 // ISR: cache page for 10 min to improve TTFB on repeat visits
 export const revalidate = 600
@@ -259,28 +258,27 @@ const getUniqueDevelopers = cache(async () => {
 
 // Below-fold content: fetches after hero so first byte can be sent sooner (streaming)
 async function HomeBelowFold() {
-  const [residentialProjects, builderFloorProjects, locations, developers] = await Promise.all([
+  const [residentialProjects, builderFloorProjects, developers] = await Promise.all([
     getResidentialProjects(),
     getBuilderFloorProjects(),
-    getUniqueLocations(),
     getUniqueDevelopers(),
   ])
   const developerLogoEntries = getDeveloperLogoDisplayEntries(developers)
   return (
     <>
-      <ProjectsSlider projects={residentialProjects} bgColor="bg-gray-100" />
-      <section className="py-8 sm:py-16 bg-white">
+      <ProjectsSlider projects={residentialProjects} bgColor="section-light" />
+      <section className="py-8 sm:py-16 section-mid" style={resolveSectionStyle('section-mid')}>
         <div className="container mx-auto px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-gray-50 rounded-lg shadow-md p-4 sm:p-6 md:p-8">
-              <p className="text-sm sm:text-lg leading-relaxed text-gray-700 mb-4 sm:mb-8">
+            <div className="card-luxury intro-card-luxury rounded-lg p-4 sm:p-6 md:p-8">
+              <p className="text-sm sm:text-lg leading-relaxed text-[#a3a3a3] mb-4 sm:mb-8">
                 Let us get to know each other first. Well, if you&apos;re engaging with us, we guess you&apos;re seeking real estate agents. We are aware of how tiresome finding a realtor would be. We would say that you&apos;re on the verge of reaching &quot;The right place&quot; and making &quot;The Right Choice.&quot;
               </p>
               <CountUpStats />
               <div className="text-center">
                 <Link
                   href="/about"
-                  className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+                  className="btn-primary mx-auto"
                   data-ga="about_read_more"
                 >
                   Read More
@@ -298,43 +296,22 @@ async function HomeBelowFold() {
         ctaHref="/builder-floor"
         allowEmpty
         emptyMessage="We are curating the finest builder floor listings. Leave your details and we'll notify you as soon as they go live."
-        bgColor="bg-gray-100"
+        bgColor="section-light"
         variant="builder-floor"
       />
-      <section className="py-8 sm:py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-12 text-center">Why Work With Us</h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
-              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">🏡</div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Local Expertise</h3>
-              <p className="text-sm sm:text-base text-gray-600">Deep knowledge of neighborhood trends, pricing, and inventory to guide smart decisions.</p>
-            </div>
-            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
-              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">🤝</div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">Negotiation Power</h3>
-              <p className="text-sm sm:text-base text-gray-600">Proven strategy to secure the best price and terms for buyers and sellers.</p>
-            </div>
-            <div className="text-center p-5 sm:p-8 bg-white rounded-xl hover:shadow-lg transition">
-              <div className="text-4xl sm:text-5xl mb-2 sm:mb-4">⚡</div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">End-to-End Service</h3>
-              <p className="text-sm sm:text-base text-gray-600">From staging and photography to financing and closing, we handle the details.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <YouTubeVideoSectionLoader />
-      <LocationsSlider locations={locations} />
-      <DevelopersSlider developers={developers} logoEntries={developerLogoEntries} />
-      <section className="bg-[#0f172a] text-white py-8 sm:py-16">
+      <WhyWorkWithUsSection />
+      <YouTubeVideoSectionLoader bgColor="section-light" />
+      <DevelopersSlider developers={developers} logoEntries={developerLogoEntries} bgColor="section-mid" />
+      <TestimonialsSection bgColor="section-light" />
+      <section className="section-cta py-8 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
-          <h2 className="text-xl sm:text-3xl font-bold mb-2 sm:mb-4">Ready to Move?</h2>
-          <p className="text-base sm:text-xl mb-4 sm:mb-8 text-gray-200">
+          <h2 className="text-xl sm:text-3xl font-bold font-serif-display text-[#f5f5f5] mb-2 sm:mb-4">Ready to Move?</h2>
+          <p className="text-base sm:text-xl mb-4 sm:mb-8 text-[#a3a3a3]">
             Let&apos;s discuss your goals and build a tailored plan to get you there.
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#16a34a] active:bg-[#16a34a] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center mx-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#22c55e] focus-visible:outline-offset-2"
+            className="btn-primary mx-auto"
             data-ga="cta_get_in_touch"
           >
             Get in Touch
@@ -346,95 +323,153 @@ async function HomeBelowFold() {
 }
 
 function BelowFoldSkeleton() {
-  return <div className="min-h-[300px] bg-gray-100" aria-hidden />
+  return <div className="min-h-[300px] section-mid" aria-hidden />
 }
 
 export default async function Home() {
-  // Fetch only hero images first so we can send HTML sooner (better TTFB/LCP)
-  const heroImages = await getHeroImages()
+  const [heroImages, locations] = await Promise.all([
+    getHeroImages(),
+    getUniqueLocations(),
+  ])
+  const carouselImages = heroImages.length > 0 ? heroImages : ['/img/hero.jpg']
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="page-shell bg-[#050505]">
       {heroImages.length > 0 && (
         <link rel="preload" as="image" href={heroImages[0]} />
       )}
-      <section className="relative min-h-[65vh] py-8 sm:py-16 md:py-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="relative w-full h-full min-h-[65vh]">
-            {heroImages.length > 0 ? (
-              <>
-                {/* Server-rendered LCP: direct from Supabase CDN (unoptimized) for faster load */}
-                <Image
-                  src={heroImages[0]}
-                  alt="Hero"
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-cover"
-                  unoptimized
-                />
-                <HeroCarousel images={heroImages} serverRenderedFirstImageUrl={heroImages[0]} />
-              </>
-            ) : (
-              <Image
-                src="/img/hero.jpg"
-                alt="Modern real estate property"
-                fill
-                priority
-                sizes="100vw"
-                quality={80}
-                className="object-cover"
+      <section
+        className="hero-section section-mid-flat relative overflow-hidden py-0 md:py-14 min-h-[340px] md:min-h-[380px]"
+        style={resolveSectionStyle('section-mid-flat')}
+      >
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              .hero-stage {
+                position: relative;
+                width: 100%;
+                min-height: 260px;
+              }
+              .hero-copy-wrap {
+                position: relative;
+                z-index: 10;
+                max-width: 36rem;
+                width: 100%;
+              }
+              .hero-image-band {
+                position: relative;
+                width: 100%;
+                height: 220px;
+                margin-top: 1.5rem;
+                overflow: hidden;
+              }
+              .hero-mobile-scrim {
+                display: none;
+              }
+              @media (max-width: 767px) {
+                .hero-stage {
+                  min-height: 340px;
+                  display: flex;
+                  align-items: flex-end;
+                  padding: 1.25rem 0 1.5rem;
+                }
+                .hero-image-band {
+                  position: absolute;
+                  top: 0;
+                  bottom: 0;
+                  left: 50%;
+                  width: 100vw;
+                  max-width: 100vw;
+                  height: auto;
+                  margin-top: 0;
+                  margin-left: -50vw;
+                  z-index: 0;
+                  overflow: hidden;
+                }
+                .hero-mobile-scrim {
+                  display: block;
+                  position: absolute;
+                  top: 0;
+                  bottom: 0;
+                  left: 50%;
+                  width: 100vw;
+                  max-width: 100vw;
+                  margin-left: -50vw;
+                  z-index: 1;
+                  pointer-events: none;
+                  background: linear-gradient(
+                    180deg,
+                    rgba(0, 0, 0, 0.45) 0%,
+                    rgba(0, 0, 0, 0.62) 45%,
+                    rgba(0, 0, 0, 0.78) 100%
+                  );
+                }
+                .hero-copy-wrap {
+                  z-index: 2;
+                  max-width: none;
+                }
+                .hero-image-fade-layer {
+                  -webkit-mask-image: none !important;
+                  mask-image: none !important;
+                }
+                .hero-image-fade-layer img {
+                  object-position: center center !important;
+                }
+              }
+              @media (min-width: 768px) {
+                .hero-stage {
+                  min-height: 300px;
+                  display: flex;
+                  align-items: center;
+                }
+                .hero-image-band {
+                  position: absolute;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  left: 25%;
+                  right: 0;
+                  width: auto;
+                  height: 280px;
+                  margin-top: 0;
+                  margin-left: 0;
+                  z-index: 1;
+                }
+              }
+            `,
+          }}
+        />
+        <div className="container mx-auto px-4">
+          <div className="hero-stage">
+            <div className="hero-image-band">
+              <HeroCarousel
+                images={carouselImages}
+                imageSizes="(min-width: 1280px) 960px, (min-width: 768px) 60vw, 100vw"
               />
-            )}
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-800/50 to-gray-900/60 z-[1]" aria-hidden />
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-start">
-            <div className="text-white">
-              <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-6 leading-tight">
-              Your Trusted Real Estate Partner in Gurgaon
+            </div>
+            <div className="hero-mobile-scrim" aria-hidden="true" />
+            <div className="hero-copy-wrap text-[#f5f5f5] min-w-0">
+              <p className="label-upper golden-text mb-2 sm:mb-3">Premium Gurgaon Real Estate</p>
+              <h1 className="font-serif-display text-2xl sm:text-3xl md:text-4xl font-semibold text-[#f5f5f5] mb-2 sm:mb-3 leading-tight tracking-wide">
+                Gurgaon&apos;s Trusted Real Estate Partner
               </h1>
-              <p className="text-sm sm:text-lg md:text-xl mb-3 sm:mb-6 text-gray-100 leading-relaxed">
-              With over a decade of hands-on experience in Gurgaon's most premium corridors—Golf Course Road, Golf Course Extension, SPR, Sohna Road, Dwarka Expressway, and New Gurgaon—RKG brings a powerful blend of market knowledge, negotiation expertise, and personalised guidance that helps clients make confident decisions in a complex market.
+              <p className="text-sm sm:text-base text-[#d4d4d4] md:text-[#a3a3a3] mb-4 sm:mb-5 leading-relaxed max-w-lg">
+                Expert guidance across Golf Course Road, SPR, Sohna Road &amp; premium corridors.
               </p>
-              <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <Link href="/apartments" className="inline-block bg-white golden-text px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-[#fff2be] active:bg-[#fff2be] transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c99700] focus-visible:outline-offset-2" data-ga="hero_browse_projects">
+
+              <div className="flex flex-wrap gap-3 sm:gap-4">
+                <Link href="/apartments" className="btn-primary" data-ga="hero_browse_projects">
                   Browse Projects
                 </Link>
-                <Link href="/contact" className="inline-block border-2 border-white text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-white/10 active:bg-white/10 transition text-sm sm:text-base touch-manipulation min-h-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2" data-ga="hero_book_consultation">
+                <Link href="/contact" className="btn-secondary" data-ga="hero_book_consultation">
                   Book a Consultation
                 </Link>
-              </div>
-              <div className="flex flex-wrap gap-4 sm:gap-8 mt-4 sm:mt-10">
-                <div>
-                  <p className="text-xl sm:text-3xl font-bold">10+</p>
-                  <p className="text-xs sm:text-base text-gray-200">Featured Projects</p>
-                </div>
-                <div>
-                  <p className="text-xl sm:text-3xl font-bold">500+</p>
-                  <p className="text-xs sm:text-base text-gray-200">Happy Clients</p>
-                </div>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-300 mt-4">Trusted across Golf Course Road, SPR, Sohna Road &amp; New Gurgaon</p>
-            </div>
-            <div className="w-full mt-6 md:mt-0">
-              <div className="bg-white/95 rounded-2xl shadow-2xl p-3 sm:p-6 md:p-8 max-w-sm mx-auto md:ml-auto backdrop-blur">
-                <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4 text-center">
-                  Book a Consultation
-                </h2>
-                <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-6 text-center">
-                  Share your details and we'll reach out with tailored property recommendations.
-                </p>
-                <ContactForm size="xs" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      <LocationsSlider locations={locations} bgColor="section-mid-flat-fade" />
       <Suspense fallback={<BelowFoldSkeleton />}>
         <HomeBelowFold />
       </Suspense>

@@ -74,23 +74,23 @@ export default function CountUpStats() {
 
   return (
     <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8" ref={sectionRef}>
-      <div className="group text-center p-4 sm:p-6 rounded-lg border-2 border-[#c99700] transition hover:border-[#e7c778] hover:shadow-[0_12px_30px_rgba(201,151,0,0.3)]">
+      <div className="group text-center p-4 sm:p-6 rounded-lg border-2 border-[#c9a227] transition hover:border-[#e0b840] hover:shadow-[0_12px_30px_rgba(201,162,39,0.3)]">
         <p className="text-3xl sm:text-4xl font-bold golden-text mb-1 sm:mb-2 transition group-hover:translate-y-[-2px]">
           {counts.residential}+
         </p>
-        <p className="text-sm sm:text-base text-gray-800 font-medium transition group-hover:text-[#c99700]">Residential Projects</p>
+        <p className="text-sm sm:text-base text-[#a3a3a3] font-medium transition group-hover:golden-text">Residential Projects</p>
       </div>
-      <div className="group text-center p-4 sm:p-6 rounded-lg border-2 border-[#c99700] transition hover:border-[#e7c778] hover:shadow-[0_12px_30px_rgba(201,151,0,0.3)]">
+      <div className="group text-center p-4 sm:p-6 rounded-lg border-2 border-[#c9a227] transition hover:border-[#e0b840] hover:shadow-[0_12px_30px_rgba(201,162,39,0.3)]">
         <p className="text-3xl sm:text-4xl font-bold golden-text mb-1 sm:mb-2 transition group-hover:translate-y-[-2px]">
           {counts.commercial.toLocaleString()}+
         </p>
-        <p className="text-sm sm:text-base text-gray-800 font-medium transition group-hover:text-[#c99700]">Commercial Projects</p>
+        <p className="text-sm sm:text-base text-[#a3a3a3] font-medium transition group-hover:golden-text">Commercial Projects</p>
       </div>
-      <div className="group text-center p-4 sm:p-6 rounded-lg border-2 border-[#c99700] transition hover:border-[#e7c778] hover:shadow-[0_12px_30px_rgba(201,151,0,0.3)]">
+      <div className="group text-center p-4 sm:p-6 rounded-lg border-2 border-[#c9a227] transition hover:border-[#e0b840] hover:shadow-[0_12px_30px_rgba(201,162,39,0.3)]">
         <p className="text-3xl sm:text-4xl font-bold golden-text mb-1 sm:mb-2 transition group-hover:translate-y-[-2px]">
           {counts.visitors.toLocaleString()}+
         </p>
-        <p className="text-sm sm:text-base text-gray-800 font-medium transition group-hover:text-[#c99700]">Monthly Visitors</p>
+        <p className="text-sm sm:text-base text-[#a3a3a3] font-medium transition group-hover:golden-text">Monthly Visitors</p>
       </div>
     </div>
   )

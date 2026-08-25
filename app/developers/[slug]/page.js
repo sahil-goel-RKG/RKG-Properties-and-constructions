@@ -111,26 +111,24 @@ export default async function DeveloperDetailPage({ params }) {
   const propertiesUrl = `/developers/${slug}/properties`
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="page-shell py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Breadcrumb */}
-          <nav className="mb-8 text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#c99700]">
+          <nav className="mb-8 text-sm text-[#a3a3a3]">
+            <Link href="/" className="golden-text hover:underline">
               Home
             </Link>
             {' / '}
-            <span className="text-gray-900">Developers</span>
+            <span className="text-[#f5f5f5]">Developers</span>
             {' / '}
-            <span className="text-gray-900">{developerName}</span>
+            <span className="text-[#f5f5f5]">{developerName}</span>
           </nav>
 
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            {/* Developer Header */}
-            <div className="bg-gradient-to-r from-blue-950 to-blue-900 p-8 text-white">
+          <div className="card-luxury overflow-hidden">
+            <div className="bg-gradient-to-r from-[#1a1a1a] to-[#141414] p-8 text-[#f5f5f5] border-b border-[#2a2a2a]">
               <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 {logo && (
-                  <div className="relative w-32 h-32 bg-white rounded-lg p-4 flex-shrink-0">
+                  <div className="relative w-32 h-32 surface-elevated rounded-lg p-4 flex-shrink-0">
                     <Image
                       src={logo}
                       alt={developerName}
@@ -141,13 +139,13 @@ export default async function DeveloperDetailPage({ params }) {
                   </div>
                 )}
                 <div className="flex-1 text-center md:text-left">
-                  <h1 className="text-4xl font-bold mb-4">{developerName}</h1>
-                  <p className="text-lg text-gray-100 mb-6">
+                  <h1 className="text-4xl font-bold font-serif-display mb-4">{developerName}</h1>
+                  <p className="text-lg text-[#a3a3a3] mb-6">
                     Transforming Visions into Iconic Spaces
                   </p>
                   <Link
                     href={propertiesUrl}
-                    className="inline-block bg-white text-[#c99700] px-8 py-3 rounded-lg font-semibold hover:bg-[#fff5d6] transition"
+                    className="btn-primary"
                   >
                     View All Properties
                   </Link>
@@ -155,46 +153,44 @@ export default async function DeveloperDetailPage({ params }) {
               </div>
             </div>
 
-            {/* Developer Stats */}
             <div className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-gray-50 p-6 rounded-lg text-center">
-                  <div className="text-4xl font-bold text-[#c99700] mb-2">
+                <div className="card-luxury p-6 rounded-lg text-center">
+                  <div className="text-4xl font-bold golden-text mb-2">
                     {developer.stats.totalProjects}
                   </div>
-                  <div className="text-gray-700 font-medium">
+                  <div className="text-[#a3a3a3] font-medium">
                     Total Projects
                   </div>
                 </div>
-                <div className="bg-gray-50 p-6 rounded-lg text-center">
-                  <div className="text-4xl font-bold text-[#c99700] mb-2">
+                <div className="card-luxury p-6 rounded-lg text-center">
+                  <div className="text-4xl font-bold golden-text mb-2">
                     {developer.stats.residentialProjects}
                   </div>
-                  <div className="text-gray-700 font-medium">
+                  <div className="text-[#a3a3a3] font-medium">
                     Apartments
                   </div>
                 </div>
-                <div className="bg-gray-50 p-6 rounded-lg text-center">
-                  <div className="text-4xl font-bold text-[#c99700] mb-2">
+                <div className="card-luxury p-6 rounded-lg text-center">
+                  <div className="text-4xl font-bold golden-text mb-2">
                     {developer.stats.builderFloorProjects}
                   </div>
-                  <div className="text-gray-700 font-medium">
+                  <div className="text-[#a3a3a3] font-medium">
                     Builder Floor Projects
                   </div>
                 </div>
               </div>
 
-              {/* Locations */}
               {developer.locations.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">
                     Locations
                   </h2>
                   <div className="flex flex-wrap gap-3">
                     {developer.locations.map((location) => (
                       <span
                         key={location}
-                        className="inline-block bg-[#fff5d6] text-gray-800 px-4 py-2 rounded-full text-sm font-medium"
+                        className="inline-block surface-elevated text-[#a3a3a3] border border-[#2a2a2a] px-4 py-2 rounded-full text-sm font-medium"
                       >
                         {location}
                       </span>
@@ -203,16 +199,15 @@ export default async function DeveloperDetailPage({ params }) {
                 </div>
               )}
 
-              {/* Featured Projects Preview */}
               {developer.projects.length > 0 && (
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-900">
+                    <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5]">
                       Featured Projects
                     </h2>
                     <Link
                       href={propertiesUrl}
-                      className="text-[#c99700] hover:text-[#a67800] font-medium hover:underline"
+                      className="golden-text hover:underline font-medium"
                     >
                       View All →
                     </Link>
@@ -222,10 +217,10 @@ export default async function DeveloperDetailPage({ params }) {
                       <Link
                         key={project.id}
                         href={`/projects/${project.slug}`}
-                        className="block bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition"
+                        className="block card-luxury rounded-lg overflow-hidden hover:border-[#c9a227] transition"
                       >
                         {project.image_url && (
-                          <div className="relative h-48 bg-gray-200">
+                          <div className="relative h-48 bg-[#1e1e1e]">
                             <Image
                               src={project.image_url}
                               alt={project.name}
@@ -236,10 +231,10 @@ export default async function DeveloperDetailPage({ params }) {
                           </div>
                         )}
                         <div className="p-4">
-                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                          <h3 className="font-semibold text-[#f5f5f5] mb-2 line-clamp-2">
                             {project.name}
                           </h3>
-                          <p className="text-sm text-gray-600">{project.location}</p>
+                          <p className="text-sm text-[#a3a3a3]">{project.location}</p>
                         </div>
                       </Link>
                     ))}
@@ -247,12 +242,11 @@ export default async function DeveloperDetailPage({ params }) {
                 </div>
               )}
 
-              {/* About Developer */}
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              <div className="card-luxury p-6 rounded-lg">
+                <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">
                   About {developerName}
                 </h2>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-[#a3a3a3] leading-relaxed">
                   {developerName} is a renowned real estate developer with a strong presence in the market. 
                   With {developer.stats.totalProjects} projects across {developer.locations.length} locations, 
                   they have established themselves as a trusted name in the industry. Their portfolio includes 
@@ -261,17 +255,16 @@ export default async function DeveloperDetailPage({ params }) {
                 </p>
               </div>
 
-              {/* CTA Section */}
               <div className="mt-8 flex flex-wrap justify-center gap-4">
                 <Link
                   href={propertiesUrl}
-                  className="inline-block text-center bg-[#c99700] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#a67800] transition"
+                  className="btn-primary"
                 >
                   Browse All Properties
                 </Link>
                 <Link
                   href="/contact"
-                  className="inline-block text-center border-2 border-[#c99700] text-[#c99700] px-8 py-3 rounded-lg font-semibold hover:bg-[#fff5d6] transition"
+                  className="btn-secondary"
                 >
                   Contact Us
                 </Link>

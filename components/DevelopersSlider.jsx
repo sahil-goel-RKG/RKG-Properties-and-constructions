@@ -4,12 +4,13 @@ import { useMemo, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getDeveloperLogo, developerNameToSlug } from '@/lib/developerUtils'
+import { resolveSectionClass, resolveSectionStyle } from '@/lib/resolveSectionClass'
 
 /**
  * @param {string[]} [developers] - from DB (fallback when logoEntries empty)
  * @param {{ src: string, label: string, href: string, key: string }[]} [logoEntries] - from public/img/developers scan
  */
-export default function DevelopersSlider({ developers = [], logoEntries }) {
+export default function DevelopersSlider({ developers = [], logoEntries, bgColor = 'section-mid' }) {
   const developersRef = useRef(null)
 
   const stableDevelopers = useMemo(() => {
@@ -46,7 +47,7 @@ export default function DevelopersSlider({ developers = [], logoEntries }) {
       <Link
         key={keySuffix}
         href={href}
-        className="bg-white p-4 sm:p-8 rounded-lg shadow-sm hover:shadow-md transition flex-shrink-0 flex items-center justify-center h-[100px] sm:h-[140px] cursor-pointer border border-transparent hover:border-[#c99700]"
+        className="card-luxury p-4 sm:p-8 rounded-lg hover:shadow-md transition flex-shrink-0 flex items-center justify-center h-[100px] sm:h-[140px] cursor-pointer border border-transparent hover:border-[#c9a227]"
       >
         <div className="relative w-20 h-20 sm:w-32 sm:h-32">
           <Image
@@ -62,13 +63,13 @@ export default function DevelopersSlider({ developers = [], logoEntries }) {
   }
 
   return (
-    <section className="bg-white py-8 sm:py-16 overflow-hidden">
+    <section className={`${resolveSectionClass(bgColor)} py-8 sm:py-16 overflow-hidden`} style={resolveSectionStyle(bgColor)}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-6 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold font-serif-display text-[#f5f5f5] mb-2 sm:mb-4">
             Developers
           </h2>
-          <p className="text-base sm:text-xl text-gray-600">
+          <p className="text-base sm:text-xl text-[#a3a3a3]">
             Transforming Visions into Iconic Spaces
           </p>
         </div>

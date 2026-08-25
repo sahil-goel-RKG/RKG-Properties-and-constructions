@@ -81,8 +81,8 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="relative h-96 bg-gray-200">
-        <div className="flex items-center justify-center h-full text-gray-400">
+      <div className="relative h-96 bg-[#1e1e1e]">
+        <div className="flex items-center justify-center h-full text-[#737373]">
           <svg
             className="w-24 h-24"
             fill="none"
@@ -105,7 +105,7 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
     <div className="space-y-4">
       {/* Main Image */}
       <div 
-        className="relative h-96 bg-gray-200 rounded-t-lg overflow-hidden cursor-pointer"
+        className="relative h-96 bg-[#1e1e1e] rounded-t-lg overflow-hidden cursor-pointer border border-[#2a2a2a]"
         onClick={() => setIsFullScreen(true)}
       >
         <Image
@@ -325,8 +325,8 @@ export default function ProjectImageGallery({ images = [], projectName = '' }) {
                 onClick={() => setSelectedImage(index)}
                 className={`relative h-20 md:h-24 rounded-lg overflow-hidden border-2 transition w-full ${
                   selectedImage === index
-                    ? 'border-[#c99700] ring-2 ring-[#ffd86b]'
-                    : 'border-gray-200 hover:border-[#c99700]'
+                    ? 'border-[#c9a227] ring-2 ring-[#c9a227]/40'
+                    : 'border-[#2a2a2a] hover:border-[#c9a227]'
                 }`}
               >
                 <Image

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { contactFormLimiter, getClientIdentifier } from '@/lib/rateLimit'
 import { validateName, validateEmail, validatePhone } from '@/lib/inputValidation'
+import { OFFICE_ADDRESS } from '@/config/constants'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -197,7 +198,7 @@ export async function POST(request) {
               </div>
               <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; text-align: center; color: #666; font-size: 12px;">
                 <p style="margin: 0;">RKG Properties and Constructions</p>
-                <p style="margin: 5px 0 0 0;">9th floor, Badshahpur Sohna Road Highway, Sohna - Gurgaon Rd, Gurugram, Haryana 122018</p>
+                <p style="margin: 5px 0 0 0;">${OFFICE_ADDRESS.full}</p>
               </div>
             </body>
           </html>

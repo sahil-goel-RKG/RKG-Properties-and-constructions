@@ -217,11 +217,11 @@ export default async function ResidentialPage({ searchParams }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="page-shell py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Apartments</h1>
-          <p className="text-xl text-gray-600">
+          <h1 className="text-4xl font-bold font-serif-display text-[#f5f5f5] mb-4">Apartments</h1>
+          <p className="text-xl text-[#a3a3a3]">
             Discover premium apartment properties in Gurgaon
           </p>
         </div>
@@ -230,15 +230,15 @@ export default async function ResidentialPage({ searchParams }) {
 
         {/* Active Filters Display */}
         {hasFilters && (
-          <div className="mb-6 bg-[#fff5d6] border border-[#f2cd6d] rounded-lg p-4">
+          <div className="mb-6 alert-success">
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-sm font-medium text-gray-700">Active Filters:</span>
+              <span className="text-sm font-medium text-[#a3a3a3]">Active Filters:</span>
               {locationFilter && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c99700] text-white rounded-full text-sm">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#0a0a0a] rounded-full text-sm font-semibold">
                   Location: {locationFilter}
                   <Link
                     href={getClearFilterUrl('location')}
-                    className="hover:text-[#fff5d6]"
+                    className="hover:text-[#f5f5f5]"
                     title="Remove filter"
                   >
                     ×
@@ -246,11 +246,11 @@ export default async function ResidentialPage({ searchParams }) {
                 </span>
               )}
               {developerFilter && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c99700] text-white rounded-full text-sm">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#0a0a0a] rounded-full text-sm font-semibold">
                   Developer: {developerFilter}
                   <Link
                     href={getClearFilterUrl('developer')}
-                    className="hover:text-[#fff5d6]"
+                    className="hover:text-[#f5f5f5]"
                     title="Remove filter"
                   >
                     ×
@@ -258,11 +258,11 @@ export default async function ResidentialPage({ searchParams }) {
                 </span>
               )}
               {areaFilter && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c99700] text-white rounded-full text-sm">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#0a0a0a] rounded-full text-sm font-semibold">
                   Area: {areaFilter}
                   <Link
                     href={getClearFilterUrl('area')}
-                    className="hover:text-[#fff5d6]"
+                    className="hover:text-[#f5f5f5]"
                     title="Remove filter"
                   >
                     ×
@@ -275,7 +275,7 @@ export default async function ResidentialPage({ searchParams }) {
 
         {projects.length > 0 ? (
           <>
-            <div className="mb-6 text-gray-600">
+            <div className="mb-6 text-[#a3a3a3]">
               <p>
                 {totalCount} {totalCount === 1 ? 'property' : 'properties'} found
                 {hasFilters && ` (${filterText.join(', ')})`}
@@ -299,21 +299,21 @@ export default async function ResidentialPage({ searchParams }) {
             />
           </>
         ) : (
-          <div className="text-center py-12 bg-white rounded-lg shadow-md">
+          <div className="text-center py-12 card-luxury rounded-lg">
             {hasFilters ? (
               <>
-                <p className="text-gray-600 mb-4">
+                <p className="text-[#a3a3a3] mb-4">
                   No apartment projects found {hasFilters && `with ${filterText.join(' and ')}`}.
                 </p>
                 <Link
                   href="/apartments"
-                  className="inline-block golden-text hover:text-[#a67800] hover:underline"
+                  className="golden-text hover:underline"
                 >
                   View all apartment projects
                 </Link>
               </>
             ) : (
-              <p className="text-gray-600 mb-4">
+              <p className="text-[#a3a3a3] mb-4">
                 No apartment projects found. Please add projects to your Supabase database.
               </p>
             )}
@@ -323,4 +323,3 @@ export default async function ResidentialPage({ searchParams }) {
     </div>
   )
 }
-

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/crm/cron/follow-up-reminders",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

@@ -121,7 +121,7 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
         <input type="hidden" name="ts" value={formData.ts} />
       </div>
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
-        <label htmlFor="name" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="name" className={`form-label ${labelClass}`}>
           Name *
         </label>
         <input
@@ -131,13 +131,13 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
           required
           value={formData.name}
           onChange={handleChange}
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${inputClass}`}
+          className={`form-input ${inputClass}`}
           placeholder="Your Name"
         />
       </div>
 
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
-        <label htmlFor="email" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="email" className={`form-label ${labelClass}`}>
           Email *
         </label>
         <input
@@ -147,13 +147,13 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
           required
           value={formData.email}
           onChange={handleChange}
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${inputClass}`}
+          className={`form-input ${inputClass}`}
           placeholder="your.email@example.com"
         />
       </div>
 
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
-        <label htmlFor="phone" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="phone" className={`form-label ${labelClass}`}>
           Phone *
         </label>
         <input
@@ -163,13 +163,13 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
           required
           value={formData.phone}
           onChange={handleChange}
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${inputClass}`}
+          className={`form-input ${inputClass}`}
           placeholder="+91-9999999999"
         />
       </div>
 
       <div className={size === 'sm' || size === 'xs' ? 'text-sm' : ''}>
-        <label htmlFor="message" className={`block font-medium text-gray-700 mb-2 ${labelClass}`}>
+        <label htmlFor="message" className={`form-label ${labelClass}`}>
           Message *
         </label>
         <textarea
@@ -179,18 +179,14 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
           rows={messageRows}
           value={formData.message}
           onChange={handleChange}
-          className={`w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffd86b] focus:border-transparent bg-white text-gray-900 placeholder:text-gray-400 ${size === 'sm' || size === 'xs' ? 'px-3 py-2 text-sm' : 'px-4 py-4'}`}
+          className={`form-input ${size === 'sm' || size === 'xs' ? 'px-3 py-2 text-sm' : 'px-4 py-4'}`}
           placeholder="Your Message"
         />
       </div>
 
       {submitStatus.type && (
         <div
-          className={`p-4 rounded-lg ${
-            submitStatus.type === 'success'
-              ? 'bg-[#fff5d6] text-[#a67800] border border-[#f2cd6d]'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
+          className={submitStatus.type === 'success' ? 'alert-success' : 'alert-error'}
         >
           {submitStatus.message}
         </div>
@@ -199,11 +195,10 @@ export default function ContactForm({ size = 'md', defaultMessage = '' }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`w-full bg-[#AB090A] text-white rounded-lg font-semibold hover:bg-[#8a0708] transition disabled:opacity-50 disabled:cursor-not-allowed ${buttonClass}`}
+        className={`btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed ${buttonClass}`}
       >
         {isSubmitting ? 'Submitting...' : 'Submit'}
       </button>
     </form>
   )
 }
-

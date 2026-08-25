@@ -1,13 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { fireGoogleAdsLeadConversion } from '@/lib/gtag'
 
+const CONTACT_POPUP_SESSION_KEY = 'contactPopupHandled'
+
+function isPopupHandled() {
+  if (typeof window === 'undefined') return true
+  return sessionStorage.getItem(CONTACT_POPUP_SESSION_KEY) === 'true'
+}
+
+function markPopupHandled() {
+  sessionStorage.setItem(CONTACT_POPUP_SESSION_KEY, 'true')
+}
+
 export default function ContactPopup() {
   const pathname = usePathname()
-  const { user, isLoaded } = useUser()
+  const initRef = useRef(false)
   const [isVisible, setIsVisible] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -23,26 +33,27 @@ export default function ContactPopup() {
   const [submitError, setSubmitError] = useState('')
 
   useEffect(() => {
-    // Never show popup inside CRM or admin routes
+    if (initRef.current) return
+    initRef.current = true
+
     if (
       typeof pathname === 'string' &&
       (pathname.startsWith('/crm') || pathname.startsWith('/admin'))
     ) {
-      setIsVisible(false)
       return
     }
-    // Check if user has already submitted in this session
-    const hasSubmitted = sessionStorage.getItem('contactPopupSubmitted')
-    
-    if (!hasSubmitted) {
-      // Show popup after 1-2 seconds (randomized between 1000-2000ms)
-      const delay = Math.random() * 1000 + 1000 // 1000-2000ms
-      const timer = setTimeout(() => {
-        setIsVisible(true)
-      }, delay)
 
-      return () => clearTimeout(timer)
+    if (isPopupHandled()) {
+      return
     }
+
+    const delay = Math.random() * 1000 + 1000
+    const timer = setTimeout(() => {
+      markPopupHandled()
+      setIsVisible(true)
+    }, delay)
+
+    return () => clearTimeout(timer)
   }, [pathname])
 
   const handleChange = (e) => {
@@ -120,8 +131,8 @@ export default function ContactPopup() {
       // 3. Fire gtag conversion once → Google Ads receives hit
       fireGoogleAdsLeadConversion()
 
-      // 4. Update UI (mark submitted, close popup)
-      sessionStorage.setItem('contactPopupSubmitted', 'true')
+      // 4. Update UI (mark handled, close popup)
+      markPopupHandled()
       setIsVisible(false)
     } catch (error) {
       setSubmitError('Network error. Please try again later.')
@@ -134,6 +145,7 @@ export default function ContactPopup() {
   const handleClose = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    markPopupHandled()
     setIsVisible(false)
   }
 
@@ -169,14 +181,13 @@ export default function ContactPopup() {
       onClick={handleBackdropClick}
       style={{ pointerEvents: 'auto' }}
     >
-      <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col mx-auto animate-in fade-in zoom-in duration-300">
-        {/* Top bar: close button always visible in top-right */}
-        <div className="flex-shrink-0 flex items-center justify-end p-2 pr-1 sm:p-3 sm:pr-2 border-b border-gray-100">
+      <div className="relative card-luxury rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col mx-auto animate-in fade-in zoom-in duration-300 border border-[#2a2a2a]">
+        <div className="flex-shrink-0 flex items-center justify-end p-2 pr-1 sm:p-3 sm:pr-2 border-b border-[#2a2a2a]">
           <button
             onClick={handleClose}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 cursor-pointer touch-manipulation transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-full surface-elevated text-[#a3a3a3] hover:text-[#f5f5f5] cursor-pointer touch-manipulation transition-colors"
             aria-label="Close popup"
             title="Close"
             style={{ minWidth: '44px', minHeight: '44px' }}
@@ -198,19 +209,18 @@ export default function ContactPopup() {
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pt-2 sm:pt-4">
         <div className="text-center mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-serif-display text-[#f5f5f5] mb-2">
             Get in Touch
           </h2>
-          <p className="text-gray-600 text-xs sm:text-sm md:text-base">
+          <p className="text-[#a3a3a3] text-xs sm:text-sm md:text-base">
             Please provide your contact details to continue
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-          {/* Name Field */}
           <div>
-            <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Name <span className="text-red-500">*</span>
+            <label htmlFor="name" className="form-label text-xs sm:text-sm">
+              Name <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -218,8 +228,8 @@ export default function ContactPopup() {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base text-gray-900 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition placeholder:text-gray-400 ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+              className={`form-input px-3 sm:px-4 py-2.5 sm:py-3 text-base ${
+                errors.name ? 'border-red-500' : 'border-[#2a2a2a]'
               }`}
               placeholder="Enter your full name"
               disabled={isSubmitting}
@@ -230,10 +240,9 @@ export default function ContactPopup() {
             )}
           </div>
 
-          {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Email <span className="text-red-500">*</span>
+            <label htmlFor="email" className="form-label text-xs sm:text-sm">
+              Email <span className="text-red-400">*</span>
             </label>
             <input
               type="email"
@@ -241,8 +250,8 @@ export default function ContactPopup() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base text-gray-900 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition placeholder:text-gray-400 ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
+              className={`form-input px-3 sm:px-4 py-2.5 sm:py-3 text-base ${
+                errors.email ? 'border-red-500' : 'border-[#2a2a2a]'
               }`}
               placeholder="Enter your email address"
               disabled={isSubmitting}
@@ -254,10 +263,9 @@ export default function ContactPopup() {
             )}
           </div>
 
-          {/* Phone Field */}
           <div>
-            <label htmlFor="phone" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Phone Number <span className="text-red-500">*</span>
+            <label htmlFor="phone" className="form-label text-xs sm:text-sm">
+              Phone Number <span className="text-red-400">*</span>
             </label>
             <input
               type="tel"
@@ -265,8 +273,8 @@ export default function ContactPopup() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-base text-gray-900 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c99700] transition placeholder:text-gray-400 ${
-                errors.phone ? 'border-red-500' : 'border-gray-300'
+              className={`form-input px-3 sm:px-4 py-2.5 sm:py-3 text-base ${
+                errors.phone ? 'border-red-500' : 'border-[#2a2a2a]'
               }`}
               placeholder="Enter your phone number"
               disabled={isSubmitting}
@@ -278,18 +286,16 @@ export default function ContactPopup() {
             )}
           </div>
 
-          {/* Error Message */}
           {submitError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="alert-error text-sm">
               {submitError}
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#c99700] hover:bg-[#a67800] active:bg-[#a67800] text-white font-semibold py-3 sm:py-3.5 px-6 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-4 sm:mt-6 text-base touch-manipulation min-h-[44px]"
+            className="btn-primary w-full mt-4 sm:mt-6 text-base touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center">

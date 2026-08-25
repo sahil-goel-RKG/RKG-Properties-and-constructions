@@ -170,33 +170,31 @@ export default async function BuilderFloorDetailPage({ params }) {
 
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="page-shell flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c99700] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c9a227] mx-auto mb-4"></div>
+          <p className="text-[#a3a3a3]">Loading...</p>
         </div>
       </div>
     }>
       <BuilderFloorDetailContent>
-        <div className="min-h-screen bg-gray-50">
+        <div className="page-shell">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-          {/* Breadcrumb */}
-          <nav className="py-8 text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#c99700]">
+          <nav className="py-8 text-sm text-[#a3a3a3]">
+            <Link href="/" className="golden-text hover:underline">
               Home
             </Link>
             {' / '}
-            <Link href="/builder-floor" className="hover:text-[#c99700]">
+            <Link href="/builder-floor" className="golden-text hover:underline">
               Builder Floors
             </Link>
             {' / '}
-            <span className="text-gray-900">{floor.name}</span>
+            <span className="text-[#f5f5f5]">{floor.name}</span>
           </nav>
 
-          {/* Section 1: Image Gallery */}
-          <section className="bg-white py-8">
-            <div className="rounded-lg shadow-lg overflow-hidden">
+          <section className="section-surface py-8">
+            <div className="rounded-lg overflow-hidden border border-[#2a2a2a]">
               <ProjectImageGallery
                 images={allImages && allImages.length > 0 ? allImages : []}
                 projectName={floor.name}
@@ -204,14 +202,13 @@ export default async function BuilderFloorDetailPage({ params }) {
             </div>
           </section>
 
-          {/* Section 2: Header / Title / Key Info */}
-          <section className="bg-white py-8">
+          <section className="section-surface py-8">
             <div className="px-4">
               <div className="mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <h1 className="text-3xl md:text-4xl font-bold font-serif-display text-[#f5f5f5] mb-4">
                   {floor.name}
                 </h1>
-                <div className="flex flex-wrap gap-4 text-gray-600">
+                <div className="flex flex-wrap gap-4 text-[#a3a3a3]">
                   {floor.location && (
                     <span className="flex items-center">
                       <svg
@@ -275,33 +272,30 @@ export default async function BuilderFloorDetailPage({ params }) {
                 </div>
               </div>
 
-              {/* Price */}
               <div className="mb-6 flex flex-wrap gap-4 items-center">
                 {priceInfo?.label && (
-                  <div className="flex-1 p-4 bg-[#fff5d6] rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Starting Price</p>
-                    <p className="text-2xl font-bold text-[#f70000]">
+                  <div className="flex-1 p-4 surface-elevated rounded-lg border border-[#2a2a2a]">
+                    <p className="text-sm text-[#737373] mb-1">Starting Price</p>
+                    <p className="text-2xl font-bold golden-text">
                       {priceInfo.label}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Enquire CTA */}
               <div className="mb-6">
                 <Link
                   href={`/contact?enquiry=${encodeURIComponent(floor.name)}`}
-                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#c99700] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#a67800] active:bg-[#a67800] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c99700] focus-visible:outline-offset-2 min-h-[48px]"
+                  className="btn-primary inline-flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px]"
                   data-ga="builder_floor_enquire"
                 >
                   Enquire about {floor.name}
                 </Link>
               </div>
 
-              {/* Short Description */}
               {floor.short_description && (
-                <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-                  <p className="text-lg text-gray-800 font-medium">
+                <div className="mb-6 p-4 surface-elevated border-l-4 border-[#c9a227] rounded">
+                  <p className="text-lg text-[#f5f5f5] font-medium">
                     {floor.short_description}
                   </p>
                 </div>
@@ -309,33 +303,32 @@ export default async function BuilderFloorDetailPage({ params }) {
             </div>
           </section>
 
-          {/* Section 3: Builder Floor Information */}
-          <section className="bg-gray-100 py-8">
+          <section className="section-muted py-8">
             <div className="px-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold font-serif-display text-[#f5f5f5] mb-6">
                 Property Information
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {floor.location && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Location</h3>
-                    <p className="text-gray-700">{floor.location}</p>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Location</h3>
+                    <p className="text-[#a3a3a3]">{floor.location}</p>
                   </div>
                 )}
 
                 {floor.developer && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">Developer</h3>
-                    <p className="text-gray-700">{floor.developer}</p>
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">Developer</h3>
+                    <p className="text-[#a3a3a3]">{floor.developer}</p>
                   </div>
                 )}
 
                 {floor.total_land_parcel && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Total Land Parcel
                     </h3>
-                    <p className="text-gray-700">
+                    <p className="text-[#a3a3a3]">
                       {floor.total_land_parcel.toLowerCase().includes('acre') 
                         ? floor.total_land_parcel 
                         : `${floor.total_land_parcel} acres`}
@@ -344,119 +337,117 @@ export default async function BuilderFloorDetailPage({ params }) {
                 )}
 
                 {floor.plot_number && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Plot Number
                     </h3>
-                    <p className="text-gray-700">{floor.plot_number}</p>
+                    <p className="text-[#a3a3a3]">{floor.plot_number}</p>
                   </div>
                 )}
 
                 {possessionDate && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Possession
                     </h3>
-                    <p className="text-gray-700">{possessionDate}</p>
+                    <p className="text-[#a3a3a3]">{possessionDate}</p>
                   </div>
                 )}
 
                 {/* Show legacy fields only if no building_config exists */}
                 {!buildingConfig && floor.floors_count && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Number of Floors
                     </h3>
-                    <p className="text-gray-700">{floor.floors_count}</p>
+                    <p className="text-[#a3a3a3]">{floor.floors_count}</p>
                   </div>
                 )}
 
                 {!buildingConfig && floor.category && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Category
                     </h3>
-                    <p className="text-gray-700">{pretty(floor.category)}</p>
+                    <p className="text-[#a3a3a3]">{pretty(floor.category)}</p>
                   </div>
                 )}
 
                 {!buildingConfig && floor.condition && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Condition
                     </h3>
-                    <p className="text-gray-700">{pretty(floor.condition)}</p>
+                    <p className="text-[#a3a3a3]">{pretty(floor.condition)}</p>
                   </div>
                 )}
 
                 {!buildingConfig && floor.roof_rights && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Roof Rights
                     </h3>
-                    <p className="text-gray-700">{floor.roof_rights}</p>
+                    <p className="text-[#a3a3a3]">{floor.roof_rights}</p>
                   </div>
                 )}
 
 
                 {!buildingConfig && floor.has_basement && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Basement
                     </h3>
-                    <p className="text-gray-700">Yes</p>
+                    <p className="text-[#a3a3a3]">Yes</p>
                   </div>
                 )}
 
                 {!buildingConfig && floor.is_triplex && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Triplex
                     </h3>
-                    <p className="text-gray-700">Yes</p>
+                    <p className="text-[#a3a3a3]">Yes</p>
                   </div>
                 )}
 
                 {!buildingConfig && floor.is_gated && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Gated
                     </h3>
-                    <p className="text-gray-700">Yes</p>
+                    <p className="text-[#a3a3a3]">Yes</p>
                   </div>
                 )}
 
                 {!buildingConfig && floor.owner_name && (
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="card-luxury p-6 rounded-lg">
+                    <h3 className="font-semibold text-[#f5f5f5] mb-2">
                       Owner Name
                     </h3>
-                    <p className="text-gray-700">{floor.owner_name}</p>
+                    <p className="text-[#a3a3a3]">{floor.owner_name}</p>
                   </div>
                 )}
               </div>
             </div>
           </section>
 
-          {/* Section 3.5: Building Configuration - White Background */}
           {buildingConfig && buildingConfig.length > 0 && (
-            <section className="bg-white py-8">
+            <section className="section-surface py-8">
               <div className="px-4">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Building Configuration</h2>
+                <h2 className="text-2xl font-bold font-serif-display text-[#f5f5f5] mb-6">Building Configuration</h2>
                 <BuildingConfigurationSlider buildingConfig={buildingConfig} status={floor.status} />
               </div>
             </section>
           )}
 
-          {/* Section 4: Full Description */}
           {floor.full_description && (
-            <section className="bg-gray-100 py-8">
+            <section className="section-muted py-8">
               <div className="px-4">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-semibold font-serif-display text-[#f5f5f5] mb-4">
                     About {floor.name}
                   </h2>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  <p className="text-[#a3a3a3] leading-relaxed whitespace-pre-line">
                     {floor.full_description}
                   </p>
                 </div>
@@ -464,19 +455,18 @@ export default async function BuilderFloorDetailPage({ params }) {
             </section>
           )}
 
-          {/* Section 5: CTA */}
-          <section className="bg-white py-8">
+          <section className="section-surface py-8">
             <div className="px-4">
               <div className="flex flex-wrap gap-4 pt-6">
                 <Link
                   href="/contact"
-                  className="bg-[#22c55e] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
+                  className="btn-primary"
                 >
                   Book a Consultation
                 </Link>
                 <Link
                   href="/builder-floor"
-                  className="border-2 border-[#c99700] text-[#c99700] px-8 py-3 rounded-lg font-semibold hover:bg-[#fff5d6] transition"
+                  className="btn-secondary"
                 >
                   View All Builder Floors
                 </Link>

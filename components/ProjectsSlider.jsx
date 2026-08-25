@@ -1,9 +1,8 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
 import ProjectCard from '@/components/ui/ProjectCard'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { resolveSectionClass, resolveSectionStyle } from '@/lib/resolveSectionClass'
 
 export default function ProjectsSlider({
   projects,
@@ -13,65 +12,29 @@ export default function ProjectsSlider({
   ctaHref = '/apartments',
   allowEmpty = false,
   emptyMessage = 'No projects available at the moment. Check back soon!',
-  bgColor = 'bg-white',
-  variant = 'apartment', // 'apartment' or 'builder-floor'
+  bgColor = 'section-mid',
+  variant = 'apartment',
 }) {
-  const scrollContainerRef = useRef(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(false)
-
-  const checkScrollButtons = useCallback(() => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-    }
-  }, [])
-
-  useEffect(() => {
-    const container = scrollContainerRef.current
-    if (container) {
-      checkScrollButtons()
-      const handleResize = () => {
-        setTimeout(checkScrollButtons, 100)
-      }
-
-      window.addEventListener('resize', handleResize)
-      container.addEventListener('scroll', checkScrollButtons)
-
-      return () => {
-        window.removeEventListener('resize', handleResize)
-        container.removeEventListener('scroll', checkScrollButtons)
-      }
-    }
-  }, [checkScrollButtons])
-
-  const scroll = (direction) => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 400
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      })
-    }
-  }
+  const sectionClass = resolveSectionClass(bgColor)
+  const sectionStyle = resolveSectionStyle(bgColor)
+  const isLightBand = bgColor === 'section-light'
+  const sectionPy = isLightBand ? 'py-8 sm:py-14' : 'py-8 sm:py-16'
+  const headMb = isLightBand ? 'mb-6 sm:mb-10' : 'mb-6 sm:mb-12'
+  const ctaMt = isLightBand ? 'mt-4 sm:mt-7' : 'mt-4 sm:mt-8'
 
   if (!projects || projects.length === 0) {
     if (!allowEmpty) return null
 
     return (
-      <section className={`${bgColor} py-8 sm:py-16`}>
+      <section className={`${sectionClass} ${sectionPy}`} style={sectionStyle}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-6 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">{title}</h2>
-            {description && <p className="text-base sm:text-xl text-gray-600">{description}</p>}
+          <div className={`text-center ${headMb}`}>
+            <h2 className="font-serif-display text-2xl sm:text-3xl font-bold text-[#f5f5f5] mb-2 sm:mb-4">{title}</h2>
+            {description && <p className="text-base sm:text-xl text-[#a3a3a3]">{description}</p>}
           </div>
-          <div className="bg-white rounded-xl shadow-md p-6 sm:p-10 text-center max-w-3xl mx-auto">
-            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{emptyMessage}</p>
-            <Link
-              href={ctaHref}
-              className="inline-block bg-[#22c55e] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#16a34a] transition"
-            >
+          <div className="card-luxury p-6 sm:p-10 text-center max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-[#a3a3a3] mb-4 sm:mb-6">{emptyMessage}</p>
+            <Link href={ctaHref} className="btn-primary">
               {ctaLabel}
             </Link>
           </div>
@@ -81,49 +44,26 @@ export default function ProjectsSlider({
   }
 
   return (
-    <section className={`${bgColor} py-8 sm:py-16`}>
+    <section className={`${sectionClass} ${sectionPy}`} style={sectionStyle}>
       <div className="container mx-auto px-4">
-        <div className="text-center mb-6 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">{title}</h2>
-          {description && <p className="text-base sm:text-xl text-gray-600">{description}</p>}
+        <div className={`text-center ${headMb}`}>
+          <h2 className="font-serif-display text-2xl sm:text-3xl font-bold text-[#f5f5f5] mb-2 sm:mb-4">{title}</h2>
+          {description && <p className="text-base sm:text-xl text-[#a3a3a3]">{description}</p>}
         </div>
 
-        <div className="relative">
-          {canScrollLeft && (
-            <button
-              onClick={() => scroll('left')}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition bg-white absolute left-4 top-1/2 -translate-y-1/2 z-10"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-700 hover:text-[#c99700]" />
-            </button>
-          )}
-
-          {canScrollRight && (
-            <button
-              onClick={() => scroll('right')}
-              className="hidden md:flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition bg-white absolute right-4 top-1/2 -translate-y-1/2 z-10"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-700 hover:text-[#c99700]" />
-            </button>
-          )}
-
+        <div>
           <div
-            ref={scrollContainerRef}
-            className="flex gap-4 sm:gap-8 overflow-x-auto overflow-y-visible px-4 sm:px-12 pb-4 sm:pb-6 scroll-smooth hide-scrollbar items-stretch"
-            onScroll={checkScrollButtons}
+            className="slider-scroll-elegant flex snap-x snap-mandatory scroll-smooth items-start gap-4 overflow-x-auto overflow-y-hidden pb-4 sm:gap-8 sm:pb-5"
           >
             {projects.map((project) => (
-              <div key={project.id} className="flex-shrink-0 w-72 sm:w-80 self-stretch">
+              <div key={project.id} className="shrink-0 snap-start">
                 <ProjectCard project={project} variant={variant} />
               </div>
             ))}
           </div>
 
-          <div className="text-center mt-4 sm:mt-8">
-            <Link
-              href={ctaHref}
-              className="inline-block bg-[#22c55e] text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-[#16a34a] transition"
-            >
+          <div className={`text-center ${ctaMt}`}>
+            <Link href={ctaHref} className="btn-primary">
               {ctaLabel}
             </Link>
           </div>

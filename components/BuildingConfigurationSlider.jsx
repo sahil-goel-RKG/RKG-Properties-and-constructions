@@ -76,31 +76,24 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
   // Determine background color based on status
   const getCardBgColor = () => {
     if (status === 'ready-to-move') {
-      return 'bg-green-50'
+      return 'bg-green-900/20 border-green-800/40'
     } else if (status === 'under-construction') {
-      return 'bg-[#fff5d6]'
+      return 'bg-[#c9a227]/10 border-[#c9a227]/30'
     }
-    return 'bg-gray-50'
+    return 'surface-muted border-[#2a2a2a]'
   }
 
-  // Determine badge background color (darker version of card background)
   const getBadgeBgColor = () => {
     if (status === 'ready-to-move') {
-      return 'bg-green-200'
+      return 'bg-green-900/40 text-green-300'
     } else if (status === 'under-construction') {
-      return 'bg-[#f2cd6d]'
+      return 'bg-[#c9a227]/20 text-[#c9a227]'
     }
-    return 'bg-gray-200'
+    return 'bg-[#2a2a2a] text-[#a3a3a3]'
   }
 
-  // Determine brochure button background color (even darker version of card background)
   const getBrochureButtonBgColor = () => {
-    if (status === 'ready-to-move') {
-      return 'bg-green-300 hover:bg-green-400'
-    } else if (status === 'under-construction') {
-      return 'bg-[#d4b85a] hover:bg-[#c5a84a]'
-    }
-    return 'bg-gray-300 hover:bg-gray-400'
+    return 'btn-outline-gold w-full text-xs py-2'
   }
 
   return (
@@ -108,10 +101,10 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 surface-elevated border border-[#2a2a2a] rounded-full p-2 hover:border-[#c9a227] transition"
           aria-label="Scroll left"
         >
-          <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#a3a3a3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -127,16 +120,16 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
           <div
             key={index}
             onClick={(e) => handleCardClick(building, index, e)}
-            className={`min-w-[320px] max-w-[380px] border border-gray-200 rounded-lg p-4 ${getCardBgColor()} flex-shrink-0 cursor-pointer hover:shadow-md transition-shadow`}
+            className={`min-w-[320px] max-w-[380px] border rounded-lg p-4 ${getCardBgColor()} flex-shrink-0 cursor-pointer hover:border-[#c9a227] transition-shadow`}
           >
-            <h4 className="text-sm font-semibold text-gray-900 mb-3 pb-2 border-b border-gray-200">
+            <h4 className="text-sm font-semibold text-[#f5f5f5] mb-3 pb-2 border-b border-[#2a2a2a]">
               Building {building.building_number || index + 1}
             </h4>
             <div className="space-y-2">
               {building.plot_size && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Plot Size:</span>
-                  <span className="text-sm text-gray-900">
+                  <span className="text-xs font-medium text-[#737373]">Plot Size:</span>
+                  <span className="text-sm text-[#a3a3a3]">
                     {building.plot_size.toLowerCase().includes('sqyd') 
                       ? building.plot_size 
                       : `${building.plot_size} sqyd`}
@@ -145,99 +138,99 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
               )}
               {building.facing && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Facing:</span>
-                  <span className="text-sm text-gray-900">{building.facing}</span>
+                  <span className="text-xs font-medium text-[#737373]">Facing:</span>
+                  <span className="text-sm text-[#a3a3a3]">{building.facing}</span>
                 </div>
               )}
               {building.floors_count && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Floors:</span>
-                  <span className="text-sm text-gray-900">{building.floors_count}</span>
+                  <span className="text-xs font-medium text-[#737373]">Floors:</span>
+                  <span className="text-sm text-[#a3a3a3]">{building.floors_count}</span>
                 </div>
               )}
               {building.roof_rights && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Roof Rights:</span>
-                  <span className="text-sm text-gray-900">{building.roof_rights}</span>
+                  <span className="text-xs font-medium text-[#737373]">Roof Rights:</span>
+                  <span className="text-sm text-[#a3a3a3]">{building.roof_rights}</span>
                 </div>
               )}
               {building.condition && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Condition:</span>
-                  <span className="text-sm text-gray-900">{pretty(building.condition)}</span>
+                  <span className="text-xs font-medium text-[#737373]">Condition:</span>
+                  <span className="text-sm text-[#a3a3a3]">{pretty(building.condition)}</span>
                 </div>
               )}
               {building.status && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Status:</span>
-                  <span className="text-sm text-gray-900">{pretty(building.status)}</span>
+                  <span className="text-xs font-medium text-[#737373]">Status:</span>
+                  <span className="text-sm text-[#a3a3a3]">{pretty(building.status)}</span>
                 </div>
               )}
               {building.category && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Category:</span>
-                  <span className="text-sm text-gray-900">{pretty(building.category)}</span>
+                  <span className="text-xs font-medium text-[#737373]">Category:</span>
+                  <span className="text-sm text-[#a3a3a3]">{pretty(building.category)}</span>
                 </div>
               )}
               {building.possession_date && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Possession:</span>
-                  <span className="text-sm text-gray-900">{building.possession_date}</span>
+                  <span className="text-xs font-medium text-[#737373]">Possession:</span>
+                  <span className="text-sm text-[#a3a3a3]">{building.possession_date}</span>
                 </div>
               )}
               {building.owner_name && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Owner:</span>
-                  <span className="text-sm text-gray-900">{building.owner_name}</span>
+                  <span className="text-xs font-medium text-[#737373]">Owner:</span>
+                  <span className="text-sm text-[#a3a3a3]">{building.owner_name}</span>
                 </div>
               )}
               {building.price_top && (
-                <div className="flex items-center justify-between pt-1 border-t border-gray-200">
-                  <span className="text-xs font-medium text-gray-600">Top Floor:</span>
-                  <span className="text-sm text-gray-900 font-semibold">
+                <div className="flex items-center justify-between pt-1 border-t border-[#2a2a2a]">
+                  <span className="text-xs font-medium text-[#737373]">Top Floor:</span>
+                  <span className="text-sm text-[#a3a3a3] font-semibold">
                     ₹{Number(building.price_top).toLocaleString('en-IN')} Cr
                   </span>
                 </div>
               )}
               {building.price_mid1 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Mid Floor 1:</span>
-                  <span className="text-sm text-gray-900">
+                  <span className="text-xs font-medium text-[#737373]">Mid Floor 1:</span>
+                  <span className="text-sm text-[#a3a3a3]">
                     ₹{Number(building.price_mid1).toLocaleString('en-IN')} Cr
                   </span>
                 </div>
               )}
               {building.price_mid2 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">Mid Floor 2:</span>
-                  <span className="text-sm text-gray-900">
+                  <span className="text-xs font-medium text-[#737373]">Mid Floor 2:</span>
+                  <span className="text-sm text-[#a3a3a3]">
                     ₹{Number(building.price_mid2).toLocaleString('en-IN')} Cr
                   </span>
                 </div>
               )}
               {building.price_ug && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-600">UG Floor:</span>
-                  <span className="text-sm text-gray-900">
+                  <span className="text-xs font-medium text-[#737373]">UG Floor:</span>
+                  <span className="text-sm text-[#a3a3a3]">
                     ₹{Number(building.price_ug).toLocaleString('en-IN')} Cr
                   </span>
                 </div>
               )}
               {(building.has_basement || building.is_triplex || building.is_gated) && (
-                <div className="pt-1 border-t border-gray-200">
+                <div className="pt-1 border-t border-[#2a2a2a]">
                   <div className="flex flex-wrap gap-2">
                     {building.has_basement && (
-                      <span className={`text-xs px-2 py-1 ${getBadgeBgColor()} text-gray-800 rounded`}>
+                      <span className={`text-xs px-2 py-1 ${getBadgeBgColor()} rounded`}>
                         Basement
                       </span>
                     )}
                     {building.is_triplex && (
-                      <span className={`text-xs px-2 py-1 ${getBadgeBgColor()} text-gray-800 rounded`}>
+                      <span className={`text-xs px-2 py-1 ${getBadgeBgColor()} rounded`}>
                         Triplex
                       </span>
                     )}
                     {building.is_gated && (
-                      <span className={`text-xs px-2 py-1 ${getBadgeBgColor()} text-gray-800 rounded`}>
+                      <span className={`text-xs px-2 py-1 ${getBadgeBgColor()} rounded`}>
                         Gated
                       </span>
                     )}
@@ -245,18 +238,18 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
                 </div>
               )}
               {building.comments && (
-                <div className="pt-1 border-t border-gray-200">
-                  <span className="text-xs font-medium text-gray-600">Notes:</span>
-                  <p className="text-xs text-gray-700 mt-1 whitespace-pre-line line-clamp-3">{building.comments}</p>
+                <div className="pt-1 border-t border-[#2a2a2a]">
+                  <span className="text-xs font-medium text-[#737373]">Notes:</span>
+                  <p className="text-xs text-[#a3a3a3] mt-1 whitespace-pre-line line-clamp-3">{building.comments}</p>
                 </div>
               )}
               {building.brochure_url && (
-                <div className="pt-2 border-t border-gray-200">
+                <div className="pt-2 border-t border-[#2a2a2a]">
                   <a
                     href={building.brochure_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center justify-center gap-2 w-full px-3 py-2 ${getBrochureButtonBgColor()} text-gray-800 rounded-lg text-xs font-semibold transition`}
+                    className={`flex items-center justify-center gap-2 ${getBrochureButtonBgColor()}`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -274,10 +267,10 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 surface-elevated border border-[#2a2a2a] rounded-full p-2 hover:border-[#c9a227] transition"
           aria-label="Scroll right"
         >
-          <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#a3a3a3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -286,20 +279,20 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
       {/* Modal for building details */}
       {selectedBuilding && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
           onClick={closeModal}
         >
-          <div 
-            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+          <div
+            className="card-luxury rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#2a2a2a]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">
+            <div className="sticky top-0 section-surface border-b border-[#2a2a2a] px-6 py-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold font-serif-display text-[#f5f5f5]">
                 Building {selectedBuilding.building_number || selectedBuilding.index + 1} - Full Details
               </h3>
               <button
                 onClick={closeModal}
-                className="text-gray-500 hover:text-gray-700 transition"
+                className="text-[#737373] hover:text-[#f5f5f5] transition"
                 aria-label="Close"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,9 +303,9 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
             
             <div className="p-6 space-y-4">
               {selectedBuilding.plot_size && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Plot Size:</span>
-                  <span className="text-base text-gray-900">
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Plot Size:</span>
+                  <span className="text-base text-[#f5f5f5]">
                     {selectedBuilding.plot_size.toLowerCase().includes('sqyd') 
                       ? selectedBuilding.plot_size 
                       : `${selectedBuilding.plot_size} sqyd`}
@@ -320,86 +313,86 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
                 </div>
               )}
               {selectedBuilding.facing && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Facing:</span>
-                  <span className="text-base text-gray-900">{selectedBuilding.facing}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Facing:</span>
+                  <span className="text-base text-[#f5f5f5]">{selectedBuilding.facing}</span>
                 </div>
               )}
               {selectedBuilding.floors_count && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Floors:</span>
-                  <span className="text-base text-gray-900">{selectedBuilding.floors_count}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Floors:</span>
+                  <span className="text-base text-[#f5f5f5]">{selectedBuilding.floors_count}</span>
                 </div>
               )}
               {selectedBuilding.roof_rights && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Roof Rights:</span>
-                  <span className="text-base text-gray-900">{selectedBuilding.roof_rights}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Roof Rights:</span>
+                  <span className="text-base text-[#f5f5f5]">{selectedBuilding.roof_rights}</span>
                 </div>
               )}
               {selectedBuilding.condition && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Condition:</span>
-                  <span className="text-base text-gray-900">{pretty(selectedBuilding.condition)}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Condition:</span>
+                  <span className="text-base text-[#f5f5f5]">{pretty(selectedBuilding.condition)}</span>
                 </div>
               )}
               {selectedBuilding.status && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Status:</span>
-                  <span className="text-base text-gray-900">{pretty(selectedBuilding.status)}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Status:</span>
+                  <span className="text-base text-[#f5f5f5]">{pretty(selectedBuilding.status)}</span>
                 </div>
               )}
               {selectedBuilding.category && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Category:</span>
-                  <span className="text-base text-gray-900">{pretty(selectedBuilding.category)}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Category:</span>
+                  <span className="text-base text-[#f5f5f5]">{pretty(selectedBuilding.category)}</span>
                 </div>
               )}
               {selectedBuilding.possession_date && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Possession:</span>
-                  <span className="text-base text-gray-900">{selectedBuilding.possession_date}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Possession:</span>
+                  <span className="text-base text-[#f5f5f5]">{selectedBuilding.possession_date}</span>
                 </div>
               )}
               {selectedBuilding.owner_name && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                  <span className="text-sm font-semibold text-gray-700">Owner:</span>
-                  <span className="text-base text-gray-900">{selectedBuilding.owner_name}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[#2a2a2a]">
+                  <span className="text-sm font-semibold text-[#a3a3a3]">Owner:</span>
+                  <span className="text-base text-[#f5f5f5]">{selectedBuilding.owner_name}</span>
                 </div>
               )}
               
               {(selectedBuilding.price_top || selectedBuilding.price_mid1 || selectedBuilding.price_mid2 || selectedBuilding.price_ug) && (
-                <div className="py-3 border-t-2 border-gray-300">
-                  <h4 className="text-base font-bold text-gray-900 mb-3">Pricing</h4>
+                <div className="py-3 border-t-2 border-[#2a2a2a]">
+                  <h4 className="text-base font-bold font-serif-display text-[#f5f5f5] mb-3">Pricing</h4>
                   <div className="space-y-2">
                     {selectedBuilding.price_top && (
-                      <div className="flex items-center justify-between py-2 bg-gray-50 rounded px-3">
-                        <span className="text-sm font-medium text-gray-700">Top Floor:</span>
-                        <span className="text-base text-gray-900 font-semibold">
+                      <div className="flex items-center justify-between py-2 card-luxury rounded px-3">
+                        <span className="text-sm font-medium text-[#737373]">Top Floor:</span>
+                        <span className="text-base text-[#f5f5f5] font-semibold">
                           ₹{Number(selectedBuilding.price_top).toLocaleString('en-IN')} Cr
                         </span>
                       </div>
                     )}
                     {selectedBuilding.price_mid1 && (
-                      <div className="flex items-center justify-between py-2 bg-gray-50 rounded px-3">
-                        <span className="text-sm font-medium text-gray-700">Mid Floor 1:</span>
-                        <span className="text-base text-gray-900 font-semibold">
+                      <div className="flex items-center justify-between py-2 card-luxury rounded px-3">
+                        <span className="text-sm font-medium text-[#737373]">Mid Floor 1:</span>
+                        <span className="text-base text-[#f5f5f5] font-semibold">
                           ₹{Number(selectedBuilding.price_mid1).toLocaleString('en-IN')} Cr
                         </span>
                       </div>
                     )}
                     {selectedBuilding.price_mid2 && (
-                      <div className="flex items-center justify-between py-2 bg-gray-50 rounded px-3">
-                        <span className="text-sm font-medium text-gray-700">Mid Floor 2:</span>
-                        <span className="text-base text-gray-900 font-semibold">
+                      <div className="flex items-center justify-between py-2 card-luxury rounded px-3">
+                        <span className="text-sm font-medium text-[#737373]">Mid Floor 2:</span>
+                        <span className="text-base text-[#f5f5f5] font-semibold">
                           ₹{Number(selectedBuilding.price_mid2).toLocaleString('en-IN')} Cr
                         </span>
                       </div>
                     )}
                     {selectedBuilding.price_ug && (
-                      <div className="flex items-center justify-between py-2 bg-gray-50 rounded px-3">
-                        <span className="text-sm font-medium text-gray-700">UG Floor:</span>
-                        <span className="text-base text-gray-900 font-semibold">
+                      <div className="flex items-center justify-between py-2 card-luxury rounded px-3">
+                        <span className="text-sm font-medium text-[#737373]">UG Floor:</span>
+                        <span className="text-base text-[#f5f5f5] font-semibold">
                           ₹{Number(selectedBuilding.price_ug).toLocaleString('en-IN')} Cr
                         </span>
                       </div>
@@ -409,20 +402,20 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
               )}
 
               {(selectedBuilding.has_basement || selectedBuilding.is_triplex || selectedBuilding.is_gated) && (
-                <div className="py-3 border-t border-gray-200">
+                <div className="py-3 border-t border-[#2a2a2a]">
                   <div className="flex flex-wrap gap-2">
                     {selectedBuilding.has_basement && (
-                      <span className={`text-sm px-3 py-1.5 ${getBadgeBgColor()} text-gray-800 rounded`}>
+                      <span className={`text-sm px-3 py-1.5 ${getBadgeBgColor()} rounded`}>
                         Basement
                       </span>
                     )}
                     {selectedBuilding.is_triplex && (
-                      <span className={`text-sm px-3 py-1.5 ${getBadgeBgColor()} text-gray-800 rounded`}>
+                      <span className={`text-sm px-3 py-1.5 ${getBadgeBgColor()} rounded`}>
                         Triplex
                       </span>
                     )}
                     {selectedBuilding.is_gated && (
-                      <span className={`text-sm px-3 py-1.5 ${getBadgeBgColor()} text-gray-800 rounded`}>
+                      <span className={`text-sm px-3 py-1.5 ${getBadgeBgColor()} rounded`}>
                         Gated
                       </span>
                     )}
@@ -431,10 +424,10 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
               )}
 
               {selectedBuilding.comments && (
-                <div className="py-3 border-t-2 border-gray-300">
-                  <h4 className="text-base font-bold text-gray-900 mb-3">Additional Notes</h4>
+                <div className="py-3 border-t-2 border-[#2a2a2a]">
+                  <h4 className="text-base font-bold font-serif-display text-[#f5f5f5] mb-3">Additional Notes</h4>
                   <div className={`rounded-lg p-4 ${getCardBgColor()}`}>
-                    <p className="text-sm text-gray-800 whitespace-pre-line leading-relaxed">
+                    <p className="text-sm text-[#a3a3a3] whitespace-pre-line leading-relaxed">
                       {selectedBuilding.comments}
                     </p>
                   </div>
@@ -442,12 +435,12 @@ export default function BuildingConfigurationSlider({ buildingConfig, status }) 
               )}
 
               {selectedBuilding.brochure_url && (
-                <div className="pt-3 border-t border-gray-200">
+                <div className="pt-3 border-t border-[#2a2a2a]">
                   <a
                     href={selectedBuilding.brochure_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center justify-center gap-2 w-full px-4 py-3 ${getBrochureButtonBgColor()} text-gray-800 rounded-lg text-sm font-semibold transition`}
+                    className={`flex items-center justify-center gap-2 ${getBrochureButtonBgColor()} text-sm`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />

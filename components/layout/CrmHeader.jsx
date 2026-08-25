@@ -4,9 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import UserButtonWrapper from '@/app/builder-floor/UserButtonWrapper'
-
-const navItem =
-  'h-full px-3 sm:px-4 flex items-center text-gray-700 hover:text-[#c99700] hover:bg-gray-100 transition whitespace-nowrap'
+import '@/app/crm/crm-theme.css'
 
 export default function CrmHeader() {
   const [isAdmin, setIsAdmin] = useState(false)
@@ -28,7 +26,7 @@ export default function CrmHeader() {
   }, [])
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <header className="crm-header sticky top-0 z-50">
       <div className="container mx-auto px-3 sm:px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
           <Link href="/crm" className="flex items-center gap-2">
@@ -47,7 +45,7 @@ export default function CrmHeader() {
               >
                 RKG
               </span>
-              <span className="text-sm sm:text-base font-bold text-gray-900">
+              <span className="crm-brand-sub text-sm sm:text-base font-bold">
                 CRM
               </span>
             </div>
@@ -55,15 +53,15 @@ export default function CrmHeader() {
 
           <div className="flex items-center h-full">
             <nav className="hidden md:flex items-center h-full">
-              <Link href="/crm" className={navItem}>
+              <Link href="/crm" className="crm-nav-link h-full px-3 sm:px-4 flex items-center transition whitespace-nowrap">
                 Leads
               </Link>
               {isAdmin ? (
                 <>
-                  <Link href="/crm/add" className={navItem}>
+                  <Link href="/crm/add" className="crm-nav-link h-full px-3 sm:px-4 flex items-center transition whitespace-nowrap">
                     Add Lead
                   </Link>
-                  <Link href="/crm/import" className={navItem}>
+                  <Link href="/crm/import" className="crm-nav-link h-full px-3 sm:px-4 flex items-center transition whitespace-nowrap">
                     Import CSV
                   </Link>
                 </>
@@ -78,7 +76,7 @@ export default function CrmHeader() {
         <nav className="md:hidden pb-3 flex items-center gap-2 overflow-x-auto">
           <Link
             href="/crm"
-            className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
+            className="crm-nav-pill px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition"
           >
             Leads
           </Link>
@@ -86,13 +84,13 @@ export default function CrmHeader() {
             <>
               <Link
                 href="/crm/add"
-                className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
+                className="crm-nav-pill px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition"
               >
                 Add Lead
               </Link>
               <Link
                 href="/crm/import"
-                className="px-3 py-2 rounded-lg text-sm font-semibold bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 whitespace-nowrap"
+                className="crm-nav-pill px-3 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition"
               >
                 Import CSV
               </Link>
@@ -103,4 +101,3 @@ export default function CrmHeader() {
     </header>
   )
 }
-

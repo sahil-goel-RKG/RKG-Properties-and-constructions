@@ -1,0 +1,383 @@
+/* Admin dark theme — matches site/CRM luxury shell; badge color coding preserved */
+
+.admin-scope,
+.admin-login-scope {
+  --admin-bg: #0a0a0a;
+  --admin-surface: #141414;
+  --admin-surface-elevated: #1e1e1e;
+  --admin-surface-muted: #242424;
+  --admin-border: #2a2a2a;
+  --admin-text: #f5f5f5;
+  --admin-text-muted: #a3a3a3;
+  --admin-text-subtle: #737373;
+  --admin-gold: #c9a227;
+  --admin-gold-hover: #e0b840;
+  --admin-gold-dark: #a67800;
+  color: var(--admin-text);
+}
+
+.admin-scope {
+  background: var(--admin-bg);
+}
+
+.admin-login-scope {
+  background: var(--admin-bg);
+  min-height: 100vh;
+}
+
+.admin-scope h1,
+.admin-scope h2,
+.admin-scope h3,
+.admin-scope h4,
+.admin-scope .admin-heading {
+  color: var(--admin-text);
+}
+
+/* Typography — table cells handled separately */
+.admin-scope .text-gray-900:not(table tbody *) {
+  color: var(--admin-text) !important;
+}
+
+.admin-scope .text-gray-700:not(table tbody *) {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-scope .text-gray-600 {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-scope .text-gray-500:not(table tbody *) {
+  color: var(--admin-text-subtle) !important;
+}
+
+.admin-scope .text-gray-400 {
+  color: #525252 !important;
+}
+
+/* Surfaces */
+.admin-scope .bg-white {
+  background-color: var(--admin-surface-elevated) !important;
+}
+
+.admin-scope .bg-gray-50 {
+  background-color: var(--admin-surface-muted) !important;
+}
+
+.admin-scope .bg-gray-100:not(.text-gray-800) {
+  background-color: #2a2a2a !important;
+}
+
+.admin-scope .bg-gray-200 {
+  background-color: var(--admin-surface-muted) !important;
+}
+
+.admin-scope .hover\:bg-gray-50:hover {
+  background-color: #2a2a2a !important;
+}
+
+.admin-scope .hover\:bg-gray-100:hover {
+  background-color: #333333 !important;
+}
+
+.admin-scope .bg-\[\#fff5d6\] {
+  background-color: rgba(201, 162, 39, 0.15) !important;
+}
+
+.admin-scope .text-\[\#a67800\]:not(.golden-text) {
+  color: var(--admin-gold) !important;
+}
+
+/* Borders & dividers */
+.admin-scope .border-gray-100,
+.admin-scope .border-gray-200,
+.admin-scope .border-gray-300,
+.admin-scope .border-gray-400 {
+  border-color: var(--admin-border) !important;
+}
+
+.admin-scope .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--admin-border) !important;
+}
+
+/* Forms */
+.admin-scope input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.admin-scope textarea,
+.admin-scope select {
+  color: var(--admin-text) !important;
+  background-color: var(--admin-surface-elevated) !important;
+  border-color: var(--admin-border) !important;
+  caret-color: var(--admin-text) !important;
+  -webkit-text-fill-color: var(--admin-text) !important;
+}
+
+.admin-scope input::placeholder,
+.admin-scope textarea::placeholder {
+  color: var(--admin-text-subtle) !important;
+  opacity: 1 !important;
+}
+
+.admin-scope input:focus,
+.admin-scope textarea:focus,
+.admin-scope select:focus {
+  outline: none;
+  border-color: var(--admin-gold) !important;
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.25);
+}
+
+.admin-scope input:disabled,
+.admin-scope select:disabled,
+.admin-scope textarea:disabled {
+  background-color: var(--admin-surface-muted) !important;
+  color: var(--admin-text-subtle) !important;
+  -webkit-text-fill-color: var(--admin-text-subtle) !important;
+}
+
+.admin-scope input[type='date'],
+.admin-scope input[type='datetime-local'] {
+  color-scheme: dark;
+}
+
+.admin-scope input[type='file'] {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-scope input[type='file']::file-selector-button {
+  background-color: var(--admin-surface-elevated);
+  color: var(--admin-text);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-right: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.admin-scope input[type='file']::file-selector-button:hover {
+  background-color: #2a2a2a;
+}
+
+.admin-scope code {
+  background-color: var(--admin-surface-muted);
+  color: var(--admin-text-muted);
+  border: 1px solid var(--admin-border);
+}
+
+/* Tables */
+.admin-scope table thead {
+  background-color: var(--admin-surface-muted) !important;
+}
+
+.admin-scope table thead th {
+  color: var(--admin-text-subtle) !important;
+}
+
+.admin-scope table tbody {
+  background-color: var(--admin-surface-elevated) !important;
+}
+
+.admin-scope table tbody tr:hover {
+  background-color: #2a2a2a !important;
+}
+
+.admin-scope table tbody td,
+.admin-scope table tbody td .text-gray-500,
+.admin-scope table tbody td .text-gray-700,
+.admin-scope table tbody td .text-gray-600 {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-scope table tbody td .text-gray-900,
+.admin-scope table tbody td .font-medium {
+  color: var(--admin-text) !important;
+}
+
+.admin-scope table tbody td details summary:hover {
+  color: var(--admin-text) !important;
+}
+
+/* Status/priority/response badges in tables — dark text on light pills */
+.admin-scope table tbody td span.rounded-full[class*='bg-blue-100'],
+.admin-scope table tbody td span.rounded-full[class*='text-blue-800'] {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  -webkit-text-fill-color: #1e40af !important;
+}
+
+.admin-scope table tbody td span.rounded-full[class*='bg-yellow-100'],
+.admin-scope table tbody td span.rounded-full[class*='text-yellow-800'] {
+  background-color: #fef9c3 !important;
+  color: #854d0e !important;
+  -webkit-text-fill-color: #854d0e !important;
+}
+
+.admin-scope table tbody td span.rounded-full[class*='bg-green-100'],
+.admin-scope table tbody td span.rounded-full[class*='text-green-800'] {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  -webkit-text-fill-color: #166534 !important;
+}
+
+.admin-scope table tbody td span.rounded-full[class*='bg-red-100'],
+.admin-scope table tbody td span.rounded-full[class*='text-red-800'] {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  -webkit-text-fill-color: #991b1b !important;
+}
+
+.admin-scope table tbody td span.rounded-full[class*='bg-orange-100'],
+.admin-scope table tbody td span.rounded-full[class*='text-orange-800'] {
+  background-color: #ffedd5 !important;
+  color: #9a3412 !important;
+  -webkit-text-fill-color: #9a3412 !important;
+}
+
+.admin-scope table tbody td span.rounded-full[class*='bg-gray-100'],
+.admin-scope table tbody td span.rounded-full[class*='text-gray-800'] {
+  background-color: #f3f4f6 !important;
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* Row action buttons */
+.admin-scope table tbody td button.bg-\[\#c99700\],
+.admin-scope table tbody td button.bg-green-600,
+.admin-scope table tbody td button.bg-gray-600 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Alerts */
+.admin-scope .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.25) !important;
+}
+
+.admin-scope .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+.admin-scope .border-red-200 {
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+.admin-scope .bg-green-50 {
+  background-color: rgba(20, 83, 45, 0.25) !important;
+}
+
+.admin-scope .text-green-700 {
+  color: #86efac !important;
+}
+
+.admin-scope .text-green-800:not(span.rounded-full):not([class*='bg-green-100']) {
+  color: #86efac !important;
+}
+
+.admin-scope .border-green-200 {
+  border-color: rgba(74, 222, 128, 0.35) !important;
+}
+
+/* Preserve action button colors */
+.admin-scope .bg-green-600 {
+  background-color: #16a34a !important;
+}
+
+.admin-scope .hover\:bg-green-700:hover {
+  background-color: #15803d !important;
+}
+
+.admin-scope .bg-gray-600 {
+  background-color: #525252 !important;
+}
+
+.admin-scope .hover\:bg-gray-700:hover {
+  background-color: #404040 !important;
+}
+
+/* Status & priority badge color coding — keep intact */
+.admin-scope .bg-blue-100 {
+  background-color: #dbeafe !important;
+}
+
+.admin-scope .text-blue-800 {
+  color: #1e40af !important;
+}
+
+.admin-scope .bg-yellow-100 {
+  background-color: #fef9c3 !important;
+}
+
+.admin-scope .text-yellow-800 {
+  color: #854d0e !important;
+}
+
+.admin-scope .bg-green-100 {
+  background-color: #dcfce7 !important;
+}
+
+.admin-scope span.bg-green-100.text-green-800,
+.admin-scope .bg-green-100.text-green-800 {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.admin-scope .bg-red-100 {
+  background-color: #fee2e2 !important;
+}
+
+.admin-scope .text-red-800 {
+  color: #991b1b !important;
+}
+
+.admin-scope .bg-orange-100 {
+  background-color: #ffedd5 !important;
+}
+
+.admin-scope .text-orange-800 {
+  color: #9a3412 !important;
+}
+
+.admin-scope span.bg-gray-100.text-gray-800,
+.admin-scope .bg-gray-100.text-gray-800 {
+  background-color: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
+/* Admin header */
+.admin-header {
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--admin-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.admin-header .admin-nav-link {
+  color: var(--admin-text-muted);
+}
+
+.admin-header .admin-nav-link:hover {
+  color: var(--admin-gold);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-header .admin-nav-pill {
+  background: var(--admin-surface-elevated);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+}
+
+.admin-header .admin-nav-pill:hover {
+  background: #2a2a2a;
+  border-color: rgba(201, 162, 39, 0.35);
+}
+
+.admin-header .admin-brand-sub {
+  color: var(--admin-text);
+}
+
+/* Login */
+.admin-login-scope h1 {
+  color: var(--admin-text);
+}
+
+.admin-login-scope p {
+  color: var(--admin-text-muted);
+}

@@ -176,13 +176,12 @@ export default async function DeveloperPropertiesPage({ params, searchParams }) 
   const uniqueTypes = [...new Set(projects.map(p => p.type).filter(Boolean))]
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16">
+    <div className="page-shell py-16">
       <div className="container mx-auto px-4">
-        {/* Developer Header */}
-        <div className="mb-8 bg-white rounded-lg shadow-md p-6">
+        <div className="mb-8 card-luxury p-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {logo && (
-              <div className="relative w-24 h-24 bg-gray-100 rounded-lg p-3 flex-shrink-0">
+              <div className="relative w-24 h-24 surface-elevated rounded-lg p-3 flex-shrink-0">
                 <Image
                   src={logo}
                   alt={developerName}
@@ -192,27 +191,27 @@ export default async function DeveloperPropertiesPage({ params, searchParams }) 
               </div>
             )}
             <div className="flex-1 text-center md:text-left">
-              <nav className="mb-4 text-sm text-gray-600">
-                <Link href="/" className="hover:text-[#c99700]">
+              <nav className="mb-4 text-sm text-[#a3a3a3]">
+                <Link href="/" className="golden-text hover:underline">
                   Home
                 </Link>
                 {' / '}
-                <Link href={`/developers/${slug}`} className="hover:text-[#c99700]">
+                <Link href={`/developers/${slug}`} className="golden-text hover:underline">
                   Developers
                 </Link>
                 {' / '}
-                <span className="text-gray-900">Properties</span>
+                <span className="text-[#f5f5f5]">Properties</span>
               </nav>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold font-serif-display text-[#f5f5f5] mb-2">
                 {developerName} Properties
               </h1>
-              <p className="text-gray-600">
+              <p className="text-[#a3a3a3]">
                 Browse all properties by {developerName}
               </p>
             </div>
             <Link
               href={`/developers/${slug}`}
-              className="text-[#c99700] hover:text-[#a67800] font-medium hover:underline"
+              className="golden-text hover:underline font-medium"
             >
               ← Back to Developer
             </Link>
@@ -234,15 +233,15 @@ export default async function DeveloperPropertiesPage({ params, searchParams }) 
 
         {/* Active Filters Display */}
         {hasFilters && (
-          <div className="mb-6 bg-[#fff5d6] border border-[#f2cd6d] rounded-lg p-4">
+          <div className="mb-6 alert-success">
             <div className="flex flex-wrap items-center gap-4">
-              <span className="text-sm font-medium text-gray-700">Active Filters:</span>
+              <span className="text-sm font-medium text-[#a3a3a3]">Active Filters:</span>
               {locationFilter && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c99700] text-white rounded-full text-sm">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#0a0a0a] rounded-full text-sm font-semibold">
                   Location: {locationFilter}
                   <Link
                     href={getClearFilterUrl('location')}
-                    className="hover:text-[#fff5d6]"
+                    className="hover:text-[#f5f5f5]"
                     title="Remove filter"
                   >
                     ×
@@ -250,11 +249,11 @@ export default async function DeveloperPropertiesPage({ params, searchParams }) 
                 </span>
               )}
               {areaFilter && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c99700] text-white rounded-full text-sm">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#0a0a0a] rounded-full text-sm font-semibold">
                   Area: {areaFilter}
                   <Link
                     href={getClearFilterUrl('area')}
-                    className="hover:text-[#fff5d6]"
+                    className="hover:text-[#f5f5f5]"
                     title="Remove filter"
                   >
                     ×
@@ -262,11 +261,11 @@ export default async function DeveloperPropertiesPage({ params, searchParams }) 
                 </span>
               )}
               {typeFilter && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c99700] text-white rounded-full text-sm">
+                <span className="inline-flex items-center gap-2 px-3 py-1 bg-[#c9a227] text-[#0a0a0a] rounded-full text-sm font-semibold">
                   Type: {typeFilter}
                   <Link
                     href={getClearFilterUrl('type')}
-                    className="hover:text-[#fff5d6]"
+                    className="hover:text-[#f5f5f5]"
                     title="Remove filter"
                   >
                     ×
@@ -279,34 +278,34 @@ export default async function DeveloperPropertiesPage({ params, searchParams }) 
 
         {projects.length > 0 ? (
           <>
-            <div className="mb-6 text-gray-600">
+            <div className="mb-6 text-[#a3a3a3]">
               <p>
                 {projects.length} {projects.length === 1 ? 'property' : 'properties'} found
                 {hasFilters && ` (${filterText.join(', ')})`}
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {projects.map((project) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>
           </>
         ) : (
-          <div className="text-center py-12 bg-white rounded-lg shadow-md">
+          <div className="text-center py-12 card-luxury rounded-lg">
             {hasFilters ? (
               <>
-                <p className="text-gray-600 mb-4">
+                <p className="text-[#a3a3a3] mb-4">
                   No properties found {hasFilters && `with ${filterText.join(' and ')}`}.
                 </p>
                 <Link
                   href={`/developers/${slug}/properties`}
-                  className="inline-block golden-text hover:text-[#a67800] hover:underline"
+                  className="golden-text hover:underline"
                 >
                   View all {developerName} properties
                 </Link>
               </>
             ) : (
-              <p className="text-gray-600 mb-4">
+              <p className="text-[#a3a3a3] mb-4">
                 No properties found for {developerName}. Please check back later.
               </p>
             )}

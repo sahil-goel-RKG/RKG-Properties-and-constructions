@@ -194,8 +194,7 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
           <input
             value={lead.customer_name || ''}
             readOnly
-            className={`${INPUT} bg-gray-50`}
-            style={{ color: '#111827' }}
+            className={`${INPUT} crm-readonly`}
           />
         </div>
 
@@ -204,8 +203,7 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
           <input
             value={lead.phone || ''}
             readOnly
-            className={`${INPUT} bg-gray-50`}
-            style={{ color: '#111827' }}
+            className={`${INPUT} crm-readonly`}
           />
         </div>
 
@@ -216,7 +214,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             onChange={(e) => setLocation(e.target.value)}
             className={INPUT}
             placeholder="e.g. Gurgaon"
-            style={{ color: '#111827' }}
           />
         </div>
 
@@ -226,7 +223,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={assignedToEmployeeId}
             onChange={(e) => setAssignedToEmployeeId(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
             disabled={assignmentLocked}
           >
             <option value="">Select</option>
@@ -251,7 +247,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={initialAssessment}
             onChange={(e) => setInitialAssessment(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           >
             <option value="">Select</option>
             {assessmentOptions.map((v) => (
@@ -268,7 +263,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={ucRtm}
             onChange={(e) => setUcRtm(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           >
             <option value="">Select</option>
             <option value="UC">UC</option>
@@ -284,7 +278,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={agreedWalkIn}
             onChange={(e) => setAgreedWalkIn(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           >
             <option value="">Select</option>
             <option value="YES">YES</option>
@@ -300,7 +293,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={endUseInvestment}
             onChange={(e) => setEndUseInvestment(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           >
             <option value="">Select</option>
             <option value="End Use">End Use</option>
@@ -316,7 +308,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={bhkInterestedIn}
             onChange={(e) => setBhkInterestedIn(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           >
             <option value="">Select</option>
             <option value="2 BHK">2 BHK</option>
@@ -336,7 +327,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={followUpDate}
             onChange={(e) => setFollowUpDate(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           />
         </div>
 
@@ -349,7 +339,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             value={followUpTime}
             onChange={(e) => setFollowUpTime(e.target.value)}
             className={SELECT}
-            style={{ color: '#111827' }}
           />
         </div>
 
@@ -362,7 +351,6 @@ export default function CrmLeadEditor({ lead, isAdmin: isAdminProp, returnHref: 
             onChange={(e) => setProjectsInterested(e.target.value)}
             className={INPUT}
             placeholder="e.g. The Camellias, Elan The Statement"
-            style={{ color: '#111827' }}
           />
         </div>
       </div>
