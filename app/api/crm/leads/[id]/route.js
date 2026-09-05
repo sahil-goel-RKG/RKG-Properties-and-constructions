@@ -43,6 +43,24 @@ function isWhitelistedAdminEmail(email) {
   return list.includes(String(email || '').trim().toLowerCase())
 }
 
+function isMissingWhatsappRemindedColumn(error) {
+  const msg = String(error?.message || '')
+  return msg.includes("follow_up_whatsapp_reminded_at")
+}
+
+function normalizeDateForCompare(value) {
+  if (value == null || value === '') return ''
+  return String(value).slice(0, 10)
+}
+
+function normalizeTimeForCompare(value) {
+  if (value == null || value === '') return ''
+  const s = String(value).trim()
+  const m = s.match(/^(\d{1,2}):(\d{2})/)
+  if (!m) return s
+  return `${String(Number(m[1])).padStart(2, '0')}:${m[2]}`
+}
+
 async function employeeNameForId(db, employeeId) {
   if (!employeeId) return null
   const { data } = await db
@@ -140,13 +158,6 @@ export async function PATCH(request, { params }) {
       }
     }
   }
-  // If follow-up schedule changed, allow a fresh WhatsApp reminder
-  if (
-    Object.prototype.hasOwnProperty.call(update, 'follow_up_date') ||
-    Object.prototype.hasOwnProperty.call(update, 'follow_up_time')
-  ) {
-    update.follow_up_whatsapp_reminded_at = null
-  }
   if (typeof body?.remarks === 'string') {
     update.remarks = normalizeOptionalString(body.remarks)
   }
@@ -178,14 +189,58 @@ export async function PATCH(request, { params }) {
   if (Object.prototype.hasOwnProperty.call(update, 'assigned_to_employee_id')) {
     update.assigned_to_name = await employeeNameForId(db, update.assigned_to_employee_id)
   }
-  const { data, error } = await db
+
+  // Reset WhatsApp reminder stamp only when follow-up actually changes.
+  // The live table may not have follow_up_whatsapp_reminded_at yet.
+  const followUpFieldsInPayload =
+    Object.prototype.hasOwnProperty.call(update, 'follow_up_date') ||
+    Object.prototype.hasOwnProperty.call(update, 'follow_up_time')
+  if (followUpFieldsInPayload) {
+    const { data: existingFollowUp } = await db
+      .from('crm_leads')
+      .select('follow_up_date, follow_up_time')
+      .eq('id', id)
+      .single()
+
+    const nextDate = Object.prototype.hasOwnProperty.call(update, 'follow_up_date')
+      ? update.follow_up_date
+      : existingFollowUp?.follow_up_date
+    const nextTime = Object.prototype.hasOwnProperty.call(update, 'follow_up_time')
+      ? update.follow_up_time
+      : existingFollowUp?.follow_up_time
+
+    const followUpChanged =
+      normalizeDateForCompare(existingFollowUp?.follow_up_date) !==
+        normalizeDateForCompare(nextDate) ||
+      normalizeTimeForCompare(existingFollowUp?.follow_up_time) !==
+        normalizeTimeForCompare(nextTime)
+
+    if (followUpChanged) {
+      update.follow_up_whatsapp_reminded_at = null
+    }
+  }
+
+  const leadSelect =
+    'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, follow_up_time, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
+
+  let { data, error } = await db
     .from('crm_leads')
     .update(update)
     .eq('id', id)
-    .select(
-      'id, excel_name, source, location, customer_name, phone, initial_assessment, projects_interested, uc_rtm, agreed_walk_in, end_use_investment, bhk_interested_in, follow_up_date, follow_up_time, remarks, assigned_to_employee_id, assigned_to_name, created_at, updated_at'
-    )
+    .select(leadSelect)
     .single()
+
+  if (error && isMissingWhatsappRemindedColumn(error) && 'follow_up_whatsapp_reminded_at' in update) {
+    delete update.follow_up_whatsapp_reminded_at
+    const retry = await db
+      .from('crm_leads')
+      .update(update)
+      .eq('id', id)
+      .select(leadSelect)
+      .single()
+    data = retry.data
+    error = retry.error
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
